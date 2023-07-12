@@ -2,6 +2,8 @@ Please always provide the [GitHub issue(s)](../issues) your PR is for, as well a
 
 Fix #<gh-issue-id>
 
+If you introduces a new block/varaint, please update the block library <add link>
+
 Test URLs:
 - Before: https://main--stewart--hlxsites.hlx.page/
 - After: https://<branch>--stewart--hlxsites.hlx.page/
