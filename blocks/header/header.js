@@ -133,7 +133,7 @@ export default async function decorate(block) {
       'aria-controls': 'nav',
       'aria-label': 'Open navigation',
     }, createElement('span', {
-      class: 'nav-hamburger-icon'
+      class: 'nav-hamburger-icon',
     })));
 
     hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
