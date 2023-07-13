@@ -72,6 +72,13 @@
   --nav-height: 58px;
 }
 
+@media (min-width: 900px) {
+  :root {
+     /* nav height */
+    --nav-height: 158px;
+  }
+}
+
 @font-face {
   font-family: 'Montserrat-fallback';
   size-adjust: 97.13%;
