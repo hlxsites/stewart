@@ -197,9 +197,9 @@ const buildTable = (builder, section) => {
       } else {
         builder.append(col);
       }
-
-      return true;
     });
+    builder.jumpTo(undefined);
+    return true;
   }
   return false;
 };
