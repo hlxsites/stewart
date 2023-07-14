@@ -274,10 +274,32 @@ const buildSectionContent = (builder, section) => {
   }
 };
 
+const translateClassNames = (className) => {
+  switch (className) {
+    case 'ss-contentcontainerwidth-narrow': return 'narrow';
+    case 'ss-contentcontainerwidth-wide': return 'wide';
+    case 'ss-margin-0': return 'no margin';
+    case 'ss-backgroundbrightness-dark': return 'dark background';
+    case 'ss-overlayopacity-90': return 'dark overlay';
+    case 'ss-overlay-right': return 'overlay right';
+    // These all get ignored
+    case 'contentbreak':
+    case 'pagesection':
+    case 'genericpagesection':
+    case 'ss-sectiontype-banner':
+    case 'aem-GridColumn':
+    case 'aem-GridColumn--default--12':
+    case 'backgroundablepagesection':
+      return undefined;
+    // Otherwise pass-thru (this includes colors)
+    default: return className.replace('ss-backgroundcolor-', '');
+  }
+};
+
 const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
-  classes = classes.filter((c) => !c.startsWith('aem-') && c !== 'pagesection' && c !== 'genericpagesection');
+  classes = classes.map(translateClassNames).filter((e) => !(!e));
   if (classes.length > 0) {
     builder.section({ style: classes.join(', ') });
   } else {
@@ -288,23 +310,22 @@ const buildGenericSection = (builder, section) => {
 
 const buildBackgroundableSection = (builder, section) => {
   const img = getBackgroundImage(section);
+  buildGenericSection(builder, section);
   if (img) {
-    builder.section({ style: 'Content break, image' });
-    builder.element('img', { src: img, class: 'background-img' }).up();
-    buildSectionContent(builder, section);
-  } else {
-    buildGenericSection(builder, section);
+    builder.withSectionMetadata(builder.sectionMeta || {});
+    builder.sectionMeta.background = builder.doc.createElement('img');
+    builder.sectionMeta.background.src = img;
   }
 };
 
 const buildContentBreakSection = (builder, section) => {
   // check if section has ss-backgroundcolor style and if so extract it
   const classes = section.classList.value.split(' ');
-  const style = classes.filter((c) => c.startsWith('ss-backgroundcolor')).join(', ');
+  const style = classes.map(translateClassNames).filter((e) => !(!e)).join(', ');
   if (style) {
-    builder.section({ style: `Content break, ${style.replace('ss-backgroundcolor-', '')}` });
+    builder.section({ style });
   } else {
-    builder.section({ style: 'Content break' });
+    builder.section();
   }
   buildSectionContent(builder, section);
 };
