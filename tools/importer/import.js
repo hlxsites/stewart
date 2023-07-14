@@ -319,15 +319,8 @@ const buildBackgroundableSection = (builder, section) => {
 };
 
 const buildContentBreakSection = (builder, section) => {
-  // check if section has ss-backgroundcolor style and if so extract it
-  const classes = section.classList.value.split(' ');
-  const style = classes.map(translateClassNames).filter((e) => !(!e)).join(', ');
-  if (style) {
-    builder.section({ style });
-  } else {
-    builder.section();
-  }
-  buildSectionContent(builder, section);
+  // These are effectively the same as generic sections but we might want to tag them differently in the future
+  buildGenericSection(builder, section);
 };
 
 const buildHeroSection = (builder, hero) => {
