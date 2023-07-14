@@ -84,6 +84,7 @@ header nav .nav-hamburger-icon::after {
   display: block;
   position: relative;
   width: 20px;
+  transition: transform .5s ease;
 }
 
 header nav .nav-hamburger-icon::before,
@@ -91,12 +92,6 @@ header nav .nav-hamburger-icon::after {
   content: '';
   position: absolute;
   background: currentcolor;
-}
-
-header nav .nav-hamburger-icon,
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  transition: transform .5s ease;
 }
 
 header nav[aria-expanded="false"] .nav-hamburger-icon,

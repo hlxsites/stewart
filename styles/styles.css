@@ -47,7 +47,7 @@
   /* fonts */
   --body-font-family: 'Montserrat', 'Montserrat-fallback', sans-serif;
   --heading-font-family: var(--body-font-family);
-  --fixed-font-family: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --fixed-font-family: sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* body sizes */
   --body-font-size-xxl:	1.625rem;
@@ -80,7 +80,7 @@
 }
 
 @font-face {
-  font-family: 'Montserrat-fallback';
+  font-family: Montserrat-fallback;
   size-adjust: 97.13%;
   ascent-override: 107%;
   src: local("Arial");
@@ -105,7 +105,7 @@ body.appear {
 body, .text-reg {
   font-size: var(--body-font-size-xs);
   line-height: 1.125rem;
-  letter-spacing: .01375rem;
+  letter-spacing: .0138rem;
 }
 
 .text-large {
@@ -150,7 +150,7 @@ h4, h5, h6 {
   font-weight: 400;
   font-size: var(--heading-font-size-xs);
   line-height: 1.375rem;
-  letter-spacing: .01125rem;
+  letter-spacing: .0113rem;
 }
 
 .h4, h4,
@@ -159,7 +159,7 @@ h4, h5, h6 {
   font-weight: 600;
   font-size: var(--heading-font-size-xxs);
   line-height: 1.4375rem;
-  letter-spacing: .01063rem;
+  letter-spacing: .0106rem;
   margin-bottom: 1rem;
 }
 
@@ -172,19 +172,19 @@ h4, h5, h6 {
   .text-large {
     font-size: var(--body-font-size-xxl);
     line-height: 2.375rem;
-    letter-spacing: .01625rem;
+    letter-spacing: .0163rem;
   }
   
   .text-small {
     font-size: var(--body-font-size-l);
     line-height: 1.625rem;
-    letter-spacing: .01125rem;
+    letter-spacing: .0113rem;
   }
   
   .text-xsmall {
     font-size: var(--body-font-size-s);
     line-height: 1.375rem;
-    letter-spacing: -.00937rem;
+    letter-spacing: -.0094rem;
   }
 
   h1, h2, h3,
@@ -195,7 +195,7 @@ h4, h5, h6 {
   h1, .h1 {
     font-size: var(--heading-font-size-xxl);
     line-height: 5.25rem;
-    letter-spacing: -.06125rem;
+    letter-spacing: -.0613rem;
   }
 
   .h2, h2 {
