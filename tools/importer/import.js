@@ -131,7 +131,7 @@ const buildExperienceFragment = (builder, section) => {
 
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
-  section.querySelectorAll('.embed').forEach((embed) => {    
+  section.querySelectorAll('.embed').forEach((embed) => {
     const src = embed.querySelector('iframe')?.getAttribute('src');
     const previous = builder.current;
     builder.jumpTo(embed);
