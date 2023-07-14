@@ -142,11 +142,20 @@ const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
     const src = embed.querySelector('iframe')?.getAttribute('src');
-    const previous = builder.current;
-    builder.jumpTo(embed);
-    builder.element('a', { href: src }).text(src).up();
-    builder.jumpTo(previous);
-    embed.querySelector('div').remove();
+    if (src) {
+      const previous = builder.current;
+      builder.jumpTo(embed);
+      builder.element('a', { href: src }).text(src).up();
+      builder.jumpTo(previous);
+      embed.querySelector('div').remove();
+    } else if (embed.querySelector('form')) {
+      const previous = builder.current;
+      builder.jumpTo(embed);
+      builder.element('tt').withText(`${embed.querySelector('form').id}`);
+      builder.jumpTo(previous);
+    } else {
+      console.log('Unknown embed type: ', embed.innerHTML);
+    }
   });
 };
 
@@ -190,7 +199,7 @@ const buildColumnsBlock = (builder, section) => {
 
       if (col.querySelector('.carousel')) {
         builder.element('div');
-        col.querySelectorAll('.cmp-carousel__item .image img').forEach((img) => {
+        col.querySelectorAll('.cmp-carousel__item img').forEach((img) => {
           builder.append(img);
         });
         col.querySelector('.carousel').remove();
