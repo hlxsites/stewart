@@ -1,4 +1,5 @@
 import { getMetadata, decorateIcons } from '../../scripts/lib-franklin.js';
+import { wrapImgsInLinks, decorateLinks, createElement } from '../../scripts/scripts.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -99,11 +100,12 @@ export default async function decorate(block) {
     const html = await resp.text();
 
     // decorate nav DOM
-    const nav = document.createElement('nav');
-    nav.id = 'nav';
+    const nav = createElement('nav', {
+      id: 'nav',
+    });
     nav.innerHTML = html;
 
-    const classes = ['brand', 'sections', 'tools'];
+    const classes = ['brand', 'tools', 'sections'];
     classes.forEach((c, i) => {
       const section = nav.children[i];
       if (section) section.classList.add(`nav-${c}`);
@@ -124,11 +126,16 @@ export default async function decorate(block) {
     }
 
     // hamburger for mobile
-    const hamburger = document.createElement('div');
-    hamburger.classList.add('nav-hamburger');
-    hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
-        <span class="nav-hamburger-icon"></span>
-      </button>`;
+    const hamburger = createElement('div', {
+      class: 'nav-hamburger',
+    }, createElement('button', {
+      type: 'button',
+      'aria-controls': 'nav',
+      'aria-label': 'Open navigation',
+    }, createElement('span', {
+      class: 'nav-hamburger-icon',
+    })));
+
     hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
     nav.prepend(hamburger);
     nav.setAttribute('aria-expanded', 'false');
@@ -136,10 +143,13 @@ export default async function decorate(block) {
     toggleMenu(nav, navSections, isDesktop.matches);
     isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
+    wrapImgsInLinks(nav);
+    decorateLinks(nav);
     decorateIcons(nav);
-    const navWrapper = document.createElement('div');
-    navWrapper.className = 'nav-wrapper';
-    navWrapper.append(nav);
+
+    const navWrapper = createElement('div', {
+      class: 'nav-wrapper',
+    }, nav);
     block.append(navWrapper);
   }
 }

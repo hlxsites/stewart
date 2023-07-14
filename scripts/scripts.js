@@ -13,7 +13,48 @@ import {
   loadCSS,
 } from './lib-franklin.js';
 
-const LCP_BLOCKS = []; // add your LCP blocks to the list
+const PRODUCTION_DOMAINS = ['www.stewart.com'];
+const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+
+/**
+ * create an element.
+ * @param {string} tagName the tag for the element
+ * @param {object} props properties to apply
+ * @param {string|Element} html content to add
+ * @returns the element
+ */
+export function createElement(tagName, props, html) {
+  const elem = document.createElement(tagName);
+  if (props) {
+    Object.keys(props).forEach((propName) => {
+      const val = props[propName];
+      if (propName === 'class') {
+        const classesArr = (typeof val === 'string') ? [val] : val;
+        elem.classList.add(...classesArr);
+      } else {
+        elem.setAttribute(propName, val);
+      }
+    });
+  }
+
+  if (html) {
+    const appendEl = (el) => {
+      if (el instanceof HTMLElement || el instanceof SVGElement) {
+        elem.append(el);
+      } else {
+        elem.insertAdjacentHTML('beforeend', el);
+      }
+    };
+
+    if (Array.isArray(html)) {
+      html.forEach(appendEl);
+    } else {
+      appendEl(html);
+    }
+  }
+
+  return elem;
+}
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -24,7 +65,7 @@ function buildHeroBlock(main) {
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
   if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = document.createElement('div');
+    const section = createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
   }
@@ -43,6 +84,54 @@ function buildAutoBlocks(main) {
   }
 }
 
+export function decorateLinks(element) {
+  const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
+  element.querySelectorAll('a').forEach((a) => {
+    try {
+      if (a.href) {
+        const url = new URL(a.href);
+
+        // local links are relative
+        // non local and non email links open in a new tab
+        const hostMatch = hosts.some((host) => url.hostname.includes(host));
+
+        if (hostMatch) {
+          a.href = `${url.pathname.replace('.html', '')}${url.search}${url.hash}`;
+        } else {
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+        }
+      }
+    } catch (e) {
+      // something went wrong
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }
+  });
+}
+
+/**
+ * Wraps images followed by links within a matching <a> tag.
+ * @param {Element} container The container element
+ */
+export function wrapImgsInLinks(container) {
+  const pictures = container.querySelectorAll('p picture');
+  pictures.forEach((pic) => {
+    const parent = pic.parentNode;
+    if (!parent.nextElementSibling) {
+      // eslint-disable-next-line no-console
+      console.warn('no next element');
+      return;
+    }
+    const link = parent.nextElementSibling.querySelector('a');
+    if (link && link.textContent.includes(link.getAttribute('href'))) {
+      link.parentElement.remove();
+      link.innerHTML = pic.outerHTML;
+      pic.replaceWith(link);
+    }
+  });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -50,6 +139,8 @@ function buildAutoBlocks(main) {
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
+  wrapImgsInLinks(main);
+  decorateLinks(main);
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
