@@ -150,7 +150,7 @@ const buildEmbed = (builder, section) => {
   });
 };
 
-const buildTable = (builder, section) => {
+const buildColumnsBlock = (builder, section) => {
   // check if section has .cmp-columnrow with more than one child
   const columnrow = section.querySelector('.cmp-columnrow');
   if (columnrow && columnrow.childElementCount > 1) {
@@ -235,12 +235,16 @@ const buildTeaserLists = (builder, section) => {
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
+    const previous = builder.current;
+    const div = builder.doc.createElement('div');
+    builder.jumpTo(div);
+
     let name = 'List';
     if (list.classList.contains('ss-layout-twocolumn')) {
       name += ' (2-col)';
     }
-    // Create a table
-    builder.block(name, 1, true).append(list);
+    // Move children dom nodes into the new div (For now, this doesn't work terribly well though!)
+    builder.block(name, 1, true).append(...list.children);
     // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
     // list.querySelectorAll('li').forEach((li) => {
     //   const href = li.querySelector('a')?.getAttribute('href');
@@ -254,21 +258,20 @@ const buildGenericLists = (builder, section) => {
     //     builder.column().append(...li.childNodes);
     //   }
     // });
-    // Remove from dom
-    // list.remove();
+    list.parentElement.replaceChild(div, list);
+    builder.jumpTo(previous);
   });
 };
 
 const buildSectionContent = (builder, section) => {
   // Since embeds might show inside tables and carousels, do this first!
   buildEmbed(builder, section);
-  if (!buildTable(builder, section)) {
+  if (!buildColumnsBlock(builder, section)) {
     builder.append(section);
     buildGenericLists(builder, section);
+    buildTeaserLists(builder, section);
+    buildCarousel(builder, section);
   }
-  buildTeaserLists(builder, section);
-  // Important this is called after table because table has a special carousel mode
-  buildCarousel(builder, section);
 };
 
 const buildGenericSection = (builder, section) => {
