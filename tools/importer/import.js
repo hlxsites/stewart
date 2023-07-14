@@ -122,6 +122,15 @@ const getBackgroundImage = (section) => {
   return undefined;
 };
 
+const fixEmptyLinks = (document) => {
+  // Find any links with no attributes and replace them with their children
+  document.querySelectorAll('a:not([href])').forEach((link) => {
+    const div = document.createElement('div');
+    div.append(...link.children);
+    link.parentElement.replaceChild(div, link);
+  });
+};
+
 const buildExperienceFragment = (builder, section) => {
   // If this isn't the page footer, leave a hint what is supposed to be here
   if (!section.classList.contains('page-footer')) {
@@ -349,11 +358,14 @@ export default {
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, metadata);
 
-    // Create hero
+    // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
     // Build document and store into main element
     builder.replaceChildren(document.body);
+
+    // General markup fix-ups
+    fixEmptyLinks(document);
 
     return document.body;
   },
