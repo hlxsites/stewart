@@ -20,7 +20,7 @@
 class BlockBuilder {
   constructor(document, pageMetadata = {}) {
     this.doc = document;
-    this.children = [];
+    this.root = document.createElement('div');
     this.pageMetadata = pageMetadata;
   }
 
@@ -32,18 +32,32 @@ class BlockBuilder {
   up() { return this.jumpTo(this.current?.parentElement); }
 
   upToTag(tag) {
+    const cur = this.current;
     while (this.current && this.current?.tagName !== tag.toUpperCase()) this.up();
-    return this;
+    return this.jumpTo(this.current || cur);
   }
 
   append(e) {
-    this.current ? this.current.append(e) : this.children.push(e);
+    this.current ? this.current.append(e) : this.root.append(e);
     return this;
+  }
+
+  replace(e, f) {
+    const old = this.current;
+    if (e) {
+      const oldRoot = this.root;
+      this.root = this.doc.createElement('div');
+      this.jumpTo(this.root);
+      f();
+      e.parentElement.replaceChild(this.root, e);
+      this.root = oldRoot;
+    }
+    return this.jumpTo(old);
   }
 
   replaceChildren(parent) {
     this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata);
-    return parent.replaceChildren(...this.children);
+    return parent.replaceChildren(...this.root.children);
   }
 
   element(tag, attrs = {}) {
@@ -56,7 +70,7 @@ class BlockBuilder {
 
   withText(text) { return this.text(text).up(); }
 
-  section(meta = {}) { return (this.children.length ? this.#writeSectionMeta().jumpTo(undefined).element('hr').up() : this).withSectionMetadata(meta); }
+  section(meta = {}) { return (this.root.children.length ? this.#writeSectionMeta().jumpTo(undefined).element('hr').up() : this).withSectionMetadata(meta); }
 
   withSectionMetadata(meta) {
     this.sectionMeta = meta;
@@ -141,102 +155,132 @@ const buildExperienceFragment = (builder, section) => {
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
-    const src = embed.querySelector('iframe')?.getAttribute('src');
-    if (src) {
-      const previous = builder.current;
-      builder.jumpTo(embed);
-      builder.element('a', { href: src }).text(src).up();
-      builder.jumpTo(previous);
-      embed.querySelector('div').remove();
-    } else if (embed.querySelector('form')) {
-      const previous = builder.current;
-      builder.jumpTo(embed);
-      builder.element('tt').withText(`${embed.querySelector('form').id}`);
-      builder.jumpTo(previous);
-    } else {
-      console.log('Unknown embed type: ', embed.innerHTML);
+    builder.replace(embed, () => {
+      const src = embed.querySelector('iframe')?.getAttribute('src');
+      if (src) {
+        builder.element('a', { href: src }).text(src).up();
+      } else if (embed.querySelector('form')) {
+        builder.element('tt').withText(`${embed.querySelector('form').id}`);
+      } else {
+        builder.append(...embed.children);
+        console.log('Unknown embed type: ', embed.innerHTML);
+      }
+    });
+  });
+};
+
+const getGridRows = (grid) => {
+  // Either we have immediate columnrow children or we have a single column with a columnrow child
+  let rows = grid.querySelectorAll('.aem-Grid > .columnrow');
+  if (rows.length === 0) {
+    rows = grid.querySelectorAll('.aem-Grid > .aem-GridColumn > .cmp-container > .columnrow');
+  }
+  return rows;
+};
+
+// Get max of column (cmp-columnrow__item) children for all rows
+const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) => row.querySelectorAll('.cmp-columnrow__item').length));
+
+const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
+
+const buildColumnsBlock = (builder, section) => {
+  const rows = getGridRows(section);
+  if (rows.length === 0) {
+    return;
+  }
+
+  const numColumns = countColumns(rows);
+  const { parentElement } = rows[0];
+  builder.replace(parentElement, () => {
+    if (parentElement.textContent.includes('take your career journey')) {
+      debugger; 
+    }
+    let inTable = false;
+    // for each child of parent element, append if it is not a column
+    for (const child of [...parentElement.children]) {
+      if (child.classList.contains('columnrow')) {
+        const cols = child.querySelectorAll('.cmp-columnrow__item');
+        let newRow = true;
+        for (const col of [...cols]) {
+          if (isHeading(col) || ((col.classList.contains('col-12') || col.querySelector('.col-12')) && newRow) || (cols.length === 1 && !inTable)) {
+            if (inTable) {
+              builder.jumpTo(undefined);
+              inTable = false;
+            }
+            builder.append(col);
+          } else {
+            if (!inTable) {
+              let name = 'Columns';
+              if (cols[0].classList.contains('col-md-8')) {
+                name += ' (66-33)';
+              } else if (cols[0].classList.contains('col-md-9')) {
+                name += ' (75-25)';
+              } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
+                name += ' (33-33-33)';
+              } else if (child.querySelector('.carousel')) {
+                name += ' (Carousel)';
+              }
+
+              builder.block(name, numColumns, false);
+              newRow = true;
+              inTable = true;
+            }
+
+            if (newRow) {
+              builder.row();
+              newRow = false;
+            } else {
+              builder.column();
+            }
+
+            if (col.querySelector('.carousel')) {
+              builder.element('div');
+              col.querySelectorAll('.cmp-carousel__item img').forEach((img) => {
+                builder.append(img);
+              });
+              col.querySelector('.carousel').remove();
+            } else {
+              builder.append(col);
+            }
+          }
+        }
+      } else {
+        if (inTable) {
+          builder.jumpTo(undefined);
+          inTable = false;
+        }
+        if (child.children?.length > 0) {
+          builder.append(...child.children);
+        } else {
+          builder.append(child);
+        }
+      }
     }
   });
 };
 
-const buildColumnsBlock = (builder, section) => {
-  // check if section has .cmp-columnrow with more than one child
-  const columnrow = section.querySelector('.cmp-columnrow');
-  if (columnrow && columnrow.childElementCount > 1) {
-    let name = 'Columns';
-    // For each child, use builder to create a row and column
-    let cols = columnrow.querySelectorAll('.aem-Grid > .columnRow > .row > .cmp-columnrow__item');
-    if (cols.length === 0) {
-      cols = columnrow.querySelectorAll('.aem-Grid > .aem-GridColumn > .cmp-container > .columnrow > .row > .cmp-columnrow__item');
-    }
-
-    if (cols.length === 0) {
-      builder.element('h3').withText('Error: No columns found in columnrow!');
-      return false;
-    }
-    if (cols[0].classList.contains('col-md-8')) {
-      name += ' (66-33)';
-    } else if (cols[0].classList.contains('col-md-9')) {
-      name += ' (75-25)';
-    } else if (columnrow.querySelector('.carousel')) {
-      name += ' (Carousel)';
-    }
-
-    builder.block(name, cols.length, true);
-    let isFirst = true;
-    let newRow = false;
-    cols.forEach((col) => {
-      if (newRow) {
-        builder.row();
-        newRow = false;
-      } else if (!isFirst) {
-        builder.column();
-      }
-      isFirst = false;
-      if (col.classList.contains('col-12') || col.classList.contains('col')) {
-        newRow = true;
-      }
-
-      if (col.querySelector('.carousel')) {
-        builder.element('div');
-        col.querySelectorAll('.cmp-carousel__item img').forEach((img) => {
-          builder.append(img);
-        });
-        col.querySelector('.carousel').remove();
-      } else {
-        builder.append(col);
-      }
-    });
-    builder.jumpTo(undefined);
-    return true;
-  }
-  return false;
-};
-
 const buildCarousel = (builder, section) => {
   section.querySelectorAll('.carousel')?.forEach((carousel) => {
-    const previous = builder.current;
-    builder.jumpTo(carousel);
-    builder.block('Carousel', 1, false);
-    carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => {
-      builder.row().append(slide);
+    builder.replace(carousel, () => {
+      builder.block('Carousel', 1, false);
+      carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => {
+        builder.row().append(slide);
+      });
     });
-    builder.jumpTo(previous);
-    carousel.querySelector('.carousel > .cmp-carousel').remove();
   });
 };
 
 const buildTeaserLists = (builder, section) => {
   // Loop over all teaserlist divs
   section.querySelectorAll('.teaserlist').forEach((list) => {
-    const teasers = list.querySelectorAll('.page-teaser');
-    list.replaceChildren();
-    builder.block('Teaser List', 2, false);
-    // For each teaser, build a block with the image and text
-    teasers.forEach((teaser) => {
-      const img = teaser.querySelector('.page-teaser_image');
-      const content = teaser.querySelector('.page-teaser_content');
-      builder.row().append(img).column().append(content);
+    builder.replace(list, () => {
+      builder.block('Teaser List', 2, false);
+      // For each teaser, build a block with the image and text
+      list.querySelectorAll('.page-teaser').forEach((teaser) => {
+        const img = teaser.querySelector('.page-teaser_image');
+        const content = teaser.querySelector('.page-teaser_content');
+        builder.row().append(img).column().append(content);
+      });
     });
   });
 };
@@ -244,43 +288,38 @@ const buildTeaserLists = (builder, section) => {
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
-    const previous = builder.current;
-    const div = builder.doc.createElement('div');
-    builder.jumpTo(div);
-
-    let name = 'List';
-    if (list.classList.contains('ss-layout-twocolumn')) {
-      name += ' (2-col)';
-    }
-    // Move children dom nodes into the new div (For now, this doesn't work terribly well though!)
-    builder.block(name, 1, true).append(...list.children);
-    // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
-    // list.querySelectorAll('li').forEach((li) => {
-    //   const href = li.querySelector('a')?.getAttribute('href');
-    //   const icon = li.querySelector('i')?.classList.filter((c) => c.startsWith('fa-')).join(' ');
-    //   const text = li.querySelector('a')?.textContent;
-    //   // Create column for icon and one for the link text
-    //   builder.row().text(icon || '???');
-    //   if (href) {
-    //     builder.column().element('a', { href }).text(text);
-    //   } else {
-    //     builder.column().append(...li.childNodes);
-    //   }
-    // });
-    list.parentElement.replaceChild(div, list);
-    builder.jumpTo(previous);
+    builder.replace(list, () => {
+      let name = 'List';
+      if (list.classList.contains('ss-layout-twocolumn')) {
+        name += ' (2-col)';
+      }
+      // Move children dom nodes into the new div (For now, this doesn't work terribly well though!)
+      builder.block(name, 1, true).append(...list.children);
+      // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
+      // list.querySelectorAll('li').forEach((li) => {
+      //   const href = li.querySelector('a')?.getAttribute('href');
+      //   const icon = li.querySelector('i')?.classList.filter((c) => c.startsWith('fa-')).join(' ');
+      //   const text = li.querySelector('a')?.textContent;
+      //   // Create column for icon and one for the link text
+      //   builder.row().text(icon || '???');
+      //   if (href) {
+      //     builder.column().element('a', { href }).text(text);
+      //   } else {
+      //     builder.column().append(...li.childNodes);
+      //   }
+      // });
+    });
   });
 };
 
 const buildSectionContent = (builder, section) => {
-  // Since embeds might show inside tables and carousels, do this first!
   buildEmbed(builder, section);
-  if (!buildColumnsBlock(builder, section)) {
-    builder.append(section);
-    buildGenericLists(builder, section);
-    buildTeaserLists(builder, section);
-    buildCarousel(builder, section);
-  }
+  buildGenericLists(builder, section);
+  buildTeaserLists(builder, section);
+  buildColumnsBlock(builder, section);
+  // Carousels inside columns are a special case, so do standalone carousels last
+  buildCarousel(builder, section);
+  builder.append(section);
 };
 
 const translateClassNames = (className) => {
@@ -383,6 +422,10 @@ export default {
 
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, metadata);
+
+    // Strip out header and footers that are not needed
+    document.querySelector('page-header')?.remove();
+    document.querySelector('page-footer')?.remove();
 
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
