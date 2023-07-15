@@ -193,6 +193,8 @@ const buildColumnsBlock = (builder, section) => {
     // for each child of parent element, append if it is not a column
     for (const child of [...parentElement.children]) {
       if (child.classList.contains('columnrow')) {
+        // First make sure we don't try to render nested columns
+        child.querySelectorAll('.cmp-columnrow__item .cmp-columnrow__item').forEach((nested) => nested.classList.remove('cmp-columnrow__item'));
         const cols = child.querySelectorAll('.cmp-columnrow__item');
         let newRow = true;
         for (const col of [...cols]) {
