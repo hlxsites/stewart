@@ -164,6 +164,12 @@ const buildEmbed = (builder, section) => {
       }
     });
   });
+
+  section.querySelectorAll('.application').forEach((app) => {
+    builder.replace(app, () => {
+      builder.element('tt').withText(`APP:${app.id}`);
+    });
+  });
 };
 
 const getGridRows = (grid) => {
