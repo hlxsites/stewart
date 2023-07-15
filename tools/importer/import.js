@@ -146,10 +146,7 @@ const fixEmptyLinks = (document) => {
 };
 
 const buildExperienceFragment = (builder, section) => {
-  // If this isn't the page footer, leave a hint what is supposed to be here
-  if (!section.classList.contains('page-footer')) {
-    builder.section().block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
-  }
+  builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 };
 
 const buildEmbed = (builder, section) => {
@@ -192,9 +189,6 @@ const buildColumnsBlock = (builder, section) => {
   const numColumns = countColumns(rows);
   const { parentElement } = rows[0];
   builder.replace(parentElement, () => {
-    if (parentElement.textContent.includes('take your career journey')) {
-      debugger; 
-    }
     let inTable = false;
     // for each child of parent element, append if it is not a column
     for (const child of [...parentElement.children]) {
@@ -249,11 +243,7 @@ const buildColumnsBlock = (builder, section) => {
           builder.jumpTo(undefined);
           inTable = false;
         }
-        if (child.children?.length > 0) {
-          builder.append(...child.children);
-        } else {
-          builder.append(child);
-        }
+        builder.append(child);
       }
     }
   });
