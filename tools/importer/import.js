@@ -285,8 +285,11 @@ const buildGenericLists = (builder, section) => {
       if (list.classList.contains('ss-layout-twocolumn')) {
         name += ' (2-col)';
       }
-      // Move children dom nodes into the new div (For now, this doesn't work terribly well though!)
-      builder.block(name, 1, true).append(...list.children);
+      // Move children dom nodes into the new div -- This isn't getting icons for some reason though.
+      builder.block(name, 1, false);
+      list.querySelectorAll('li').forEach((listItem) => {
+        builder.row().append(...listItem.children);
+      });
       // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
       // list.querySelectorAll('li').forEach((li) => {
       //   const href = li.querySelector('a')?.getAttribute('href');
