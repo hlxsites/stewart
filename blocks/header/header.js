@@ -89,6 +89,23 @@ function buildMobileMenu(nav) {
   nav.append(mobileMenu);
 }
 
+let mouseEntered;
+function bindMouseOverEvents(section, sections) {
+  section.addEventListener('mouseenter', () => {
+    mouseEntered = true;
+    toggleNavDrop(section, sections, true);
+  });
+
+  section.addEventListener('mouseleave', () => {
+    mouseEntered = false;
+    setTimeout(() => {
+      if (!mouseEntered) {
+        toggleNavDrop(section, sections, false);
+      }
+    }, 400);
+  });
+}
+
 /**
  * decorates the header, mainly the nav
  * @param {Element} block The header block element
@@ -131,9 +148,7 @@ export default async function decorate(block) {
             sectionLink.role = 'button';
             sectionLink.setAttribute('href', '#');
 
-            navSection.addEventListener('mouseover', () => {
-              toggleNavDrop(navSection, navSections, true);
-            });
+            bindMouseOverEvents(navSection, navSections);
           }
         }
       });
@@ -158,9 +173,7 @@ export default async function decorate(block) {
             sectionLink.setAttribute('href', '#');
           }
 
-          navTool.addEventListener('mouseover', () => {
-            toggleNavDrop(navTool, navTools, true);
-          });
+          bindMouseOverEvents(navTool, navTools);
         }
       });
     }
