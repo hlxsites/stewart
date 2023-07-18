@@ -288,8 +288,8 @@ const buildGenericLists = (builder, section) => {
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
       let name = 'List';
-      if (list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (2-col)';
+      if (!list.classList.contains('ss-layout-twocolumn')) {
+        name += ' (1-col)';
       }
       // Move children dom nodes into the new div -- This isn't getting icons for some reason though.
       builder.block(name, 1, false);
