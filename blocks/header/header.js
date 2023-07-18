@@ -211,6 +211,7 @@ export default async function decorate(block) {
       const targetNavDrop = e.target.closest('.nav-drop[aria-expanded="true"] > ul');
       if (!targetNavDrop) {
         toggleAllNavSections(nav);
+        nav.querySelectorAll('.drop-expanded').forEach((el) => el.classList.remove('drop-expanded'));
       }
     });
 

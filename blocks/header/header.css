@@ -185,34 +185,12 @@ header nav .nav-sections ul > li > ul > li {
   font-size: var(--body-font-size-xxs);
 }
 
-header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading::after {
-  content: unset;
-}
-
-header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading {
-  padding-inline-start: 24px;
-  padding-block-end: 1rem;
-}
-
-header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading::before {
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: 0;
-  left: 2px;
-  transform: rotate(225deg);
-  width: 10px;
-  height: 10px;
-  border: 2px solid var(--clr-brand-red);
-  border-width: 2px 2px 0 0;
-}
-
 header nav[aria-expanded="true"] .nav-sections.nav-sections-mobile {
   display: block;
   visibility: visible;
 }
 
-.nav-sections-mobile.drop-expanded li[aria-expanded="false"] {
+.nav-sections-mobile.drop-expanded > ul > li:not([aria-expanded="true"]) {
   display: none;
 }
 
@@ -403,6 +381,11 @@ header nav .nav-drop .nav-section-heading {
   cursor: pointer;
 }
 
+header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading {
+  padding-inline-start: 24px;
+  padding-block-end: 1rem;
+}
+
 header nav .nav-drop .nav-section-heading::after {
   content: '';
   display: inline-block;
@@ -414,6 +397,12 @@ header nav .nav-drop .nav-section-heading::after {
   height: 10px;
   border: 2px solid var(--clr-brand-red);
   border-width: 2px 2px 0 0;
+}
+
+header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading::after {
+  top: 0;
+  left: 2px;
+  transform: rotate(225deg);
 }
 
 @media (min-width: 900px) {
