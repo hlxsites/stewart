@@ -4,7 +4,7 @@ import {
   loadHeader,
   loadFooter,
   decorateButtons,
-  decorateIcons,
+  decorateIcons as libFranklinDecorateIcons,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -54,6 +54,27 @@ export function createElement(tagName, props, html) {
   }
 
   return elem;
+}
+
+/**
+ * Extension of decorateIcons from lib-franklin.
+ * adds special handing for fa icons from icon font
+ * @param {Element} element the container element
+ */
+export async function decorateIcons(element) {
+  const faPrefixes = ['fa-', 'far-', 'fab-', 'fas-', 'fal-'];
+  element.querySelectorAll('span.icon').forEach((icon) => {
+    const iconName = Array.from(icon.classList).find((c) => c.startsWith('icon-')).substring(5);
+    const isFaIcon = faPrefixes.some((prefix) => iconName.startsWith(prefix));
+    if (isFaIcon) {
+      const faIcon = iconName.split('-');
+      const faPrefix = faIcon[0];
+      const faIconName = faIcon.slice(1).join('-');
+      icon.className = `fa-icon ${faPrefix} fa-${faIconName}`;
+    }
+  });
+
+  libFranklinDecorateIcons(element);
 }
 
 /**
