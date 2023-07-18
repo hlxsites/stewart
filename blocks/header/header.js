@@ -16,7 +16,7 @@ function closeOnEscape(e) {
     const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
     if (navSectionExpanded && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
-      toggleAllNavSections(navSections);
+      toggleAllNavSections(nav);
       navSectionExpanded.focus();
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
@@ -26,30 +26,28 @@ function closeOnEscape(e) {
   }
 }
 
-function openOnKeydown(e) {
-  const focused = document.activeElement;
-  const isNavDrop = focused.className === 'nav-drop';
-  if (isNavDrop && (e.code === 'Enter' || e.code === 'Space')) {
-    const dropExpanded = focused.getAttribute('aria-expanded') === 'true';
-    // eslint-disable-next-line no-use-before-define
-    toggleAllNavSections(focused.closest('.nav-sections'));
-    focused.setAttribute('aria-expanded', dropExpanded ? 'false' : 'true');
-  }
-}
-
-function focusNavSection() {
-  document.activeElement.addEventListener('keydown', openOnKeydown);
-}
-
 /**
  * Toggles all nav sections
- * @param {Element} sections The container element
+ * @param {Element} nav The container element
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
-function toggleAllNavSections(sections, expanded = false) {
-  sections.querySelectorAll('.nav-sections > ul > li').forEach((section) => {
+function toggleAllNavSections(nav, expanded = false) {
+  nav.querySelectorAll('.nav-drop').forEach((section) => {
     section.setAttribute('aria-expanded', expanded);
   });
+}
+
+function toggleNavDrop(section, sections, forceExpanded = null) {
+  const expanded = forceExpanded !== null ? !forceExpanded : section.getAttribute('aria-expanded') === 'true';
+  toggleAllNavSections(sections.closest('nav'));
+  section.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+
+  const anyExpanded = sections.querySelector('.nav-drop[aria-expanded="true"]');
+  if (anyExpanded) {
+    sections.classList.add('drop-expanded');
+  } else {
+    sections.classList.remove('drop-expanded');
+  }
 }
 
 /**
@@ -61,27 +59,11 @@ function toggleAllNavSections(sections, expanded = false) {
 function toggleMenu(nav, navSections, forceExpanded = null) {
   const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
   const button = nav.querySelector('.nav-hamburger button');
-  // document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
+  document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
+  toggleAllNavSections(nav, expanded || isDesktop.matches ? 'false' : 'true');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-  // enable nav dropdown keyboard accessibility
-  const navDrops = navSections.querySelectorAll('.nav-drop');
-  if (isDesktop.matches) {
-    navDrops.forEach((drop) => {
-      if (!drop.hasAttribute('tabindex')) {
-        drop.setAttribute('role', 'button');
-        drop.setAttribute('tabindex', 0);
-        drop.addEventListener('focus', focusNavSection);
-      }
-    });
-  } else {
-    navDrops.forEach((drop) => {
-      drop.removeAttribute('role');
-      drop.removeAttribute('tabindex');
-      drop.removeEventListener('focus', focusNavSection);
-    });
-  }
+
   // enable menu collapse on escape keypress
   if (!expanded || isDesktop.matches) {
     // collapse menu on escape press
@@ -142,12 +124,16 @@ export default async function decorate(block) {
           const sectionLink = navSection.querySelector(':scope > a');
           if (sectionLink) {
             const sectionLi = createElement('li', { class: 'nav-section-link' });
-            sectionLi.append(sectionLink);
+            sectionLi.append(sectionLink.cloneNode(true));
             subList.insertAdjacentElement('afterbegin', sectionLi);
 
-            const sectionHead = sectionLink.cloneNode(true);
-            sectionHead.className = 'nav-section-heading';
-            navSection.insertAdjacentElement('afterbegin', sectionHead);
+            sectionLink.className = 'nav-section-heading';
+            sectionLink.role = 'button';
+            sectionLink.setAttribute('href', '#');
+
+            navSection.addEventListener('mouseover', () => {
+              toggleNavDrop(navSection, navSections, true);
+            });
           }
         }
       });
@@ -166,10 +152,22 @@ export default async function decorate(block) {
           const sectionLink = navTool.querySelector(':scope > a');
           if (sectionLink) {
             sectionLink.className = 'nav-section-heading';
+
+            sectionLink.className = 'nav-section-heading';
+            sectionLink.role = 'button';
+            sectionLink.setAttribute('href', '#');
           }
+
+          navTool.addEventListener('mouseover', () => {
+            toggleNavDrop(navTool, navTools, true);
+          });
         }
       });
     }
+
+    const utilRowWrapper = createElement('div', { class: 'nav-utility-row' });
+    utilRowWrapper.append(nav.querySelector('.nav-brand'), navTools);
+    nav.prepend(utilRowWrapper);
 
     // hamburger for mobile
     const hamburger = createElement('div', {
@@ -197,20 +195,22 @@ export default async function decorate(block) {
 
     nav.addEventListener('click', (e) => {
       const sectionHeading = e.target.closest('.nav-section-heading');
-      const sections = sectionHeading.closest('.nav-sections, .nav-tools');
-      const section = sectionHeading.closest('.nav-drop');
-      if (sectionHeading && section && sections) {
-        e.preventDefault();
-        const expanded = section.getAttribute('aria-expanded') === 'true';
-        toggleAllNavSections(sections);
-        section.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-
-        const anyExpanded = sections.querySelector('.nav-drop[aria-expanded="true"]');
-        if (anyExpanded) {
-          sections.classList.add('drop-expanded');
-        } else {
-          sections.classList.remove('drop-expanded');
+      if (sectionHeading) {
+        const sections = sectionHeading.closest('.nav-sections, .nav-tools');
+        const section = sectionHeading.closest('.nav-drop');
+        if (section && sections) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleNavDrop(section, sections);
         }
+      }
+    });
+
+    // close any open nav drops on outside clicks
+    document.addEventListener('click', (e) => {
+      const targetNavDrop = e.target.closest('.nav-drop[aria-expanded="true"] > ul');
+      if (!targetNavDrop) {
+        toggleAllNavSections(nav);
       }
     });
 
