@@ -58,15 +58,17 @@ export function createElement(tagName, props, html) {
 
 /**
  * Extension of decorateIcons from lib-franklin.
- * adds special handing for fa icons from icon fonr
+ * adds special handing for fa icons from icon font
  * @param {Element} element the container element
  */
 export async function decorateIcons(element) {
+  const faPrefixes = ['fa-', 'far-', 'fab-', 'fas-', 'fal-'];
   element.querySelectorAll('span.icon').forEach((icon) => {
     const iconName = Array.from(icon.classList).find((c) => c.startsWith('icon-')).substring(5);
-    if (iconName.startsWith('fa')) {
-      const [fa, iconRealName] = iconName.split('-');
-      icon.className = `${fa} fa-${iconRealName}`;
+    const isFaIcon = faPrefixes.some((prefix) => iconName.startsWith(prefix));
+    if (isFaIcon) {
+      const [faPrefix, faIconName] = iconName.split('-');
+      icon.className = `fa-icon ${faPrefix} fa-${faIconName}`;
     }
   });
 
