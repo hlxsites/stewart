@@ -145,7 +145,8 @@ export default async function decorate(block) {
             sectionLi.append(sectionLink);
             subList.insertAdjacentElement('afterbegin', sectionLi);
 
-            const sectionHead = createElement('span', { class: 'nav-section-heading' }, sectionLink.textContent);
+            const sectionHead = sectionLink.cloneNode(true);
+            sectionHead.className = 'nav-section-heading';
             navSection.insertAdjacentElement('afterbegin', sectionHead);
           }
         }
@@ -162,6 +163,10 @@ export default async function decorate(block) {
         const subList = navTool.querySelector('ul');
         if (subList) {
           navTool.classList.add('nav-drop');
+          const sectionLink = navTool.querySelector(':scope > a');
+          if (sectionLink) {
+            sectionLink.className = 'nav-section-heading';
+          }
         }
       });
     }
@@ -191,9 +196,11 @@ export default async function decorate(block) {
     decorateIcons(nav);
 
     nav.addEventListener('click', (e) => {
-      const section = e.target.closest('.nav-drop');
-      const sections = section.closest('.nav-sections, .nav-tools');
-      if (section) {
+      const sectionHeading = e.target.closest('.nav-section-heading');
+      const sections = sectionHeading.closest('.nav-sections, .nav-tools');
+      const section = sectionHeading.closest('.nav-drop');
+      if (sectionHeading && section && sections) {
+        e.preventDefault();
         const expanded = section.getAttribute('aria-expanded') === 'true';
         toggleAllNavSections(sections);
         section.setAttribute('aria-expanded', expanded ? 'false' : 'true');

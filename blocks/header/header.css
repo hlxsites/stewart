@@ -180,7 +180,6 @@ header nav .nav-sections ul li a:hover {
 
 header nav .nav-drop {
   padding-right: 16px;
-  cursor: pointer;
 }
 
 header nav .nav-drop > ul {
@@ -204,12 +203,13 @@ header nav .nav-drop > ul > li {
   font-weight: 600;
 }
 
-header nav .nav-sections .nav-drop .nav-section-heading {
+header nav .nav-drop .nav-section-heading {
   position: relative;
-  display: block
+  display: block;
+  cursor: pointer;
 }
 
-header nav .nav-sections .nav-drop[aria-expanded="false"] .nav-section-heading::after {
+header nav .nav-drop .nav-section-heading::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -220,6 +220,10 @@ header nav .nav-sections .nav-drop[aria-expanded="false"] .nav-section-heading::
   height: 10px;
   border: 2px solid var(--clr-brand-red);
   border-width: 2px 2px 0 0;
+}
+
+header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading::after {
+  content: unset;
 }
 
 header nav .nav-sections .nav-drop[aria-expanded="true"] .nav-section-heading {
@@ -337,23 +341,12 @@ header nav .nav-tools .nav-drop {
   display: block
 }
 
-header nav .nav-tools .nav-drop::after {
-  content: '';
-  display: inline-block;
-  position: absolute;
-  top: 50%;
-  right: 2px;
-  transform: translateY(-50%) rotate(45deg);
-  width: 10px;
-  height: 10px;
-  border: 2px solid var(--clr-brand-red);
-  border-width: 2px 2px 0 0;
+header nav .nav-tools .nav-drop .nav-section-heading::after {
   transition: transform .3s ease-in-out;
 }
 
-header nav .nav-tools .nav-drop[aria-expanded="true"]::after {
-  transform: rotate(135deg);
-  top: 1.6rem;
+header nav .nav-tools .nav-drop[aria-expanded="true"] .nav-section-heading::after {
+  transform: rotate(135deg) translateY(12px);
 }
 
 header nav .nav-tools .search-item {
