@@ -296,19 +296,6 @@ const buildGenericLists = (builder, section) => {
       list.querySelectorAll('li').forEach((listItem) => {
         builder.row().append(...listItem.children);
       });
-      // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
-      // list.querySelectorAll('li').forEach((li) => {
-      //   const href = li.querySelector('a')?.getAttribute('href');
-      //   const icon = li.querySelector('i')?.classList.filter((c) => c.startsWith('fa-')).join(' ');
-      //   const text = li.querySelector('a')?.textContent;
-      //   // Create column for icon and one for the link text
-      //   builder.row().text(icon || '???');
-      //   if (href) {
-      //     builder.column().element('a', { href }).text(text);
-      //   } else {
-      //     builder.column().append(...li.childNodes);
-      //   }
-      // });
     });
   });
 };
