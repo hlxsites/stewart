@@ -404,6 +404,31 @@ const buildSection = (builder, section) => {
   }
 };
 
+const ICON_PARENT_SELECTOR = '.pagesection li';
+const ICON_SELECTOR = `${ICON_PARENT_SELECTOR} i`;
+const restoreIcons = (document, originalDocument) => {
+  // For every li with an icon in the original document, find the corresponding li in the imported document and add the icon
+  // Use the index of the li in the query selector to locate in both lists
+  originalDocument.querySelectorAll(ICON_SELECTOR).forEach((icon, index) => {
+    const li = document.querySelectorAll(ICON_PARENT_SELECTOR)[index];
+    if (!li) {
+      console.log('Could not find li for icon: ', icon.innerHTML, ' index ', index);
+      return;
+    }
+    // Change icon to text indicating name of icon instead
+    const iconName = [...icon.classList].filter((c) => c.startsWith('fa-')).join(' ').replace('fa-', '');
+    if (iconName) {
+      const newIcon = document.createTextNode(`{${iconName}} `);
+      if (li.querySelector('a')) {
+        li.querySelector('a').prepend(newIcon);
+      } else {
+        li.prepend(newIcon);
+      }
+      console.log('Added icon: ', newIcon.textContent, ' to ', li.innerHTML);
+    }
+  });
+};
+
 export default {
   /**
    * Apply DOM operations to the provided document and return
@@ -424,6 +449,12 @@ export default {
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, metadata);
 
+    const parser = new DOMParser();
+    const originalDoc = parser.parseFromString(html, 'text/html');
+
+    // Restore markup that was stripped out by the importer
+    restoreIcons(document, originalDoc);
+
     // Strip out header and footers that are not needed
     document.querySelector('page-header')?.remove();
     document.querySelector('page-footer')?.remove();
@@ -431,11 +462,11 @@ export default {
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
+    // General markup fix-ups
+    // fixEmptyLinks(document);
+
     // Build document and store into main element
     builder.replaceChildren(document.body);
-
-    // General markup fix-ups
-    fixEmptyLinks(document);
 
     return document.body;
   },
