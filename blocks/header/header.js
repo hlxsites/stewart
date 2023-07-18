@@ -219,15 +219,6 @@ export default async function decorate(block) {
       }
     });
 
-    // close any open nav drops on outside clicks
-    document.addEventListener('click', (e) => {
-      const targetNavDrop = e.target.closest('.nav-drop[aria-expanded="true"] > ul');
-      if (!targetNavDrop) {
-        toggleAllNavSections(nav);
-        nav.querySelectorAll('.drop-expanded').forEach((el) => el.classList.remove('drop-expanded'));
-      }
-    });
-
     const navWrapper = createElement('div', {
       class: 'nav-wrapper',
     }, nav);

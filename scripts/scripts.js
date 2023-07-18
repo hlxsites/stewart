@@ -67,7 +67,9 @@ export async function decorateIcons(element) {
     const iconName = Array.from(icon.classList).find((c) => c.startsWith('icon-')).substring(5);
     const isFaIcon = faPrefixes.some((prefix) => iconName.startsWith(prefix));
     if (isFaIcon) {
-      const [faPrefix, faIconName] = iconName.split('-');
+      const faIcon = iconName.split('-');
+      const faPrefix = faIcon[0];
+      const faIconName = faIcon.slice(1).join('-');
       icon.className = `fa-icon ${faPrefix} fa-${faIconName}`;
     }
   });
