@@ -18,7 +18,7 @@ header nav {
   padding: 0 1rem;
   font-family: var(--body-font-family);
 
-  --border-color: #dad6d6;
+  --border-color: var(--overlay-background-color);
 }
 
 @media (min-width: 600px) {
@@ -70,6 +70,7 @@ header nav .nav-hamburger button {
   overflow: initial;
   text-overflow: initial;
   white-space: initial;
+  min-width: 0;
 }
 
 header nav .nav-hamburger-icon,
@@ -447,7 +448,6 @@ header nav .nav-mobile-menu {
   background-color: var(--background-color);
   padding: 0 1rem;
   transform: translateX(-100%);
-  transition: transform .3s ease-in-out;
   min-height: 100dvh;
   border-top: 2px solid var(--border-color);
 }
@@ -455,6 +455,7 @@ header nav .nav-mobile-menu {
 @media (max-width: 899px) {
   header nav[aria-expanded="true"] .nav-mobile-menu {
     transform: translateX(0);
+    transition: transform .3s ease-in-out;
   }
 }
 
