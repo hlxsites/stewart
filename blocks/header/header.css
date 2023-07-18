@@ -200,6 +200,10 @@ header nav .nav-drop[aria-expanded="true"] > ul {
   transform: translateX(0);
 }
 
+header nav .nav-drop > ul > li {
+  font-weight: 600;
+}
+
 header nav .nav-sections .nav-drop .nav-section-heading {
   position: relative;
   display: block
@@ -313,6 +317,10 @@ header nav .nav-tools ul > li {
   padding-block: 1rem;
 }
 
+header nav .nav-tools .nav-drop ul > li { 
+  font-weight: 500;
+}
+
 header nav[aria-expanded="true"] .nav-tools.nav-tools-mobile {
   display: block;
   visibility: visible;
@@ -340,16 +348,12 @@ header nav .nav-tools .nav-drop::after {
   height: 10px;
   border: 2px solid var(--clr-brand-red);
   border-width: 2px 2px 0 0;
+  transition: transform .3s ease-in-out;
 }
 
 header nav .nav-tools .nav-drop[aria-expanded="true"]::after {
-  transform: translateY(-50%) rotate(225deg);
-  left: 8px;
-  top: 2rem;
-}
-
-header nav .nav-tools .nav-drop[aria-expanded="true"] {
-  padding-left: 24px;
+  transform: rotate(135deg);
+  top: 1.6rem;
 }
 
 header nav .nav-tools .search-item {
