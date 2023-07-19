@@ -125,6 +125,11 @@ const extractMetadata = (document) => {
     img.src = metadata.image;
     metadata.image = img;
   }
+  const relatedLinks = document.querySelector('.be-related-link-container .be-list');
+  if (relatedLinks) {
+    metadata.related = relatedLinks;
+  }
+
   return metadata;
 };
 
@@ -315,10 +320,23 @@ const translateClassNames = (className) => {
     case 'ss-contentcontainerwidth-narrow': return 'narrow';
     case 'ss-contentcontainerwidth-wide': return 'wide';
     case 'ss-margin-0': return 'no margin';
-    case 'ss-backgroundbrightness-dark': return 'dark background';
-    case 'ss-overlayopacity-90': return 'dark overlay';
-    case 'ss-overlay-right': return 'overlay right';
+    case 'ss-margin-bottom-small': return 'short';
+    case 'ss-backgroundbrightness-dark': return 'dark';
+    case 'ss-overlayopacity-90': return 'opacity 90';
+    case 'ss-overlayopacity-80': return 'opacity 80';
+    case 'ss-overlayopacity-70': return 'opacity 70';
+    case 'ss-overlayopacity-60': return 'opacity 60';
+    case 'ss-overlayopacity-50': return 'opacity 50';
+    case 'ss-overlayopacity-40': return 'opacity 40';
+    case 'ss-overlayopacity-30': return 'opacity 30';
+    case 'ss-overlayopacity-20': return 'opacity 20';
+    case 'ss-overlayopacity-10': return 'opacity 10';
+    case 'ss-overlay-gradient-disabled': return 'no gradient';
+    case 'ss-overlay-right': return 'right';
+    case 'ss-overlay-left': return 'left';
     // These all get ignored
+    case 'backgroundablepagehero':
+    case 'pagehero':
     case 'contentbreak':
     case 'pagesection':
     case 'genericpagesection':
@@ -336,8 +354,17 @@ const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
+  classes.sort();
+  let allSectionClasses = {};
+  if (sessionStorage.getItem('allSectionClasses') !== null) {
+    allSectionClasses = JSON.parse(sessionStorage.getItem('allSectionClasses'));
+  }
+  const classCombo = classes.join(', ');
+  allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
+  sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
+
   if (classes.length > 0) {
-    builder.section({ style: classes.join(', ') });
+    builder.section({ style: classCombo });
   } else {
     builder.section();
   }
@@ -361,12 +388,28 @@ const buildContentBreakSection = (builder, section) => {
 
 const buildHeroSection = (builder, hero) => {
   const meta = {};
+
+  let classes = hero.classList.value.split(' ');
+  // remove classes named pagesection or start with aem
+  classes = classes.map(translateClassNames).filter((e) => !(!e));
+  classes.sort();
+  let allSectionClasses = {};
+  if (sessionStorage.getItem('allHeroClasses') !== null) {
+    allSectionClasses = JSON.parse(sessionStorage.getItem('allHeroClasses'));
+  }
+  let style = classes.join(', ');
+
   const img = getBackgroundImage(hero);
   if (img) {
     builder.element('img', { src: img, class: 'hero-img' }).up();
   } else {
-    builder.withSectionMetadata({ style: 'no-background' });
+    style = style ? `${style}, no-background` : 'no-background';
   }
+  if (style) {
+    builder.withSectionMetadata({ style });
+  }
+  allSectionClasses[style || 'none'] = (allSectionClasses[style || 'none'] || 0) + 1;
+  sessionStorage.setItem('allHeroClasses', JSON.stringify(allSectionClasses));
   // Rely on importer to strip out extra divs, etc.
   // buildSectionContent(builder, hero);
   builder.append(hero);
@@ -403,9 +446,9 @@ const restoreIcons = (document, originalDocument) => {
       return;
     }
     // Change icon to text indicating name of icon instead
-    const iconName = [...icon.classList].filter((c) => c.startsWith('fa-')).join(' ').replace('fa-', '');
+    const iconName = [...icon.classList].filter((c) => c.startsWith('fa')).join(' ').replaceAll(' fa-', '-');
     if (iconName) {
-      const newIcon = document.createTextNode(`{${iconName}} `);
+      const newIcon = document.createTextNode(`:${iconName}: `);
       if (li.querySelector('a')) {
         li.querySelector('a').prepend(newIcon);
       } else {
@@ -454,6 +497,10 @@ export default {
 
     // Build document and store into main element
     builder.replaceChildren(document.body);
+
+    // Note the classes used for each section
+    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
+    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
     return document.body;
   },
