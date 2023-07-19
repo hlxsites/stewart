@@ -1,0 +1,4 @@
+User-agent: *
+
+
+Sitemap: https://www.stewart.com/sitemap-index.xml
