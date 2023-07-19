@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable max-len */
-/* eslint-disable no-unused-vars */
-/* eslint-disable newline-per-chained-call */
-/* eslint-disable no-restricted-syntax */
+/* global WebImporter */
+/* eslint-disable no-unused-expressions, max-len, no-unused-vars, newline-per-chained-call, no-restricted-syntax, no-console, class-methods-use-this */
 /*
  * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -14,8 +11,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* global WebImporter */
-/* eslint-disable no-console, class-methods-use-this */
 
 class BlockBuilder {
   constructor(document, pageMetadata = {}) {
@@ -121,20 +116,10 @@ const extractMetadata = (document) => {
     img.src = metadata.image;
     metadata.image = img;
   }
-  const relatedLinks = document.querySelector('.be-related-link-container .be-list');
-  if (relatedLinks) {
-    metadata.related = relatedLinks;
-  }
   return metadata;
 };
 
-const getBackgroundImage = (section) => {
-  const backgroundDiv = section.querySelector('.has-background');
-  if (backgroundDiv) {
-    return backgroundDiv.getAttribute('style').replace(/.*?url\((['"])?(.*?)(['"])?\).*/gi, '$2').split(',')[0];
-  }
-  return undefined;
-};
+const getBackgroundImage = (section) => section.querySelector('.has-background')?.getAttribute('style').replace(/.*?url\((['"])?(.*?)(['"])?\).*/gi, '$2').split(',')[0];
 
 const buildExperienceFragment = (builder, section) => builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 
@@ -288,24 +273,24 @@ const buildSectionContent = (builder, section) => {
 
 const translateClassNames = (className) => {
   switch (className) {
-    case 'ss-contentcontainerwidth-narrow': return 'narrow';
-    case 'ss-contentcontainerwidth-wide': return 'wide';
-    case 'ss-margin-0': return 'no margin';
-    case 'ss-margin-bottom-small': return 'short';
-    case 'ss-backgroundbrightness-dark': return 'dark';
-    case 'ss-overlayopacity-90': return 'opacity 90';
-    case 'ss-overlayopacity-80': return 'opacity 80';
-    case 'ss-overlayopacity-70': return 'opacity 70';
-    case 'ss-overlayopacity-60': return 'opacity 60';
-    case 'ss-overlayopacity-50': return 'opacity 50';
-    case 'ss-overlayopacity-40': return 'opacity 40';
-    case 'ss-overlayopacity-30': return 'opacity 30';
-    case 'ss-overlayopacity-20': return 'opacity 20';
-    case 'ss-overlayopacity-10': return 'opacity 10';
-    case 'ss-overlay-gradient-disabled': return 'no gradient';
-    case 'ss-overlay-right': return 'right';
-    case 'ss-overlay-left': return 'left';
+    case 'ss-contentcontainerwidth-narrow': return 'Narrow';
+    case 'ss-contentcontainerwidth-wide': return 'Wide';
+    case 'ss-backgroundbrightness-dark': return 'Dark';
+    case 'ss-overlayopacity-90': return 'Opacity 90';
+    case 'ss-overlayopacity-80': return 'Opacity 80';
+    case 'ss-overlayopacity-70': return 'Opacity 70';
+    case 'ss-overlayopacity-60': return 'Opacity 60';
+    case 'ss-overlayopacity-50': return 'Opacity 50';
+    case 'ss-overlayopacity-40': return 'Opacity 40';
+    case 'ss-overlayopacity-30': return 'Opacity 30';
+    case 'ss-overlayopacity-20': return 'Opacity 20';
+    case 'ss-overlayopacity-10': return 'Opacity 10';
+    case 'ss-overlay-gradient-disabled': return 'No gradient';
+    case 'ss-overlay-right': return 'Right';
+    case 'ss-overlay-left': return 'Left';
     // These all get ignored
+    case 'ss-margin-0':
+    case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
     case 'pagehero':
     case 'contentbreak':
@@ -362,6 +347,15 @@ const buildHeroSection = (builder, hero) => {
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
   classes.sort();
+
+  // Dark to light transformation -- Dark is default instead of Light
+  if (classes.indexOf('Dark') >= 0) {
+    // remove value dark from array classes
+    classes.splice(classes.indexOf('Dark'), 1);
+  } else {
+    classes.push('Light');
+  }
+
   let allSectionClasses = {};
   if (sessionStorage.getItem('allHeroClasses') !== null) {
     allSectionClasses = JSON.parse(sessionStorage.getItem('allHeroClasses'));
@@ -372,7 +366,7 @@ const buildHeroSection = (builder, hero) => {
   if (img) {
     builder.element('img', { src: img, class: 'hero-img' }).up();
   } else {
-    style = style ? `${style}, no-background` : 'no-background';
+    style = style ? `${style}, No background` : 'No background';
   }
   if (style) {
     builder.withSectionMetadata({ style });
