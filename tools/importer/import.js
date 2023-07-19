@@ -148,6 +148,8 @@ const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) =
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
 
+const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
   if (rows.length === 0) { return; }
@@ -254,6 +256,7 @@ const buildGenericLists = (builder, section) => {
 };
 
 const buildSectionContent = (builder, section) => {
+  buildTables(builder, section);
   buildEmbed(builder, section);
   buildGenericLists(builder, section);
   buildTeaserLists(builder, section);
@@ -310,12 +313,8 @@ const buildGenericSection = (builder, section) => {
   const classCombo = classes.join(', ');
   allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
-
-  if (classes.length > 0) {
-    builder.section({ style: classCombo });
-  } else {
-    builder.section();
-  }
+  builder.section();
+  if (classes.length > 0) { builder.addSectionMetadata({ style: classCombo }); }
   buildSectionContent(builder, section);
 };
 
@@ -323,9 +322,9 @@ const buildBackgroundableSection = (builder, section) => {
   const img = getBackgroundImage(section);
   buildGenericSection(builder, section);
   if (img) {
-    builder.withSectionMetadata(builder.sectionMeta || {});
-    builder.sectionMeta.background = builder.doc.createElement('img');
-    builder.sectionMeta.background.src = img;
+    const imgTag = builder.doc.createElement('img');
+    imgTag.src = img;
+    builder.addSectionMetadata('background', imgTag);
   }
 };
 
