@@ -11,7 +11,7 @@
  */
 
  :root {
-  /* colors */
+  /* these colors came from legecy css commented out ones are not used anywhere...yet
   --clr-blue: #007bff;
   --clr-indigo: #6610f2;
   --clr-purple: #53469c;
@@ -20,11 +20,8 @@
   --clr-orange: #fd7e14;
   --clr-yellow: #ffc107;
   --clr-green: #28a745;
-  --clr-teal: #006781;
   --clr-cyan: #96e0ff;
-  --clr-gray: #6c757d;
   --clr-gray-dark: #343a40;
-  --clr-primary: #007dbd;
   --clr-secondary: #007dbd;
   --clr-success: #28a745;
   --clr-info: #96e0ff;
@@ -32,15 +29,22 @@
   --clr-danger: #dc3545;
   --clr-light: #e9e8e8;
   --clr-dark: #6e6e6e;
+  */
+
+  /* colors */
   --clr-brand-red: #9e2239;
   --clr-black: #000;
   --clr-white: #fff;
+  --clr-primary: #007dbd;
+  --clr-gray: #f2f2f2;
+  --clr-gray-light: #dad6d6;
+  --clr-teal: #006781;
+  
 
   /* element colors */
   --link-color: var(--clr-black);
   --link-hover-color: var(--clr-primary);
   --background-color: var(--clr-white);
-  --overlay-background-color: #dad6d6;
   --text-color: var(--clr-black);
 
   /* fonts */
@@ -224,7 +228,7 @@ p, dl, ol, ul, pre, blockquote {
 hr {
   margin-block: 1.5em;
   border: 0;
-  border-bottom: 1px solid var(--overlay-background-color);
+  border-bottom: 1px solid var(--clr-gray-light);
 }
 
 code, pre, samp {
@@ -292,7 +296,7 @@ a.button:hover, a.button:focus, button:hover, button:focus  {
 }
 
 button:disabled, button:disabled:hover {
-  background-color: var(--overlay-background-color);
+  background-color: var(--clr-gray-light);
   cursor: unset;
 }
 
@@ -363,4 +367,55 @@ main .section {
 main .section > div {
   max-width: var(--max-content-width);
   margin-inline: auto;
+}
+
+/* background styles and colors */
+.section.has-bg-image,
+.section.teal,
+.section.grey,
+.section.gray,
+.section.black,
+.section.blue {
+  margin-block-end: 0;
+} 
+
+.section.has-bg-image {
+  position: relative;
+  color: var(--clr-white);
+  background: linear-gradient(270deg, rgba(71 76 85 / 90%) 25%, rgba(71 76 85 / 60%) 45%, rgba(71 76 85 / 0%) 65%);
+}
+
+.section.has-bg-image picture.bg-image {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+
+.section.has-bg-image picture.bg-image img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.section.grey, .section.gray {
+  background-color: var(--clr-gray);
+}
+
+.section.teal {
+  background: linear-gradient(180deg,var(--clr-teal),#002f39);
+  box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
+  color: var(--clr-white);
+}
+
+.section.black {
+  color: var(--clr-black);
+}
+
+.section.blue {
+  color: var(--clr-teal);
 }

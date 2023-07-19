@@ -11,6 +11,7 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
+  toClassName,
 } from './lib-franklin.js';
 
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
@@ -154,6 +155,33 @@ export function wrapImgsInLinks(container) {
 }
 
 /**
+ * decorates section background images our of section metadata
+ * @param {element} main the container element
+ */
+function decorateSectionBackgroundImages(main) {
+  main.querySelectorAll('div.section-metadata').forEach((sectionMeta) => {
+    sectionMeta.querySelectorAll(':scope > div').forEach((row) => {
+      if (row.children) {
+        const cols = [...row.children];
+        if (cols[1]) {
+          const name = toClassName(cols[0].textContent);
+          if (name === 'background') {
+            const pic = cols[1].querySelector('picture');
+            if (pic) {
+              const section = sectionMeta.parentElement;
+              pic.classList.add('bg-image');
+              section.prepend(pic);
+              section.classList.add('has-bg-image');
+              row.remove();
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -165,6 +193,7 @@ export function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
+  decorateSectionBackgroundImages(main);
   decorateSections(main);
   decorateBlocks(main);
 }

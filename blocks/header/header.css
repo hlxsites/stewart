@@ -18,7 +18,7 @@ header nav {
   padding: 0 1rem;
   font-family: var(--body-font-family);
 
-  --border-color: var(--overlay-background-color);
+  --border-color: var(--clr-gray-light);
 }
 
 @media (min-width: 600px) {
