@@ -11,7 +11,7 @@
  */
 
  :root {
-  /* colors */
+  /* these colors came from legecy css commented out ones are not used anywhere...yet
   --clr-blue: #007bff;
   --clr-indigo: #6610f2;
   --clr-purple: #53469c;
@@ -20,11 +20,8 @@
   --clr-orange: #fd7e14;
   --clr-yellow: #ffc107;
   --clr-green: #28a745;
-  --clr-teal: #006781;
   --clr-cyan: #96e0ff;
-  --clr-gray: #6c757d;
   --clr-gray-dark: #343a40;
-  --clr-primary: #007dbd;
   --clr-secondary: #007dbd;
   --clr-success: #28a745;
   --clr-info: #96e0ff;
@@ -32,16 +29,22 @@
   --clr-danger: #dc3545;
   --clr-light: #e9e8e8;
   --clr-dark: #6e6e6e;
+  */
+
+  /* colors */
   --clr-brand-red: #9e2239;
   --clr-black: #000;
   --clr-white: #fff;
+  --clr-primary: #007dbd;
+  --clr-gray: #f2f2f2;
+  --clr-gray-light: #dad6d6;
+  --clr-teal: #006781;
+  
 
   /* element colors */
-  --link-color: #035fe6;
-  --link-hover-color: #136ff6;
+  --link-color: var(--clr-black);
+  --link-hover-color: var(--clr-primary);
   --background-color: var(--clr-white);
-  --overlay-background-color: #eee;
-  --highlight-background-color: #ccc;
   --text-color: var(--clr-black);
 
   /* fonts */
@@ -70,6 +73,7 @@
 
   /* nav height */
   --nav-height: 58px;
+  --max-content-width: 1440px;
 }
 
 @media (min-width: 900px) {
@@ -77,6 +81,10 @@
      /* nav height */
     --nav-height: 158px;
   }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 @font-face {
@@ -129,7 +137,7 @@ body, .text-reg {
 h1, h2, h3,
 h4, h5, h6 {
   font-family: var(--heading-font-family);
-  margin-bottom: 2rem;
+  margin-block: 0 1em;
 }
 
 .h1, h1 {
@@ -160,7 +168,6 @@ h4, h5, h6 {
   font-size: var(--heading-font-size-xxs);
   line-height: 1.4375rem;
   letter-spacing: .0106rem;
-  margin-bottom: 1rem;
 }
 
 @media (min-width: 900px) {
@@ -187,11 +194,6 @@ h4, h5, h6 {
     letter-spacing: -.0094rem;
   }
 
-  h1, h2, h3,
-  h4, h5, h6 {
-    margin-bottom: 4rem;
-  }
-
   h1, .h1 {
     font-size: var(--heading-font-size-xxl);
     line-height: 5.25rem;
@@ -216,20 +218,17 @@ h4, h5, h6 {
     font-size: var(--heading-font-size-m);
     line-height: 2.625rem;
     letter-spacing: .02rem;
-    margin-bottom: 2rem;
   }
 }
 
 p, dl, ol, ul, pre, blockquote {
-  margin-top: 1em;
-  margin-bottom: 1em;
+  margin-block: 0 1.5em;
 }
 
 hr {
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
+  margin-block: 1.5em;
   border: 0;
-  border-bottom: 1px solid var(--overlay-background-color);
+  border-bottom: 1px solid var(--clr-gray-light);
 }
 
 code, pre, samp {
@@ -265,39 +264,40 @@ a:hover {
 
 /* buttons */
 a.button:any-link, button {
-  font-family: var(--body-font-family);
   display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
-  border: 2px solid transparent;
-  padding: 5px 30px;
+  border: 1px solid var(--clr-primary);
+  padding: .5rem;
+  min-width: 10rem;
   text-align: center;
   font-style: normal;
   font-weight: 600;
   cursor: pointer;
   color: var(--background-color);
-  background-color: var(--link-color);
-  margin: 16px 0;
+  background-color: var(--clr-primary);
+  margin-block-end: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-radius: 30px;
+}
+
+@media (min-width: 900px) {
+  a.button:any-link, button {
+    padding: 1rem;
+    min-width: 17.5rem;
+  }
 }
 
 a.button:hover, a.button:focus, button:hover, button:focus  {
-  background-color: var(--link-hover-color);
+  background-color: #006497;
+  border-color: #005b8a;
   cursor: pointer;
 }
 
 button:disabled, button:disabled:hover {
-  background-color: var(--overlay-background-color);
+  background-color: var(--clr-gray-light);
   cursor: unset;
-}
-
-a.button.secondary, button.secondary {
-  background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color)
 }
 
 main input {
@@ -305,7 +305,7 @@ main input {
   width: 100%;
   max-width: 50rem;
   display: block;
-  margin-bottom: 1rem;
+  margin-block-end: 1rem;
   padding: 0.75rem 0.6rem;
   border-radius: 0.25rem;
   box-sizing: border-box;
@@ -353,23 +353,69 @@ main img {
 }
 
 main .section {
-  padding: 64px 16px;
-}
-
-@media (min-width: 600px) {
-  main .section {
-    padding: 64px 32px;
-  }
+  padding-inline: 1.5rem;
+  margin-block-end: 2rem;
 }
 
 @media (min-width: 900px) {
-  .section > div {
-    max-width: 1200px;
-    margin: auto;
+  main .section {
+    padding-inline: 6rem;
   }
 }
 
-/* section metadata */
-main .section.highlight {
-  background-color: var(--highlight-background-color);
+/* wrappers, e.g. default-content-wrapper, columns-wrapper, etc. */
+main .section > div {
+  max-width: var(--max-content-width);
+  margin-inline: auto;
+}
+
+/* background styles and colors */
+.section.has-bg-image,
+.section.teal,
+.section.grey,
+.section.gray,
+.section.black,
+.section.blue {
+  margin-block-end: 0;
+} 
+
+.section.has-bg-image {
+  position: relative;
+  color: var(--clr-white);
+  background: linear-gradient(270deg, rgba(71 76 85 / 90%) 25%, rgba(71 76 85 / 60%) 45%, rgba(71 76 85 / 0%) 65%);
+}
+
+.section.has-bg-image picture.bg-image {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  object-fit: cover;
+  box-sizing: border-box;
+}
+
+.section.has-bg-image picture.bg-image img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.section.grey, .section.gray {
+  background-color: var(--clr-gray);
+}
+
+.section.teal {
+  background: linear-gradient(180deg,var(--clr-teal),#002f39);
+  box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
+  color: var(--clr-white);
+}
+
+.section.black {
+  color: var(--clr-black);
+}
+
+.section.blue {
+  color: var(--clr-teal);
 }
