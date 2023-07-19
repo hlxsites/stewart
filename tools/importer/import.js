@@ -32,28 +32,21 @@ class BlockBuilder {
     return this.jumpTo(this.current || cur);
   }
 
-  append(e) {
-    this.current ? this.current.append(e) : this.root.append(e);
-    return this;
-  }
+  append(e) { return (this.current ? this.current.append(e) : this.root.append(e), this); }
 
   replace(e, f) {
+    if (!e) { return; }
     const old = this.current;
-    if (e) {
-      const oldRoot = this.root;
-      this.root = this.doc.createElement('div');
-      this.jumpTo(this.root);
-      f();
-      e.parentElement.replaceChild(this.root, e);
-      this.root = oldRoot;
-    }
-    return this.jumpTo(old);
+    const oldRoot = this.root;
+    this.root = this.doc.createElement('div');
+    this.jumpTo(this.root);
+    f();
+    e.parentElement.replaceChild(this.root, e);
+    this.root = oldRoot;
+    this.jumpTo(old);
   }
 
-  replaceChildren(parent) {
-    this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata);
-    return parent.replaceChildren(...this.root.children);
-  }
+  replaceChildren(parent) { return (this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata), parent.replaceChildren(...this.root.children)); }
 
   element(tag, attrs = {}) {
     const e = this.doc.createElement(tag);
@@ -78,8 +71,7 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    this.endBlock().element('table').element('tr').element('th', { colspan }).text(name);
-    return createRow ? this.row() : this;
+    return (this.endBlock().element('table').element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -239,7 +231,7 @@ const buildTeaserLists = (builder, section) => {
       builder.block('Teaser List', 2, false);
       // For each teaser, build a block with the image and text
       list.querySelectorAll('.page-teaser').forEach((teaser) => {
-        const img = teaser.querySelector('.page-teaser_image');
+        const img = teaser.querySelector('.page-teaser_image') || '';
         const content = teaser.querySelector('.page-teaser_content');
         builder.row().append(img).column().append(content);
       });
@@ -435,11 +427,8 @@ export default {
     // eslint-disable-next-line no-unused-vars
     document, url, html, params,
   }) => {
-    // Extract metadata
-    const metadata = extractMetadata(document);
-
     // define the main element: the one that will be transformed to Markdown
-    const builder = new BlockBuilder(document, metadata);
+    const builder = new BlockBuilder(document, extractMetadata(document));
 
     const parser = new DOMParser();
     const originalDoc = parser.parseFromString(html, 'text/html');
@@ -448,14 +437,10 @@ export default {
     restoreIcons(document, originalDoc);
 
     // Strip out header and footers that are not needed
-    document.querySelector('page-header')?.remove();
-    document.querySelector('page-footer')?.remove();
+    document.querySelector('page-header, page-footer')?.remove();
 
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
-
-    // General markup fix-ups
-    // fixEmptyLinks(document);
 
     // Build document and store into main element
     builder.replaceChildren(document.body);
