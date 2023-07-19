@@ -105,14 +105,10 @@ class BlockBuilder {
   #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
 }
 
-const getMetadata = (document, prop) => {
-  const metaElement = document.querySelector(`head meta[property='${prop}']`) || document.querySelector(`head meta[name='${prop}']`);
-  return metaElement?.content;
-};
+const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
 const extractMetadata = (document) => {
   const metadata = {};
-  /* for a list of metadata properties, build a metadata map using getMetdata to obtain their values */
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
   metadataProperties.forEach((prop) => {
     const val = getMetadata(document, prop);
@@ -129,7 +125,6 @@ const extractMetadata = (document) => {
   if (relatedLinks) {
     metadata.related = relatedLinks;
   }
-
   return metadata;
 };
 
@@ -141,18 +136,7 @@ const getBackgroundImage = (section) => {
   return undefined;
 };
 
-const fixEmptyLinks = (document) => {
-  // Find any links with no attributes and replace them with their children
-  document.querySelectorAll('a:not([href])').forEach((link) => {
-    const div = document.createElement('div');
-    div.append(...link.children);
-    link.parentElement.replaceChild(div, link);
-  });
-};
-
-const buildExperienceFragment = (builder, section) => {
-  builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
-};
+const buildExperienceFragment = (builder, section) => builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
@@ -165,16 +149,12 @@ const buildEmbed = (builder, section) => {
         builder.element('tt').withText(`${embed.querySelector('form').id}`);
       } else {
         builder.append(...embed.children);
-        console.log('Unknown embed type: ', embed.innerHTML);
+        console.log('Unknown embed type: ', embed.outerHTML);
       }
     });
   });
 
-  section.querySelectorAll('.application').forEach((app) => {
-    builder.replace(app, () => {
-      builder.element('tt').withText(`APP:${app.id}`);
-    });
-  });
+  section.querySelectorAll('.application').forEach((app) => builder.replace(app, () => builder.element('tt').withText(`APP:${app.id}`)));
 };
 
 const getGridRows = (grid) => {
@@ -193,9 +173,7 @@ const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.
 
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
-  if (rows.length === 0) {
-    return;
-  }
+  if (rows.length === 0) { return; }
 
   const numColumns = countColumns(rows);
   const { parentElement } = rows[0];
@@ -242,9 +220,7 @@ const buildColumnsBlock = (builder, section) => {
 
             if (col.querySelector('.carousel')) {
               builder.element('div');
-              col.querySelectorAll('.cmp-carousel__item img').forEach((img) => {
-                builder.append(img);
-              });
+              col.querySelectorAll('.cmp-carousel__item img').forEach((img) => builder.append(img));
               col.querySelector('.carousel').remove();
             } else {
               builder.append(col);
@@ -266,9 +242,7 @@ const buildCarousel = (builder, section) => {
   section.querySelectorAll('.carousel')?.forEach((carousel) => {
     builder.replace(carousel, () => {
       builder.block('Carousel', 1, false);
-      carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => {
-        builder.row().append(slide);
-      });
+      carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => builder.row().append(slide));
     });
   });
 };
@@ -296,11 +270,8 @@ const buildGenericLists = (builder, section) => {
       if (!list.classList.contains('ss-layout-twocolumn')) {
         name += ' (1-col)';
       }
-      // Move children dom nodes into the new div -- This isn't getting icons for some reason though.
       builder.block(name, 1, false);
-      list.querySelectorAll('li').forEach((listItem) => {
-        builder.row().append(...listItem.children);
-      });
+      list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
     });
   });
 };
@@ -381,10 +352,8 @@ const buildBackgroundableSection = (builder, section) => {
   }
 };
 
-const buildContentBreakSection = (builder, section) => {
-  // These are effectively the same as generic sections but we might want to tag them differently in the future
-  buildGenericSection(builder, section);
-};
+// Same thing for now
+const buildContentBreakSection = buildGenericSection;
 
 const buildHeroSection = (builder, hero) => {
   const meta = {};
@@ -411,7 +380,6 @@ const buildHeroSection = (builder, hero) => {
   allSectionClasses[style || 'none'] = (allSectionClasses[style || 'none'] || 0) + 1;
   sessionStorage.setItem('allHeroClasses', JSON.stringify(allSectionClasses));
   // Rely on importer to strip out extra divs, etc.
-  // buildSectionContent(builder, hero);
   builder.append(hero);
 };
 
@@ -434,7 +402,7 @@ const buildSection = (builder, section) => {
   }
 };
 
-const ICON_PARENT_SELECTOR = '.pagesection li';
+const ICON_PARENT_SELECTOR = '.icon .cmp-icon';
 const ICON_SELECTOR = `${ICON_PARENT_SELECTOR} i`;
 const restoreIcons = (document, originalDocument) => {
   // For every li with an icon in the original document, find the corresponding li in the imported document and add the icon
