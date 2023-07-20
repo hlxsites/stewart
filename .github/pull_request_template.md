@@ -2,7 +2,7 @@ Please always provide the [GitHub issue(s)](../issues) your PR is for, as well a
 
 Fix #<gh-issue-id>
 
-If you introduces a new block/varaint, please update the block library https://main--stewart--hlxsites.hlx.page/tools/sidekick/library/library.html
+If your PR introduces a new block/black varaint, please update the block library https://main--stewart--hlxsites.hlx.page/tools/sidekick/library/library.html
 
 Test URLs:
 - Before: https://main--stewart--hlxsites.hlx.live/
