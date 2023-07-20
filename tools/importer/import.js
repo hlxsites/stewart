@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable max-len */
-/* eslint-disable no-unused-vars */
-/* eslint-disable newline-per-chained-call */
-/* eslint-disable no-restricted-syntax */
+/* global WebImporter */
+/* eslint-disable no-unused-expressions, max-len, no-unused-vars, newline-per-chained-call, no-restricted-syntax, no-console, class-methods-use-this */
 /*
  * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -14,8 +11,6 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* global WebImporter */
-/* eslint-disable no-console, class-methods-use-this */
 
 class BlockBuilder {
   constructor(document, pageMetadata = {}) {
@@ -105,14 +100,10 @@ class BlockBuilder {
   #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
 }
 
-const getMetadata = (document, prop) => {
-  const metaElement = document.querySelector(`head meta[property='${prop}']`) || document.querySelector(`head meta[name='${prop}']`);
-  return metaElement?.content;
-};
+const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
 const extractMetadata = (document) => {
   const metadata = {};
-  /* for a list of metadata properties, build a metadata map using getMetdata to obtain their values */
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
   metadataProperties.forEach((prop) => {
     const val = getMetadata(document, prop);
@@ -128,26 +119,9 @@ const extractMetadata = (document) => {
   return metadata;
 };
 
-const getBackgroundImage = (section) => {
-  const backgroundDiv = section.querySelector('.has-background');
-  if (backgroundDiv) {
-    return backgroundDiv.getAttribute('style').replace(/.*?url\((['"])?(.*?)(['"])?\).*/gi, '$2').split(',')[0];
-  }
-  return undefined;
-};
+const getBackgroundImage = (section) => section.querySelector('.has-background')?.getAttribute('style').replace(/.*?url\((['"])?(.*?)(['"])?\).*/gi, '$2').split(',')[0];
 
-const fixEmptyLinks = (document) => {
-  // Find any links with no attributes and replace them with their children
-  document.querySelectorAll('a:not([href])').forEach((link) => {
-    const div = document.createElement('div');
-    div.append(...link.children);
-    link.parentElement.replaceChild(div, link);
-  });
-};
-
-const buildExperienceFragment = (builder, section) => {
-  builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
-};
+const buildExperienceFragment = (builder, section) => builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
@@ -160,16 +134,12 @@ const buildEmbed = (builder, section) => {
         builder.element('tt').withText(`${embed.querySelector('form').id}`);
       } else {
         builder.append(...embed.children);
-        console.log('Unknown embed type: ', embed.innerHTML);
+        console.log('Unknown embed type: ', embed.outerHTML);
       }
     });
   });
 
-  section.querySelectorAll('.application').forEach((app) => {
-    builder.replace(app, () => {
-      builder.element('tt').withText(`APP:${app.id}`);
-    });
-  });
+  section.querySelectorAll('.application').forEach((app) => builder.replace(app, () => builder.element('tt').withText(`APP:${app.id}`)));
 };
 
 const getGridRows = (grid) => {
@@ -188,9 +158,7 @@ const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.
 
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
-  if (rows.length === 0) {
-    return;
-  }
+  if (rows.length === 0) { return; }
 
   const numColumns = countColumns(rows);
   const { parentElement } = rows[0];
@@ -237,9 +205,7 @@ const buildColumnsBlock = (builder, section) => {
 
             if (col.querySelector('.carousel')) {
               builder.element('div');
-              col.querySelectorAll('.cmp-carousel__item img').forEach((img) => {
-                builder.append(img);
-              });
+              col.querySelectorAll('.cmp-carousel__item img').forEach((img) => builder.append(img));
               col.querySelector('.carousel').remove();
             } else {
               builder.append(col);
@@ -261,9 +227,7 @@ const buildCarousel = (builder, section) => {
   section.querySelectorAll('.carousel')?.forEach((carousel) => {
     builder.replace(carousel, () => {
       builder.block('Carousel', 1, false);
-      carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => {
-        builder.row().append(slide);
-      });
+      carousel.querySelectorAll('.cmp-carousel__item').forEach((slide) => builder.row().append(slide));
     });
   });
 };
@@ -288,27 +252,11 @@ const buildGenericLists = (builder, section) => {
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
       let name = 'List';
-      if (list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (2-col)';
+      if (!list.classList.contains('ss-layout-twocolumn')) {
+        name += ' (1-col)';
       }
-      // Move children dom nodes into the new div -- This isn't getting icons for some reason though.
       builder.block(name, 1, false);
-      list.querySelectorAll('li').forEach((listItem) => {
-        builder.row().append(...listItem.children);
-      });
-      // Loop over all list items -- there is a lot of variance and for some reason the DOM isn't right when this code executes!
-      // list.querySelectorAll('li').forEach((li) => {
-      //   const href = li.querySelector('a')?.getAttribute('href');
-      //   const icon = li.querySelector('i')?.classList.filter((c) => c.startsWith('fa-')).join(' ');
-      //   const text = li.querySelector('a')?.textContent;
-      //   // Create column for icon and one for the link text
-      //   builder.row().text(icon || '???');
-      //   if (href) {
-      //     builder.column().element('a', { href }).text(text);
-      //   } else {
-      //     builder.column().append(...li.childNodes);
-      //   }
-      // });
+      list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
     });
   });
 };
@@ -325,13 +273,26 @@ const buildSectionContent = (builder, section) => {
 
 const translateClassNames = (className) => {
   switch (className) {
-    case 'ss-contentcontainerwidth-narrow': return 'narrow';
-    case 'ss-contentcontainerwidth-wide': return 'wide';
-    case 'ss-margin-0': return 'no margin';
-    case 'ss-backgroundbrightness-dark': return 'dark background';
-    case 'ss-overlayopacity-90': return 'dark overlay';
-    case 'ss-overlay-right': return 'overlay right';
+    case 'ss-contentcontainerwidth-narrow': return 'Narrow';
+    case 'ss-contentcontainerwidth-wide': return 'Wide';
+    case 'ss-backgroundbrightness-dark': return 'Dark';
+    case 'ss-overlayopacity-90': return 'Opacity 90';
+    case 'ss-overlayopacity-80': return 'Opacity 80';
+    case 'ss-overlayopacity-70': return 'Opacity 70';
+    case 'ss-overlayopacity-60': return 'Opacity 60';
+    case 'ss-overlayopacity-50': return 'Opacity 50';
+    case 'ss-overlayopacity-40': return 'Opacity 40';
+    case 'ss-overlayopacity-30': return 'Opacity 30';
+    case 'ss-overlayopacity-20': return 'Opacity 20';
+    case 'ss-overlayopacity-10': return 'Opacity 10';
+    case 'ss-overlay-gradient-disabled': return 'No gradient';
+    case 'ss-overlay-right': return 'Right';
+    case 'ss-overlay-left': return 'Left';
     // These all get ignored
+    case 'ss-margin-0':
+    case 'ss-margin-bottom-small':
+    case 'backgroundablepagehero':
+    case 'pagehero':
     case 'contentbreak':
     case 'pagesection':
     case 'genericpagesection':
@@ -349,8 +310,17 @@ const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
+  classes.sort();
+  let allSectionClasses = {};
+  if (sessionStorage.getItem('allSectionClasses') !== null) {
+    allSectionClasses = JSON.parse(sessionStorage.getItem('allSectionClasses'));
+  }
+  const classCombo = classes.join(', ');
+  allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
+  sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
+
   if (classes.length > 0) {
-    builder.section({ style: classes.join(', ') });
+    builder.section({ style: classCombo });
   } else {
     builder.section();
   }
@@ -367,21 +337,43 @@ const buildBackgroundableSection = (builder, section) => {
   }
 };
 
-const buildContentBreakSection = (builder, section) => {
-  // These are effectively the same as generic sections but we might want to tag them differently in the future
-  buildGenericSection(builder, section);
-};
+// Same thing for now
+const buildContentBreakSection = buildGenericSection;
 
 const buildHeroSection = (builder, hero) => {
   const meta = {};
+
+  let classes = hero.classList.value.split(' ');
+  // remove classes named pagesection or start with aem
+  classes = classes.map(translateClassNames).filter((e) => !(!e));
+  classes.sort();
+
+  // Dark to light transformation -- Dark is default instead of Light
+  if (classes.indexOf('Dark') >= 0) {
+    // remove value dark from array classes
+    classes.splice(classes.indexOf('Dark'), 1);
+  } else {
+    classes.push('Light');
+  }
+
+  let allSectionClasses = {};
+  if (sessionStorage.getItem('allHeroClasses') !== null) {
+    allSectionClasses = JSON.parse(sessionStorage.getItem('allHeroClasses'));
+  }
+  let style = classes.join(', ');
+
   const img = getBackgroundImage(hero);
   if (img) {
     builder.element('img', { src: img, class: 'hero-img' }).up();
   } else {
-    builder.withSectionMetadata({ style: 'no-background' });
+    style = style ? `${style}, No background` : 'No background';
   }
+  if (style) {
+    builder.withSectionMetadata({ style });
+  }
+  allSectionClasses[style || 'none'] = (allSectionClasses[style || 'none'] || 0) + 1;
+  sessionStorage.setItem('allHeroClasses', JSON.stringify(allSectionClasses));
   // Rely on importer to strip out extra divs, etc.
-  // buildSectionContent(builder, hero);
   builder.append(hero);
 };
 
@@ -404,6 +396,31 @@ const buildSection = (builder, section) => {
   }
 };
 
+const ICON_PARENT_SELECTOR = '.icon .cmp-icon';
+const ICON_SELECTOR = `${ICON_PARENT_SELECTOR} i`;
+const restoreIcons = (document, originalDocument) => {
+  // For every li with an icon in the original document, find the corresponding li in the imported document and add the icon
+  // Use the index of the li in the query selector to locate in both lists
+  originalDocument.querySelectorAll(ICON_SELECTOR).forEach((icon, index) => {
+    const li = document.querySelectorAll(ICON_PARENT_SELECTOR)[index];
+    if (!li) {
+      console.log('Could not find li for icon: ', icon.innerHTML, ' index ', index);
+      return;
+    }
+    // Change icon to text indicating name of icon instead
+    const iconName = [...icon.classList].filter((c) => c.startsWith('fa')).join(' ').replaceAll(' fa-', '-');
+    if (iconName) {
+      const newIcon = document.createTextNode(`:${iconName}: `);
+      if (li.querySelector('a')) {
+        li.querySelector('a').prepend(newIcon);
+      } else {
+        li.prepend(newIcon);
+      }
+      console.log('Added icon: ', newIcon.textContent, ' to ', li.innerHTML);
+    }
+  });
+};
+
 export default {
   /**
    * Apply DOM operations to the provided document and return
@@ -424,6 +441,12 @@ export default {
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, metadata);
 
+    const parser = new DOMParser();
+    const originalDoc = parser.parseFromString(html, 'text/html');
+
+    // Restore markup that was stripped out by the importer
+    restoreIcons(document, originalDoc);
+
     // Strip out header and footers that are not needed
     document.querySelector('page-header')?.remove();
     document.querySelector('page-footer')?.remove();
@@ -431,11 +454,15 @@ export default {
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
+    // General markup fix-ups
+    // fixEmptyLinks(document);
+
     // Build document and store into main element
     builder.replaceChildren(document.body);
 
-    // General markup fix-ups
-    fixEmptyLinks(document);
+    // Note the classes used for each section
+    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
+    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
     return document.body;
   },
