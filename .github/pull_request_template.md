@@ -5,5 +5,5 @@ Fix #<gh-issue-id>
 If you introduces a new block/varaint, please update the block library https://main--stewart--hlxsites.hlx.page/tools/sidekick/library.html
 
 Test URLs:
-- Before: https://main--stewart--hlxsites.hlx.page/
-- After: https://<branch>--stewart--hlxsites.hlx.page/
+- Before: https://main--stewart--hlxsites.hlx.live/
+- After: https://<branch>--stewart--hlxsites.hlx.live/
