@@ -247,6 +247,19 @@ const buildTeaserLists = (builder, section) => {
   });
 };
 
+const buildAccordions = (builder, section) => {
+  section.querySelectorAll('.accordion')?.forEach((carousel) => {
+    builder.replace(carousel, () => {
+      builder.block('Accordion', 2, false);
+      carousel.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+        const header = accordionItem.querySelector('.cmp-accordion__header');
+        const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
+        builder.row().append(header).column().append(panelContent);
+      });
+    });
+  });
+};
+
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
@@ -268,6 +281,7 @@ const buildSectionContent = (builder, section) => {
   buildColumnsBlock(builder, section);
   // Carousels inside columns are a special case, so do standalone carousels last
   buildCarousel(builder, section);
+  buildAccordions(builder, section);
   builder.append(section);
 };
 

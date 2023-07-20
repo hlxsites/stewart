@@ -1,0 +1,76 @@
+main .accordion .accordion-item {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--clr-black);
+}
+
+main .accordion .accordion-item > h3 {
+  margin: 0;
+  display: flex;
+}
+
+main .accordion .accordion-item > h3 > .accordion-item-trigger {
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  color: var(--clr-black);
+  padding: 20px 0;
+  border: 0;
+  margin: 0;
+  display: flex;
+  white-space: normal;
+}
+
+main .accordion .accordion-item-active > h3 > .accordion-item-trigger {
+  border: 0;
+}
+
+main .accordion .accordion-item > h3 > .accordion-item-trigger:hover,
+main .accordion .accordion-item > h3 > .accordion-item-trigger:active,
+main .accordion .accordion-item > h3 > .accordion-item-trigger:focus {
+  background-color: transparent;
+}
+
+main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  display: flex;
+  line-height: 46px;
+}
+
+
+main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title::before {
+    font-family: 'Font Awesome 5 Pro'; /* stylelint-disable-line font-family-no-missing-generic-family-keyword */
+    content: '\f105';
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    justify-content: center;
+    transform: rotate(0);
+    transform-origin: center;
+    transition: transform .5s;
+    font-size: 60px;
+    color: var(--clr-teal-light);
+    font-weight: 300;
+    text-align: center;
+}
+
+main .accordion .accordion-item-active .accordion-item-trigger > .accordion-item-title::before {
+  transform: rotate(90deg);
+}
+
+main .accordion .accordion-item .accordion-panel {
+  padding:0 24px;
+}
+
+
+@media (min-width: 900px) {
+  main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
+    font-size: var(--heading-font-size-m);
+  }
+
+  main .accordion .accordion-item .accordion-panel {
+    padding:0 50px;
+  }
+
+}
