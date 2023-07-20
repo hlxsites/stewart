@@ -32,28 +32,21 @@ class BlockBuilder {
     return this.jumpTo(this.current || cur);
   }
 
-  append(e) {
-    this.current ? this.current.append(e) : this.root.append(e);
-    return this;
-  }
+  append(e) { return (this.current ? this.current.append(e) : this.root.append(e), this); }
 
   replace(e, f) {
+    if (!e) { return; }
     const old = this.current;
-    if (e) {
-      const oldRoot = this.root;
-      this.root = this.doc.createElement('div');
-      this.jumpTo(this.root);
-      f();
-      e.parentElement.replaceChild(this.root, e);
-      this.root = oldRoot;
-    }
-    return this.jumpTo(old);
+    const oldRoot = this.root;
+    this.root = this.doc.createElement('div');
+    this.jumpTo(this.root);
+    f();
+    e.parentElement.replaceChild(this.root, e);
+    this.root = oldRoot;
+    this.jumpTo(old);
   }
 
-  replaceChildren(parent) {
-    this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata);
-    return parent.replaceChildren(...this.root.children);
-  }
+  replaceChildren(parent) { return (this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata), parent.replaceChildren(...this.root.children)); }
 
   element(tag, attrs = {}) {
     const e = this.doc.createElement(tag);
@@ -78,8 +71,7 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    this.endBlock().element('table').element('tr').element('th', { colspan }).text(name);
-    return createRow ? this.row() : this;
+    return (this.endBlock().element('table').element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -155,6 +147,8 @@ const getGridRows = (grid) => {
 const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) => row.querySelectorAll('.cmp-columnrow__item').length));
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
+
+const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
 
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
@@ -239,7 +233,7 @@ const buildTeaserLists = (builder, section) => {
       builder.block('Teaser List', 2, false);
       // For each teaser, build a block with the image and text
       list.querySelectorAll('.page-teaser').forEach((teaser) => {
-        const img = teaser.querySelector('.page-teaser_image');
+        const img = teaser.querySelector('.page-teaser_image') || '';
         const content = teaser.querySelector('.page-teaser_content');
         builder.row().append(img).column().append(content);
       });
@@ -262,6 +256,7 @@ const buildGenericLists = (builder, section) => {
 };
 
 const buildSectionContent = (builder, section) => {
+  buildTables(builder, section);
   buildEmbed(builder, section);
   buildGenericLists(builder, section);
   buildTeaserLists(builder, section);
@@ -318,12 +313,8 @@ const buildGenericSection = (builder, section) => {
   const classCombo = classes.join(', ');
   allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
-
-  if (classes.length > 0) {
-    builder.section({ style: classCombo });
-  } else {
-    builder.section();
-  }
+  builder.section();
+  if (classes.length > 0) { builder.addSectionMetadata({ style: classCombo }); }
   buildSectionContent(builder, section);
 };
 
@@ -331,9 +322,9 @@ const buildBackgroundableSection = (builder, section) => {
   const img = getBackgroundImage(section);
   buildGenericSection(builder, section);
   if (img) {
-    builder.withSectionMetadata(builder.sectionMeta || {});
-    builder.sectionMeta.background = builder.doc.createElement('img');
-    builder.sectionMeta.background.src = img;
+    const imgTag = builder.doc.createElement('img');
+    imgTag.src = img;
+    builder.addSectionMetadata('background', imgTag);
   }
 };
 
@@ -435,11 +426,8 @@ export default {
     // eslint-disable-next-line no-unused-vars
     document, url, html, params,
   }) => {
-    // Extract metadata
-    const metadata = extractMetadata(document);
-
     // define the main element: the one that will be transformed to Markdown
-    const builder = new BlockBuilder(document, metadata);
+    const builder = new BlockBuilder(document, extractMetadata(document));
 
     const parser = new DOMParser();
     const originalDoc = parser.parseFromString(html, 'text/html');
@@ -448,14 +436,10 @@ export default {
     restoreIcons(document, originalDoc);
 
     // Strip out header and footers that are not needed
-    document.querySelector('page-header')?.remove();
-    document.querySelector('page-footer')?.remove();
+    document.querySelector('page-header, page-footer')?.remove();
 
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
-
-    // General markup fix-ups
-    // fixEmptyLinks(document);
 
     // Build document and store into main element
     builder.replaceChildren(document.body);
