@@ -84,13 +84,21 @@ export async function decorateIcons(element) {
  */
 function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
-  // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = createElement('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
-    main.prepend(section);
+  if (!h1) {
+    return;
   }
+
+  const section = h1.closest('div');
+  const picture = section.querySelector('picture');
+  if (!picture) {
+    return;
+  }
+
+  const elems = [...section.children];
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const block = buildBlock('hero', { elems: filtered });
+  section.append(block);
+  main.prepend(section);
 }
 
 /**
