@@ -37,8 +37,8 @@ export default function decorate(block) {
   block.replaceChildren(wrapper);
 
   block.append(createElement('div', { class: 'carousel-slide-controls' }, [
-    createElement('button', { class: ['carousel-slide-control', 'carousel-slide-prev'], 'aria-label': 'Previous' }),
-    createElement('button', { class: ['carousel-slide-control', 'carousel-slide-next'], 'aria-label': 'Next' }),
+    createElement('button', { class: ['carousel-slide-control', 'carousel-slide-prev', 'fa'], 'aria-label': 'Previous' }),
+    createElement('button', { class: ['carousel-slide-control', 'carousel-slide-next', 'fa'], 'aria-label': 'Next' }),
   ]));
 
   block.querySelectorAll('.carousel-slide-control').forEach((btn) => {

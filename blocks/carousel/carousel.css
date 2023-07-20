@@ -33,7 +33,7 @@ main .carousel .carousel-slide-control {
   height: 50px;
   border-radius: 9px;
   color: var(--clr-white);
-  background-color: var(----clr-gray-light);
+  background-color: var(--clr-gray-light);
   border: none;
   display: flex;
   align-items: center;
@@ -55,7 +55,6 @@ main .carousel .carousel-slide-control.carousel-slide-prev {
 }
 
 main .carousel .carousel-slide-control::after {
-  font-family: Font Awesome\ 5 Pro;
   font-size: 35px;
 }
 
