@@ -9,27 +9,27 @@ main .hero-container {
 }
 
 main .hero-container.opacity-10 {
-  background-color: rgba(0,0,0,.1);
+  background-color: rgb(0 0 0 / 10%);
 }
 
 main .hero-container.opacity-15 {
-  background-color: rgba(0,0,0,.15);
+  background-color: rgb(0 0 0 / 15%);
 }
 
 main .hero-container.opacity-20 {
-  background-color: rgba(0,0,0,.2);
+  background-color: rgb(0 0 0 / 20%);
 }
 
 main .hero-container.opacity-30 {
-  background-color: rgba(0,0,0,.3);
+  background-color: rgb(0 0 0 / 30%);
 }
 
 main .hero-container.opacity-40 {
-  background-color: rgba(0,0,0,.4);
+  background-color: rgb(0 0 0 / 40%);
 }
 
 main .hero-container.opacity-50 {
-  background-color: rgba(0,0,0,.5);
+  background-color: rgb(0 0 0 / 50%);
 }
   
 main .hero {
