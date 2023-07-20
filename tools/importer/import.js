@@ -182,11 +182,11 @@ const buildColumnsBlock = (builder, section) => {
             if (!inTable) {
               let name = 'Columns';
               if (cols[0].classList.contains('col-md-8')) {
-                name += ' (66-33)';
+                name += ' (columns-split-66-33)';
               } else if (cols[0].classList.contains('col-md-9')) {
-                name += ' (75-25)';
+                name += ' (columns-split-75-25)';
               } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                name += ' (33-33-33)';
+                name += ' (columns-split-33-33-33)';
               } else if (child.querySelector('.carousel')) {
                 name += ' (Carousel)';
               }
@@ -288,12 +288,12 @@ const translateClassNames = (className) => {
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
     case 'ss-overlay-left': return 'Left';
+    case 'contentbreak': return 'More padding';
     // These all get ignored
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
     case 'pagehero':
-    case 'contentbreak':
     case 'pagesection':
     case 'genericpagesection':
     case 'ss-sectiontype-banner':

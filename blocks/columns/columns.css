@@ -1,3 +1,7 @@
+.columns-container.more-padding {
+  padding: 2.5rem 1.5rem;
+}
+
 .columns > div {
   display: flex;
   flex-direction: column;
@@ -19,6 +23,16 @@
   display: block;
 }
 
+.columns-container.more-padding .columns .row .column-1{
+  border-inline-start: 0.25rem solid var(--clr-white);
+  padding-inline-start: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.columns-container.more-padding.grey .columns .row .column-1{
+  border-inline-start: 0.25rem solid var(--clr-teal);
+}
+
 @media (min-width: 900px) {
   .columns > div {
     align-items: center;
@@ -29,5 +43,22 @@
   .columns > div > div {
     flex: 1;
     order: unset;
+  }
+
+  .columns.columns-split-66-33 .row .column-1{
+    flex-grow: 2;
+  }
+
+  .columns.columns-split-75-25 .row .column-1{
+    flex-grow: 3;
+  }
+
+  .columns-container.more-padding {
+    padding: 7.5rem;
+  }
+
+  .columns-container.more-padding .columns .row .column-1{
+    padding-inline-start: 1.5rem;
+    margin-bottom: 0;
   }
 }
