@@ -1,4 +1,4 @@
-.columns-container.more-padding {
+.columns-container.content-break {
   padding: 2.5rem 1.5rem;
 }
 
@@ -23,13 +23,13 @@
   display: block;
 }
 
-.columns-container.more-padding .columns .row .column-1{
+.columns-container.content-break .columns .row .column-1{
   border-inline-start: 0.25rem solid var(--clr-white);
   padding-inline-start: 1rem;
   margin-bottom: 2.5rem;
 }
 
-.columns-container.more-padding.grey .columns .row .column-1{
+.columns-container.content-break.grey .columns .row .column-1{
   border-inline-start: 0.25rem solid var(--clr-teal);
 }
 
@@ -45,19 +45,19 @@
     order: unset;
   }
 
-  .columns.columns-split-66-33 .row .column-1{
+  .columns.split-66-33 .row .column-1{
     flex-grow: 2;
   }
 
-  .columns.columns-split-75-25 .row .column-1{
+  .columns.split-75-25 .row .column-1{
     flex-grow: 3;
   }
 
-  .columns-container.more-padding {
+  .columns-container.content-break {
     padding: 7.5rem;
   }
 
-  .columns-container.more-padding .columns .row .column-1{
+  .columns-container.content-break .columns .row .column-1{
     padding-inline-start: 1.5rem;
     margin-bottom: 0;
   }
