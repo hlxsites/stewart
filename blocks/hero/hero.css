@@ -7,24 +7,51 @@ main .hero-container > div {
 main .hero-container {
   padding-inline: 0;
 }
+
+main .hero-container.opacity-10 {
+  background-color: rgb(0 0 0 / 10%);
+}
+
+main .hero-container.opacity-15 {
+  background-color: rgb(0 0 0 / 15%);
+}
+
+main .hero-container.opacity-20 {
+  background-color: rgb(0 0 0 / 20%);
+}
+
+main .hero-container.opacity-30 {
+  background-color: rgb(0 0 0 / 30%);
+}
+
+main .hero-container.opacity-40 {
+  background-color: rgb(0 0 0 / 40%);
+}
+
+main .hero-container.opacity-50 {
+  background-color: rgb(0 0 0 / 50%);
+}
   
 main .hero {
   position: relative;
-  padding: 1.5rem;
+  padding: 3.125rem 1.5rem;
   min-height: 300px;
-}
-
-@media (min-width: 900px) {
-  main .hero {
-    padding: 3rem 6rem;
-  }
 }
 
 main .hero h1 {
   max-width: var(--max-content-width);
   margin-left: auto;
   margin-right: auto;
-  color: white;
+  color: var(--clr-white);  
+}
+
+main .hero h1::after {
+  content: "";
+  display: block;
+  background-color: var(--clr-brand-red);
+  width: 4.5rem;
+  height: 0.25rem;
+  margin: 0.5rem 0 0;
 }
 
 main .hero picture {
@@ -42,4 +69,36 @@ main .hero img {
   object-fit: cover;
   width: 100%;
   height: 100%;
+}
+
+main .hero h2 {
+  color: var(--clr-white);
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+main .hero .align-end {
+  text-align: end;
+  margin-top: 28px;
+  margin-bottom: 2.5rem;
+}
+
+main .hero .align-end a {
+  margin-block-end: 0;
+}
+
+@media (min-width: 900px) {
+  main .hero {
+    padding: 6.25rem 8.5rem;
+  }
+
+  main .hero h1::after {
+    height: 0.5rem;
+    margin: 1.5rem 0 0;
+    width: 10rem;
+  }
+
+  main .hero .align-end {
+    margin-top: 5rem;
+  }
 }
