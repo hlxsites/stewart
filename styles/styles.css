@@ -39,7 +39,8 @@
   --clr-gray: #f2f2f2;
   --clr-gray-light: #dad6d6;
   --clr-teal: #006781;
-
+  --clr-teal-light: #248464;
+  
 
   /* element colors */
   --link-color: var(--clr-black);

@@ -94,6 +94,12 @@ class BlockBuilder {
 
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
+const getPublishDate = (document) => {
+  const publishDate = document.querySelector('.contentcontainer > .cmp-container > .singlesimpleattributeprojection > .cmp-singlesimpleattributeprojection p:nth-child(1) > b')?.textContent;
+  if (publishDate) { return publishDate.match(/[A-Za-z]+ [0-9]{1,2}, [12][0-9]{3}/)[0]; }
+  return document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+};
+
 const extractMetadata = (document) => {
   const metadata = {};
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
@@ -108,6 +114,10 @@ const extractMetadata = (document) => {
     img.src = metadata.image;
     metadata.image = img;
   }
+  const publishDate = getPublishDate(document);
+  if (publishDate) { metadata['Publish Date'] = publishDate; }
+  const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
+  if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
   return metadata;
 };
 
@@ -176,11 +186,11 @@ const buildColumnsBlock = (builder, section) => {
             if (!inTable) {
               let name = 'Columns';
               if (cols[0].classList.contains('col-md-8')) {
-                name += ' (66-33)';
+                name += ' (Split 66-33)';
               } else if (cols[0].classList.contains('col-md-9')) {
-                name += ' (75-25)';
+                name += ' (Split 75-25)';
               } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                name += ' (33-33-33)';
+                name += ' (Split 33-33-33)';
               } else if (child.querySelector('.carousel')) {
                 name += ' (Carousel)';
               }
@@ -241,6 +251,19 @@ const buildTeaserLists = (builder, section) => {
   });
 };
 
+const buildAccordions = (builder, section) => {
+  section.querySelectorAll('.accordion')?.forEach((accordion) => {
+    builder.replace(accordion, () => {
+      builder.block('Accordion', 2, false);
+      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+        const header = accordionItem.querySelector('.cmp-accordion__header');
+        const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
+        builder.row().append(header).column().append(panelContent);
+      });
+    });
+  });
+};
+
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
@@ -263,6 +286,7 @@ const buildSectionContent = (builder, section) => {
   buildColumnsBlock(builder, section);
   // Carousels inside columns are a special case, so do standalone carousels last
   buildCarousel(builder, section);
+  buildAccordions(builder, section);
   builder.append(section);
 };
 
@@ -284,13 +308,13 @@ const translateClassNames = (className) => {
     case 'ss-overlayopacity-10': return 'Opacity 10';
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
+    case 'contentbreak': return 'Content break';
     // These all get ignored
     case 'ss-overlay-left':
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
     case 'pagehero':
-    case 'contentbreak':
     case 'pagesection':
     case 'genericpagesection':
     case 'ss-sectiontype-banner':
@@ -316,7 +340,7 @@ const buildGenericSection = (builder, section) => {
   allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
   builder.section();
-  if (classes.length > 0) { builder.addSectionMetadata({ style: classCombo }); }
+  if (classes.length > 0) { builder.addSectionMetadata('style', classCombo); }
   buildSectionContent(builder, section);
 };
 
@@ -333,6 +357,7 @@ const buildBackgroundableSection = (builder, section) => {
 // Same thing for now
 const buildContentBreakSection = buildGenericSection;
 
+const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
   const meta = {};
 
@@ -348,6 +373,8 @@ const buildHeroSection = (builder, hero) => {
   } else {
     classes.push('Light');
   }
+
+  if (isNarrowHero(hero)) { classes.push('Narrow'); }
 
   let allSectionClasses = {};
   if (sessionStorage.getItem('allHeroClasses') !== null) {
