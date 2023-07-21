@@ -423,7 +423,7 @@ main .section>div {
 }
 
 .section.has-opacity {
-  --_bg-overlay-color: 71, 76, 85;
+  --_bg-overlay-color: 71 76 85;
   --_bg-overlay-opacity-1: 0;
   --_bg-overlay-opacity-2: 0;
   --_bg-overlay-opacity-3: 0;
