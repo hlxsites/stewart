@@ -384,11 +384,12 @@ main .section>div {
   margin-inline: auto;
 }
 
-/* background styles and colors */
+
 .section.no-margin {
   margin-block-end: 0;
 }
 
+/* background styles and colors */
 .section.has-bg {
   padding: 2.5rem 1.5rem;
 }
@@ -509,4 +510,22 @@ main .section>div {
 
 .section.blue {
   color: var(--clr-teal);
+}
+
+@media(min-width: 600px) {
+  .section.wide {
+    padding: 8% 3%;
+  }
+  .section.narrow {
+    margin: 0 8%;
+    width: auto;
+    max-width: 64rem;
+  }
+}
+
+@media(min-width: 900px) {
+  .section.narrow {
+    margin: 0 auto;
+    width: auto
+  }
 }
