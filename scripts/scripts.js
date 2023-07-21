@@ -194,16 +194,23 @@ function decorateSectionBackgroundImages(main) {
  * @param {Element} main the container element
  */
 function decorateSectionsExt(main) {
+  const bgClasses = ['has-bg-image', 'teal', 'blue', 'black', 'gray', 'grey'];
+  const opacityClasses = ['opacity-100', 'opacity-90', 'opacity-80', 'opacity-70', 'opacity-60', 'opacity-55', 'opacity-50'];
   const allSections = main.querySelectorAll('div.section');
   for (let i = 0; i < allSections.length; i += 1) {
     const section = allSections[i];
-    // if the section has a background
-    // and the next one does not, then the section gets no bottom margin
-    const bgClasses = ['has-bg-image', 'teal', 'blue', 'black', 'gray', 'grey'];
+
     const hasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
     if (hasBg) {
       section.classList.add('has-bg');
     }
+
+    const hasOpacity = [...section.classList].some((cls) => opacityClasses.includes(cls));
+    if (hasOpacity) {
+      section.classList.add('has-opacity');
+    }
+    // if the section has a background
+    // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
     if (nextSection) {

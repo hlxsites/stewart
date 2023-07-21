@@ -420,6 +420,78 @@ main .section>div {
   height: 100%;
 }
 
+.section.has-opacity {
+  --_bg-overlay-color: 71, 76, 85;
+  --_bg-overlay-opacity-1: 0;
+  --_bg-overlay-opacity-2: 0;
+  --_bg-overlay-opacity-3: 0;
+  --_bg-overlay-opacity-stop-1: 25%;
+  --_bg-overlay-opacity-stop-2: 45%;
+  --_bg-overlay-opacity-stop-3: 65%;
+  --_bg-opacty-angle: 270deg;
+  --_bg-overlay-opacity-no-gradient: 1;
+
+  background: linear-gradient(var(--_bg-opacty-angle), 
+    rgba(var(--_bg-overlay-color), var(--_bg-overlay-opacity-1)) var(--_bg-overlay-opacity-stop-1), 
+    rgba(var(--_bg-overlay-color), var(--_bg-overlay-opacity-2)) var(--_bg-overlay-opacity-stop-2), 
+    rgba(var(--_bg-overlay-color), var(--_bg-overlay-opacity-3)) var(--_bg-overlay-opacity-stop-3))
+}
+
+.section.has-opacity.right {
+  --_bg-opacty-angle: 90deg;
+}
+
+.section.has-opacity.no-gradient {
+  background: rgba(0, 0, 0, var(--_bg-overlay-opacity-no-gradient));
+}
+
+.section.has-bg-image.opacity-100 {
+  --_bg-overlay-opacity-1: 1;
+  --_bg-overlay-opacity-2: .667;
+  --_bg-overlay-opacity-stop-1: 0;
+  --_bg-overlay-opacity-no-gradient: .71;
+}
+
+.section.has-bg-image.opacity-90 {
+  --_bg-overlay-opacity-1: .9;
+  --_bg-overlay-opacity-2: .6;
+  --_bg-overlay-opacity-no-gradient: .639;
+}
+
+.section.has-bg-image.opacity-80 {
+  --_bg-overlay-opacity-1: .8;
+  --_bg-overlay-opacity-2: .533;
+  --_bg-overlay-opacity-no-gradient: .568;
+}
+
+.section.has-bg-image.opacity-70 {
+  --_bg-overlay-opacity-1: .7;
+  --_bg-overlay-opacity-2: .4667;
+  --_bg-overlay-opacity-no-gradient: .497;
+}
+
+.section.has-bg-image.opacity-60 {
+  --_bg-overlay-opacity-1: .6;
+  --_bg-overlay-opacity-2: .4;
+  --_bg-overlay-opacity-no-gradient: .426;
+}
+
+.section.has-bg-image.opacity-55 {
+  --_bg-overlay-opacity-1: .55;
+  --_bg-overlay-opacity-2: .3667;
+  --_bg-overlay-opacity-no-gradient: .3905;
+}
+
+.section.has-bg-image.opacity-50 {
+  --_bg-overlay-opacity-1: .5;
+  --_bg-overlay-opacity-2: .3333;
+  --_bg-overlay-opacity-no-gradient: .355;
+}
+
+.section.dark {
+  color: var(--clr-white);
+}
+
 .section.grey,
 .section.gray {
   background-color: var(--clr-gray);
