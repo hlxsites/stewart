@@ -284,8 +284,8 @@ const translateClassNames = (className) => {
     case 'ss-overlayopacity-10': return 'Opacity 10';
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
-    case 'ss-overlay-left': return 'Left';
     // These all get ignored
+    case 'ss-overlay-left':
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
