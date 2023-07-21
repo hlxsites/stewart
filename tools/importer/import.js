@@ -355,6 +355,7 @@ const buildBackgroundableSection = (builder, section) => {
 // Same thing for now
 const buildContentBreakSection = buildGenericSection;
 
+const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
   const meta = {};
 
@@ -370,6 +371,8 @@ const buildHeroSection = (builder, hero) => {
   } else {
     classes.push('Light');
   }
+
+  if (isNarrowHero(hero)) { classes.push('Narrow'); }
 
   let allSectionClasses = {};
   if (sessionStorage.getItem('allHeroClasses') !== null) {
