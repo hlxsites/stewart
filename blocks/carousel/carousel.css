@@ -7,15 +7,16 @@ main .carousel .carousel-slides-wrapper {
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   overflow-x: scroll;
-  width: calc(100% - 80px);
+
   /* 80 px = 2*button width + 10px */
+  width: calc(100% - 80px);
   margin-inline: auto;
 }
 
 @media (min-width: 600px) {
   main .carousel .carousel-slides-wrapper {
-    width: calc(100% - 140px);
     /* 140 px = 2*button width + 10px */
+    width: calc(100% - 140px);
   }
 }
 
