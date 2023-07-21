@@ -116,6 +116,8 @@ const extractMetadata = (document) => {
   }
   const publishDate = getPublishDate(document);
   if (publishDate) { metadata['Publish Date'] = publishDate; }
+  const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
+  if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
   return metadata;
 };
 
@@ -250,10 +252,10 @@ const buildTeaserLists = (builder, section) => {
 };
 
 const buildAccordions = (builder, section) => {
-  section.querySelectorAll('.accordion')?.forEach((carousel) => {
-    builder.replace(carousel, () => {
+  section.querySelectorAll('.accordion')?.forEach((accordion) => {
+    builder.replace(accordion, () => {
       builder.block('Accordion', 2, false);
-      carousel.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
         const header = accordionItem.querySelector('.cmp-accordion__header');
         const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
         builder.row().append(header).column().append(panelContent);
@@ -293,10 +295,12 @@ const translateClassNames = (className) => {
     case 'ss-contentcontainerwidth-narrow': return 'Narrow';
     case 'ss-contentcontainerwidth-wide': return 'Wide';
     case 'ss-backgroundbrightness-dark': return 'Dark';
+    case 'ss-overlayopacity-100': return 'Opacity 100';
     case 'ss-overlayopacity-90': return 'Opacity 90';
     case 'ss-overlayopacity-80': return 'Opacity 80';
     case 'ss-overlayopacity-70': return 'Opacity 70';
     case 'ss-overlayopacity-60': return 'Opacity 60';
+    case 'ss-overlayopacity-55': return 'Opacity 55';
     case 'ss-overlayopacity-50': return 'Opacity 50';
     case 'ss-overlayopacity-40': return 'Opacity 40';
     case 'ss-overlayopacity-30': return 'Opacity 30';
@@ -304,9 +308,9 @@ const translateClassNames = (className) => {
     case 'ss-overlayopacity-10': return 'Opacity 10';
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
-    case 'ss-overlay-left': return 'Left';
     case 'contentbreak': return 'Content break';
     // These all get ignored
+    case 'ss-overlay-left':
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
@@ -336,7 +340,7 @@ const buildGenericSection = (builder, section) => {
   allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
   builder.section();
-  if (classes.length > 0) { builder.addSectionMetadata({ style: classCombo }); }
+  if (classes.length > 0) { builder.addSectionMetadata('style', classCombo); }
   buildSectionContent(builder, section);
 };
 
@@ -353,6 +357,7 @@ const buildBackgroundableSection = (builder, section) => {
 // Same thing for now
 const buildContentBreakSection = buildGenericSection;
 
+const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
   const meta = {};
 
@@ -368,6 +373,8 @@ const buildHeroSection = (builder, hero) => {
   } else {
     classes.push('Light');
   }
+
+  if (isNarrowHero(hero)) { classes.push('Narrow'); }
 
   let allSectionClasses = {};
   if (sessionStorage.getItem('allHeroClasses') !== null) {
