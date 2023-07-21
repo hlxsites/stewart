@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
- :root {
+:root {
   /* these colors came from legecy css commented out ones are not used anywhere...yet
   --clr-blue: #007bff;
   --clr-indigo: #6610f2;
@@ -54,14 +54,14 @@
   --fixed-font-family: sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* body sizes */
-  --body-font-size-xxl:	1.625rem;
-  --body-font-size-xl:	1.375rem;
-  --body-font-size-l:	1.125rem;
-  --body-font-size-m:	1rem;
-  --body-font-size-s:	.9375rem;
-  --body-font-size-xs:	.875rem;
-  --body-font-size-xxs:	0.75rem;
-  --body-font-size-xxxs:	.5rem;
+  --body-font-size-xxl: 1.625rem;
+  --body-font-size-xl: 1.375rem;
+  --body-font-size-l: 1.125rem;
+  --body-font-size-m: 1rem;
+  --body-font-size-s: .9375rem;
+  --body-font-size-xs: .875rem;
+  --body-font-size-xxs: 0.75rem;
+  --body-font-size-xxxs: .5rem;
 
   /* heading sizes */
   --heading-font-size-xxl: 4.0625rem;
@@ -79,12 +79,14 @@
 
 @media (min-width: 900px) {
   :root {
-     /* nav height */
+    /* nav height */
     --nav-height: 158px;
   }
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -111,7 +113,8 @@ body.appear {
   display: unset;
 }
 
-body, .text-reg {
+body,
+.text-reg {
   font-size: var(--body-font-size-xs);
   line-height: 1.125rem;
   letter-spacing: .0138rem;
@@ -135,27 +138,34 @@ body, .text-reg {
   letter-spacing: -.005rem;
 }
 
-h1, h2, h3,
-h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--heading-font-family);
   margin-block: 0 1em;
 }
 
-.h1, h1 {
+.h1,
+h1 {
   font-weight: 800;
   font-size: var(--heading-font-size-m);
   line-height: 2.375rem;
   letter-spacing: -.03rem;
 }
 
-.h2, h2 {
+.h2,
+h2 {
   font-weight: 700;
   font-size: var(--heading-font-size-s);
   line-height: 2rem;
   letter-spacing: -.0225rem;
 }
 
-.h3, h3 {
+.h3,
+h3 {
   font-weight: 400;
   font-size: var(--heading-font-size-xs);
   line-height: 1.375rem;
@@ -182,13 +192,13 @@ h4, h5, h6 {
     line-height: 2.375rem;
     letter-spacing: .0163rem;
   }
-  
+
   .text-small {
     font-size: var(--body-font-size-l);
     line-height: 1.625rem;
     letter-spacing: .0113rem;
   }
-  
+
   .text-xsmall {
     font-size: var(--body-font-size-s);
     line-height: 1.375rem;
@@ -264,7 +274,8 @@ a:hover {
 }
 
 /* buttons */
-a.button:any-link, button {
+a.button:any-link,
+button {
   display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
@@ -290,13 +301,17 @@ a.button:any-link, button {
   }
 }
 
-a.button:hover, a.button:focus, button:hover, button:focus  {
+a.button:hover,
+a.button:focus,
+button:hover,
+button:focus {
   background-color: #006497;
   border-color: #005b8a;
   cursor: pointer;
 }
 
-button:disabled, button:disabled:hover {
+button:disabled,
+button:disabled:hover {
   background-color: var(--clr-gray-light);
   cursor: unset;
 }
@@ -365,25 +380,29 @@ main .section {
 }
 
 /* wrappers, e.g. default-content-wrapper, columns-wrapper, etc. */
-main .section > div {
+main .section>div {
   max-width: var(--max-content-width);
   margin-inline: auto;
 }
 
-/* background styles and colors */
-.section.has-bg-image,
-.section.teal,
-.section.grey,
-.section.gray,
-.section.black,
-.section.blue {
+
+.section.no-margin {
   margin-block-end: 0;
-} 
+}
+
+/* background styles and colors */
+.section.has-bg {
+  padding: 2.5rem 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .section.has-bg {
+    padding: 7.5rem;
+  }
+}
 
 .section.has-bg-image {
   position: relative;
-  color: var(--clr-white);
-  background: linear-gradient(270deg, rgba(71 76 85 / 90%) 25%, rgba(71 76 85 / 60%) 45%, rgba(71 76 85 / 0%) 65%);
 }
 
 .section.has-bg-image picture.bg-image {
@@ -403,20 +422,114 @@ main .section > div {
   height: 100%;
 }
 
-.section.grey, .section.gray {
+.section.has-opacity {
+  --_bg-overlay-color: 71 76 85;
+  --_bg-overlay-opacity-1: 0;
+  --_bg-overlay-opacity-2: 0;
+  --_bg-overlay-opacity-3: 0;
+  --_bg-overlay-opacity-stop-1: 25%;
+  --_bg-overlay-opacity-stop-2: 45%;
+  --_bg-overlay-opacity-stop-3: 65%;
+  --_bg-opacty-angle: 270deg;
+  --_bg-overlay-opacity-no-gradient: 1;
+
+  background: linear-gradient(var(--_bg-opacty-angle), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-1)) var(--_bg-overlay-opacity-stop-1), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-2)) var(--_bg-overlay-opacity-stop-2), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-3)) var(--_bg-overlay-opacity-stop-3))
+}
+
+.section.has-opacity.right {
+  --_bg-opacty-angle: 90deg;
+}
+
+.section.has-opacity.no-gradient {
+  background: rgba(0 0 0 / var(--_bg-overlay-opacity-no-gradient));
+}
+
+.section.has-bg-image.opacity-100 {
+  --_bg-overlay-opacity-1: 1;
+  --_bg-overlay-opacity-2: .667;
+  --_bg-overlay-opacity-stop-1: 0;
+  --_bg-overlay-opacity-no-gradient: .71;
+}
+
+.section.has-bg-image.opacity-90 {
+  --_bg-overlay-opacity-1: .9;
+  --_bg-overlay-opacity-2: .6;
+  --_bg-overlay-opacity-no-gradient: .639;
+}
+
+.section.has-bg-image.opacity-80 {
+  --_bg-overlay-opacity-1: .8;
+  --_bg-overlay-opacity-2: .533;
+  --_bg-overlay-opacity-no-gradient: .568;
+}
+
+.section.has-bg-image.opacity-70 {
+  --_bg-overlay-opacity-1: .7;
+  --_bg-overlay-opacity-2: .4667;
+  --_bg-overlay-opacity-no-gradient: .497;
+}
+
+.section.has-bg-image.opacity-60 {
+  --_bg-overlay-opacity-1: .6;
+  --_bg-overlay-opacity-2: .4;
+  --_bg-overlay-opacity-no-gradient: .426;
+}
+
+.section.has-bg-image.opacity-55 {
+  --_bg-overlay-opacity-1: .55;
+  --_bg-overlay-opacity-2: .3667;
+  --_bg-overlay-opacity-no-gradient: .3905;
+}
+
+.section.has-bg-image.opacity-50 {
+  --_bg-overlay-opacity-1: .5;
+  --_bg-overlay-opacity-2: .3333;
+  --_bg-overlay-opacity-no-gradient: .355;
+}
+
+.section.dark {
+  color: var(--clr-white);
+}
+
+.section.grey,
+.section.gray {
   background-color: var(--clr-gray);
 }
 
 .section.teal {
-  background: linear-gradient(180deg,var(--clr-teal),#002f39);
+  background: linear-gradient(180deg, var(--clr-teal), #002f39);
   box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
   color: var(--clr-white);
 }
 
 .section.black {
-  color: var(--clr-black);
+  background-color: var(--clr-black);
+  color: var(--clr-white);
 }
 
 .section.blue {
-  color: var(--clr-teal);
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+}
+
+@media(min-width: 600px) {
+  .section.wide {
+    padding: 8% 3%;
+  }
+  
+  .section.narrow {
+    margin: 0 8%;
+    width: auto;
+    max-width: 64rem;
+  }
+}
+
+@media(min-width: 900px) {
+  .section.narrow {
+    margin: 0 auto;
+    width: auto
+  }
 }

@@ -3,7 +3,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url(/fonts/fa-pro/fa-brands-400.woff);
+  src: url(/fonts/fa-pro/fa-brands-400.eot);
+  src: url(/fonts/fa-pro/fa-brands-400.eot?#iefix) format("embedded-opentype"), url(/fonts/fa-pro/fa-brands-400.woff2) format("woff2"), url(/fonts/fa-pro/fa-brands-400.woff) format("woff"), url(/fonts/fa-pro/fa-brands-400.ttf) format("truetype"), url(/fonts/fa-pro/fa-brands-400.svg#fontawesome) format("svg")
 }
 
 .fab {
@@ -16,7 +17,8 @@
   font-style: normal;
   font-weight: 900;
   font-display: block;
-  src: url(/fonts/fa-pro/fa-solid-900.woff) format("woff");
+  src: url(/fonts/fa-pro/fa-solid-900.eot);
+  src: url(/fonts/fa-pro/fa-solid-900.eot?#iefix) format("embedded-opentype"), url(/fonts/fa-pro/fa-solid-900.woff2) format("woff2"), url(/fonts/fa-pro/fa-solid-900.woff) format("woff"), url(/fonts/fa-pro/fa-solid-900.ttf) format("truetype"), url(/fonts/fa-pro/fa-solid-900.svg#fontawesome) format("svg")
 }
 
 .fa, .fas {
@@ -28,7 +30,8 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url(/fonts/fa-pro/fa-regular-400.woff) format("woff");
+  src: url(/fonts/fa-pro/fa-regular-400.eot);
+  src: url(/fonts/fa-pro/fa-regular-400.eot?#iefix) format("embedded-opentype"), url(/fonts/fa-pro/fa-regular-400.woff2) format("woff2"), url(/fonts/fa-pro/fa-regular-400.woff) format("woff"), url(/fonts/fa-pro/fa-regular-400.ttf) format("truetype"), url(/fonts/fa-pro/fa-regular-400.svg#fontawesome) format("svg")
 }
 
 .fa, .far, .fas {
@@ -44,7 +47,8 @@
   font-style: normal;
   font-weight: 300;
   font-display: block;
-  src: url(/fonts/fa-pro/fa-light-300.woff) format("woff");
+  src: url(/fonts/fa-pro/fa-light-300.eot);
+  src: url(/fonts/fa-pro/fa-light-300.eot?#iefix) format("embedded-opentype"), url(/fonts/fa-pro/fa-light-300.woff2) format("woff2"), url(/fonts/fa-pro/fa-light-300.woff) format("woff"), url(/fonts/fa-pro/fa-light-300.ttf) format("truetype"), url(/fonts/fa-pro/fa-light-300.svg#fontawesome) format("svg")
 }
 
 .fal {
