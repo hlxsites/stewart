@@ -116,6 +116,8 @@ const extractMetadata = (document) => {
   }
   const publishDate = getPublishDate(document);
   if (publishDate) { metadata['Publish Date'] = publishDate; }
+  const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
+  if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
   return metadata;
 };
 
