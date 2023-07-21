@@ -163,7 +163,7 @@ export function wrapImgsInLinks(container) {
 }
 
 /**
- * decorates section background images our of section metadata
+ * decorates section background images out of section metadata
  * @param {element} main the container element
  */
 function decorateSectionBackgroundImages(main) {
@@ -190,6 +190,34 @@ function decorateSectionBackgroundImages(main) {
 }
 
 /**
+ * perform additional section class decoration
+ * @param {Element} main the container element
+ */
+function decorateSectionsExt(main) {
+  const allSections = main.querySelectorAll('div.section');
+  for (let i = 0; i < allSections.length; i += 1) {
+    const section = allSections[i];
+    // if the section has a background
+    // and the next one does not, then the section gets no bottom margin
+    const bgClasses = ['has-bg-image', 'teal', 'blue', 'black', 'gray', 'grey'];
+    const hasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
+    if (hasBg) {
+      section.classList.add('has-bg');
+    }
+    let nextSection;
+    if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
+    if (nextSection) {
+      const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
+      if (nextHasBg) {
+        section.classList.add('no-margin');
+      }
+    } else {
+      section.classList.add('no-margin');
+    }
+  }
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -203,6 +231,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSectionBackgroundImages(main);
   decorateSections(main);
+  decorateSectionsExt(main);
   decorateBlocks(main);
 }
 
