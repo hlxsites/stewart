@@ -252,10 +252,10 @@ const buildTeaserLists = (builder, section) => {
 };
 
 const buildAccordions = (builder, section) => {
-  section.querySelectorAll('.accordion')?.forEach((carousel) => {
-    builder.replace(carousel, () => {
+  section.querySelectorAll('.accordion')?.forEach((accordion) => {
+    builder.replace(accordion, () => {
       builder.block('Accordion', 2, false);
-      carousel.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
         const header = accordionItem.querySelector('.cmp-accordion__header');
         const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
         builder.row().append(header).column().append(panelContent);
