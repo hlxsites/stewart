@@ -506,11 +506,11 @@ main .section>div {
 }
 
 .section.black {
-  color: var(--clr-black);
+  background-color: var(--clr-black);
 }
 
 .section.blue {
-  color: var(--clr-teal);
+  background-color: var(--clr-teal);
 }
 
 @media(min-width: 600px) {
