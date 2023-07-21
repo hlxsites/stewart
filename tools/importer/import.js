@@ -295,10 +295,12 @@ const translateClassNames = (className) => {
     case 'ss-contentcontainerwidth-narrow': return 'Narrow';
     case 'ss-contentcontainerwidth-wide': return 'Wide';
     case 'ss-backgroundbrightness-dark': return 'Dark';
+    case 'ss-overlayopacity-100': return 'Opacity 100';
     case 'ss-overlayopacity-90': return 'Opacity 90';
     case 'ss-overlayopacity-80': return 'Opacity 80';
     case 'ss-overlayopacity-70': return 'Opacity 70';
     case 'ss-overlayopacity-60': return 'Opacity 60';
+    case 'ss-overlayopacity-55': return 'Opacity 55';
     case 'ss-overlayopacity-50': return 'Opacity 50';
     case 'ss-overlayopacity-40': return 'Opacity 40';
     case 'ss-overlayopacity-30': return 'Opacity 30';
@@ -306,9 +308,9 @@ const translateClassNames = (className) => {
     case 'ss-overlayopacity-10': return 'Opacity 10';
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
-    case 'ss-overlay-left': return 'Left';
     case 'contentbreak': return 'Content break';
     // These all get ignored
+    case 'ss-overlay-left':
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
     case 'backgroundablepagehero':
