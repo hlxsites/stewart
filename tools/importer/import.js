@@ -338,7 +338,7 @@ const buildGenericSection = (builder, section) => {
   allSectionClasses[classCombo || 'none'] = (allSectionClasses[classCombo || 'none'] || 0) + 1;
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
   builder.section();
-  if (classes.length > 0) { builder.addSectionMetadata({ style: classCombo }); }
+  if (classes.length > 0) { builder.addSectionMetadata('style', classCombo); }
   buildSectionContent(builder, section);
 };
 
