@@ -1,14 +1,123 @@
-footer {
+.footer {
   padding: 2rem;
   background-color: var(--clr-black);
   font-size: var(--body-font-size-s);
-}
-
-footer .footer {
-  max-width: 1200px;
-  margin: auto;
+  border-top: 1px solid #43464a;
 }
 
 footer .footer p {
   margin: 0;
+  color: var(--clr-white);
+  text-align: center;
+}
+
+footer .footer a {
+  color: var(--clr-white);
+}
+
+footer .inner-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+footer .inner-wrapper .logo{
+  margin-bottom: 1.5rem;
+}
+
+footer .inner-wrapper .legal-text{
+  margin-bottom: 2.5rem;
+  font-size: 0.5rem;
+  line-height: .875rem;
+  letter-spacing: -0.005rem;
+}
+
+footer .inner-wrapper .links-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+footer .inner-wrapper .links-list li a::after{
+  content: "|";
+  color: var(--clr-white);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+footer .inner-wrapper .links-list li:last-child a::after{
+  content: none;
+}
+
+footer .inner-wrapper .column-1{
+  order: 2;
+}
+
+footer .inner-wrapper .column-2{
+  order: 1;
+}
+
+footer .icons-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  list-style-type: none;
+}
+
+footer .icons-wrapper li {
+  margin-inline-start: 1rem;
+}
+
+footer .icons-wrapper li:first-child {
+  margin-inline-start: 0;
+}
+
+footer .icons-wrapper .fa-icon {
+  font-size: 1.75rem;
+
+}
+
+@media (min-width: 900px) {
+  .footer {
+    padding: 1.875rem 6rem;
+  }
+
+  footer .footer p {
+    text-align: start;
+  }
+
+  footer .inner-wrapper {
+    flex-direction: row;
+  }
+
+  footer .inner-wrapper .legal-text{
+    margin-inline-start: 5rem;
+    margin-bottom: 2.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.375rem;
+    letter-spacing: -0.0094rem;
+  }
+  
+  footer .inner-wrapper .links-wrapper {
+    margin-inline-start: 5rem;
+  }
+
+  footer .inner-wrapper .links-list {
+    justify-content: flex-start;
+  }
+
+  footer .inner-wrapper .column-1{
+    order: 1;
+    flex-grow: 2;
+  }
+  
+  footer .inner-wrapper .column-2{
+    order: 2;
+    flex-grow: 1;
+  }
+
+  footer .icons-wrapper {
+    justify-content: flex-end;
+  }
 }
