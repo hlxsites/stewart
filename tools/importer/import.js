@@ -95,7 +95,7 @@ class BlockBuilder {
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
 const getPublishDate = (document) => {
-  let publishDate = document.querySelector('.contentcontainer > .cmp-container > .singlesimpleattributeprojection > .cmp-singlesimpleattributeprojection p:nth-child(1) > b')?.textContent;
+  const publishDate = document.querySelector('.contentcontainer > .cmp-container > .singlesimpleattributeprojection > .cmp-singlesimpleattributeprojection p:nth-child(1) > b')?.textContent;
   if (publishDate) { return publishDate.match(/[A-Za-z]+ [0-9]{1,2}, [12][0-9]{3}/)[0]; }
   return document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
 };
