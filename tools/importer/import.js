@@ -94,9 +94,13 @@ class BlockBuilder {
 
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
+const dateParserFormat1 = /[A-Za-z]+ [0-9]{1,2}, [12][0-9]{3}/;
+const dateParserFormat2 = /[A-Za-z]+.\s?[0-9]{1,2}, [12][0-9]{3}/;
 const getPublishDate = (document) => {
   const publishDate = document.querySelector('.contentcontainer > .cmp-container > .singlesimpleattributeprojection > .cmp-singlesimpleattributeprojection p:nth-child(1) > b')?.textContent;
-  if (publishDate) { return publishDate.match(/[A-Za-z]+ [0-9]{1,2}, [12][0-9]{3}/)[0]; }
+  if (publishDate && publishDate.match(dateParserFormat1)) { return publishDate.match(dateParserFormat1)[0]; }
+  if (publishDate && publishDate.match(dateParserFormat2)) { return publishDate.match(dateParserFormat2)[0]; }
+  if (publishDate) { console.error('Could not parse publish date: ', publishDate); }
   return document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
 };
 
