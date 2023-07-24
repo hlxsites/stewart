@@ -6,9 +6,9 @@ import {
 
 async function autoblockCarousel(block) {
   let carouselCol;
-  let maxPics = 0;
+  let maxPics = 1;
   block.querySelectorAll('.column').forEach((col) => {
-    const pics = col.querySelectorAll('picture').length > 1;
+    const pics = col.querySelectorAll('picture').length;
     if (pics > maxPics) {
       maxPics = pics;
       carouselCol = col;
