@@ -1,0 +1,77 @@
+.list-container .ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-container .ul .list-item {
+  font-size: var(--body-font-size-xs);
+  line-height: 1.125rem;
+  letter-spacing: 0.0138rem;
+  padding-bottom: 1rem;
+}
+
+.list-container .ul .list-item a {
+  color: var(--clr-teal);
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.list-container .ul .list-item .list-inner-wrapper{
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.list-container .ul .list-item .fa-icon {
+  display: inline-block;
+  border-radius: 100%;
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+  font-size: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.0125rem;
+  text-align: center;
+}
+
+.list-container .ul .list-item .link-text {
+  padding-inline-start: 1rem;
+  font-weight: 600;
+}
+
+@media (min-width: 900px) {
+  .list-container .ul {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .list-container .ul .list-item {
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .list-container .ul .list-item:nth-child(odd) {
+    padding-inline-end: 2.5rem;
+    border-inline-end: .0625rem solid #757575;
+  }
+
+  .list-container .ul .list-item:nth-child(2n) {
+    padding-inline-start: 2.5rem;
+  }
+
+  .list-container .ul .list-item .fa-icon {
+    font-size: 3.125rem;
+    width: 6rem;
+    height: 6rem;
+    letter-spacing: 0.0313rem;
+    line-height: 6rem;
+    flex: 0 0 6rem;
+  }
+
+  .list-container .ul .list-item .link-text {
+    padding-inline-start: 2.5rem;
+  }
+}
