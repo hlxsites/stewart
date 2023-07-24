@@ -14,7 +14,8 @@ main .carousel .carousel-slides-wrapper {
 }
 
 @media (min-width: 600px) {
-  main .carousel .carousel-slides-wrapper {
+  /* Select carousel not located inside of a columns block */  
+  main .section > .carousel-wrapper > .carousel .carousel-slides-wrapper {
     /* 140 px = 2*button width + 10px */
     width: calc(100% - 140px);
   }
@@ -50,7 +51,8 @@ main .carousel .carousel-slide-control {
 }
 
 @media (min-width: 600px) {
-  main .carousel .carousel-slide-control {
+  /* Select carousel not located inside of a columns block */  
+  main .section > .carousel-wrapper > .carousel .carousel-slide-control {
     width: 60px;
     height: 70px;
     border-radius: 15px;
