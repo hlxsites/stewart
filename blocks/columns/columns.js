@@ -20,7 +20,7 @@ async function autoblockCarousel(block) {
     });
     carouselCol.appendChild(carouselBlock);
     decorateBlock(carouselBlock);
-    await loadBlock(carouselBlock);    
+    await loadBlock(carouselBlock);
   }
 }
 
