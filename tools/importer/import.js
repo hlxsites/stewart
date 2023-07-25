@@ -281,6 +281,24 @@ const buildGenericLists = (builder, section) => {
   });
 };
 
+const buildButtons = (builder, section) => {
+  section.querySelectorAll('.btn').forEach((button) => {
+    const parent = button.parentElement;
+
+    if (parent.classList.contains('ss-buttonstyle-secondary')) {
+      const em = builder.doc.createElement('em');
+      em.textContent = button.textContent;
+      button.textContent = '';
+      button.append(em);
+    } if (parent.classList.contains('ss-buttonstyle-tertiary')) {
+      const strong = builder.doc.createElement('strong');
+      strong.textContent = button.textContent;
+      button.textContent = '';
+      button.append(strong);
+    }
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
   buildEmbed(builder, section);
@@ -290,6 +308,7 @@ const buildSectionContent = (builder, section) => {
   // Carousels inside columns are a special case, so do standalone carousels last
   buildCarousel(builder, section);
   buildAccordions(builder, section);
+  buildButtons(builder, section);
   builder.append(section);
 };
 
@@ -444,6 +463,19 @@ const restoreIcons = (document, originalDocument) => {
   });
 };
 
+/**
+   * Return a path that describes the document being transformed (file name, nesting...).
+   * The path is then used to create the corresponding Word document.
+   * @param {HTMLDocument} document The document
+   * @param {string} url The url of the page imported
+   * @param {string} html The raw html (the document is cleaned up during preprocessing)
+   * @param {object} params Object containing some parameters given by the import process.
+   * @return {string} The path
+   */
+const generateDocumentPath = ({
+  document, url, html, params,
+}) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, ''));
+
 export default {
   /**
    * Apply DOM operations to the provided document and return
@@ -454,7 +486,7 @@ export default {
    * @param {object} params Object containing some parameters given by the import process.
    * @returns {HTMLElement} The root element to be transformed
    */
-  transformDOM: ({
+  transform: ({
     // eslint-disable-next-line no-unused-vars
     document, url, html, params,
   }) => {
@@ -476,23 +508,50 @@ export default {
     // Build document and store into main element
     builder.replaceChildren(document.body);
 
+    // make all links absolute
+    document.querySelectorAll('a').forEach((a) => {
+      let { href } = a;
+      if (href.startsWith('/')) {
+        href = `https://www.stewart.com${href}`;
+      }
+      const aURL = new URL(href);
+      console.log(aURL.pathname);
+      console.log(aURL.hostname);
+
+      if (aURL.hostname === 'www.stewart.com') {
+        // sanitze local links
+        aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+      }
+      a.href = aURL.toString();
+    });
+
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
-    return document.body;
-  },
+    const blocks = [...document.querySelectorAll('table')]
+      .map((table) => {
+        const header = table.querySelector('tr > th');
+        if (header) {
+          return header.textContent;
+        }
 
-  /**
-   * Return a path that describes the document being transformed (file name, nesting...).
-   * The path is then used to create the corresponding Word document.
-   * @param {HTMLDocument} document The document
-   * @param {string} url The url of the page imported
-   * @param {string} html The raw html (the document is cleaned up during preprocessing)
-   * @param {object} params Object containing some parameters given by the import process.
-   * @return {string} The path
-   */
-  generateDocumentPath: ({
-    document, url, html, params,
-  }) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, '')),
+        return '';
+      })
+      .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()))
+      .join(', ');
+
+    return [{
+      element: document.body,
+      path: generateDocumentPath({
+        document,
+        url,
+        html,
+        params,
+      }),
+      report: {
+        blocks,
+      },
+    }];
+  },
 };
