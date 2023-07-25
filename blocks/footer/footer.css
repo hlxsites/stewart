@@ -69,13 +69,21 @@ footer .icons-wrapper li {
   margin-inline-start: 1rem;
 }
 
-footer .icons-wrapper li:first-child {
-  margin-inline-start: 0;
+footer .icons-wrapper li a {
+  text-decoration: none;
 }
 
 footer .icons-wrapper .fa-icon {
   font-size: 1.75rem;
 
+}
+
+footer .icons-wrapper li a:hover > .fa-icon {
+  color: var(--clr-primary);
+}
+
+footer .icons-wrapper li:first-child {
+  margin-inline-start: 0;
 }
 
 @media (min-width: 900px) {

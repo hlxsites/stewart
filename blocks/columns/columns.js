@@ -1,5 +1,32 @@
-export default function decorate(block) {
+import {
+  buildBlock,
+  decorateBlock,
+  loadBlock,
+} from '../../scripts/lib-franklin.js';
+
+async function autoblockCarousel(block) {
+  let carouselCol;
+  let maxPics = 1;
+  block.querySelectorAll('.column').forEach((col) => {
+    const pics = col.querySelectorAll('picture').length;
+    if (pics > maxPics) {
+      maxPics = pics;
+      carouselCol = col;
+    }
+  });
+  if (carouselCol) {
+    const carouselBlock = buildBlock('carousel', {
+      elems: carouselCol.querySelectorAll('picture'),
+    });
+    carouselCol.appendChild(carouselBlock);
+    decorateBlock(carouselBlock);
+    await loadBlock(carouselBlock);
+  }
+}
+
+export default async function decorate(block) {
   const cols = [...block.firstElementChild.children];
+
   block.classList.add(`columns-${cols.length}-cols`);
 
   const rowCount = [...block.children].length;
@@ -27,4 +54,9 @@ export default function decorate(block) {
       }
     });
   });
+
+  // if block has carousel style, autoblock carousel column
+  if (block.classList.contains('carousel')) {
+    await autoblockCarousel(block);
+  }
 }
