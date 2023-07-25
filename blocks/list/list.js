@@ -57,4 +57,15 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
+
+  const section = block.closest('.section');
+
+  if (section.classList.value.split(' ').includes('white-card')) {
+    const cardWrapper = document.createElement('div');
+    cardWrapper.className = 'card white-opacity';
+    [...section.children].forEach((ele) => {
+      cardWrapper.append(ele);
+    });
+    section.replaceChildren(cardWrapper);
+  }
 }
