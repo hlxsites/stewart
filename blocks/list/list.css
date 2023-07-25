@@ -34,11 +34,27 @@
   line-height: 2.5rem;
   letter-spacing: 0.0125rem;
   text-align: center;
+  flex: 0 0 2.5rem;
+  margin-inline-end: 1rem;
 }
 
 .list-container .ul .list-item .link-text {
-  padding-inline-start: 1rem;
   font-weight: 600;
+}
+
+.list-container .ul .list-item .text-wrapper h4,
+.list-container .ul .list-item .text-wrapper p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+  letter-spacing: 0.0138rem;
+}
+
+.list-container .ul .list-item .text-wrapper strong {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.01rem;
+  margin-bottom: 0.5rem;
 }
 
 @media (min-width: 900px) {
@@ -50,6 +66,10 @@
   .list-container .ul .list-item {
     font-size: var(--body-font-size-xl);
     line-height: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .list-container .ul .list-item.with-icon {
     padding-bottom: 2.5rem;
   }
 
@@ -73,5 +93,18 @@
 
   .list-container .ul .list-item .link-text {
     padding-inline-start: 2.5rem;
+  }
+
+  .list-container .ul .list-item .text-wrapper h4,
+  .list-container .ul .list-item .text-wrapper p {
+    font-size: 1.375rem;
+    line-height: 2rem;
+  }
+
+  .list-container .ul .list-item .text-wrapper strong {
+    font-size: 1.625rem;
+    line-height: 2.375rem;
+    letter-spacing: 0.0163rem;
+    margin-bottom: 0;
   }
 }

@@ -17,6 +17,7 @@ function getListItemRestructured(parent) {
       }
       if (icon) {
         listItem.querySelector('.list-inner-wrapper').append(icon);
+        listItem.classList.add('with-icon');
       } else {
         const span = document.createElement('div');
         span.className = 'link-text';
@@ -25,6 +26,7 @@ function getListItemRestructured(parent) {
       }
     } else if (icon) {
       innerWrapper.append(icon);
+      listItem.classList.add('with-icon');
     } else {
       if (!textWrapper) {
         const wrapper = document.createElement('div');
