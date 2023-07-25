@@ -511,25 +511,27 @@ export default {
     // make all links absolute
     document.querySelectorAll('a').forEach((a) => {
       let { href } = a;
-      if (href.startsWith('/')) {
-        href = `https://www.stewart.com${href}`;
-      }
-      const aURL = new URL(href);
-      console.log(aURL.pathname);
-      console.log(aURL.hostname);
+      if (href) {
+        if (href.startsWith('/')) {
+          href = `https://www.stewart.com${href}`;
+        }
+        const aURL = new URL(href);
 
-      if (aURL.hostname === 'www.stewart.com') {
-        // sanitze local links
-        aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+        if (aURL.hostname === 'www.stewart.com') {
+          // sanitze local links
+          if (!aURL.pathname.startsWith('/content/dam/')) {
+            aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+          }
+        }
+        a.href = aURL.toString();
       }
-      a.href = aURL.toString();
     });
 
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
-    const blocks = [...document.querySelectorAll('table')]
+    const blocksArr = [...document.querySelectorAll('table')]
       .map((table) => {
         const header = table.querySelector('tr > th');
         if (header) {
@@ -538,8 +540,8 @@ export default {
 
         return '';
       })
-      .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()))
-      .join(', ');
+      .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
+    const blocks = new Set(blocksArr);
 
     return [{
       element: document.body,
@@ -550,7 +552,7 @@ export default {
         params,
       }),
       report: {
-        blocks,
+        blocks: [...blocks].join(', '),
       },
     }];
   },
