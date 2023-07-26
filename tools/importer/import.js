@@ -315,6 +315,21 @@ const buildButtons = (builder, section) => {
   });
 };
 
+const buildBlockQuotes = (builder, section) => {
+  section.querySelectorAll('.cmp-quotation').forEach((bq) => {
+    const image = bq.querySelector('.quotation-image');
+    const name = bq.querySelector('.quotation-person_name');
+    const title = bq.querySelector('.quotation-person_title');
+    const quote = bq.querySelector('.quotation-text blockquote');
+    builder.replace(bq, () => {
+      builder
+        .block('Blockquote', 2, true)
+        .append(image).append(name).append(title)
+        .column().append(...quote.children);
+    });
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
   buildEmbed(builder, section);
@@ -325,6 +340,7 @@ const buildSectionContent = (builder, section) => {
   buildCarousel(builder, section);
   buildAccordions(builder, section);
   buildButtons(builder, section);
+  buildBlockQuotes(builder, section);
   builder.append(section);
 };
 
