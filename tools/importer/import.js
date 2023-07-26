@@ -118,7 +118,7 @@ const extractMetadata = (document) => {
     metadata.image = img;
   }
   const publishDate = getPublishDate(document);
-  if (publishDate) { metadata['Publish Date'] = publishDate; }
+  if (publishDate) { metadata['Publication Date'] = publishDate; }
   const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
   if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
   return metadata;
@@ -161,7 +161,23 @@ const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) =
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
 
-const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+// const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+const buildTables = (builder, section) => {
+  section.querySelectorAll('table').forEach((table) => {
+    let maxCols = 1;
+    table.querySelectorAll('tr').forEach((tr) => {
+      const cols = tr.querySelectorAll('td');
+      if (cols.length > maxCols) maxCols = cols.length;
+    });
+
+    builder.replace(table, () => {
+      builder.block('Table', maxCols, false).upToTag('table');
+      [...table.querySelectorAll('tr')].forEach((tr) => {
+        builder.append(tr);
+      });
+    });
+  });
+};
 
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
@@ -281,6 +297,39 @@ const buildGenericLists = (builder, section) => {
   });
 };
 
+const buildButtons = (builder, section) => {
+  section.querySelectorAll('.btn').forEach((button) => {
+    const parent = button.parentElement;
+
+    if (parent.classList.contains('ss-buttonstyle-secondary')) {
+      const em = builder.doc.createElement('em');
+      em.textContent = button.textContent;
+      button.textContent = '';
+      button.append(em);
+    } if (parent.classList.contains('ss-buttonstyle-tertiary')) {
+      const strong = builder.doc.createElement('strong');
+      strong.textContent = button.textContent;
+      button.textContent = '';
+      button.append(strong);
+    }
+  });
+};
+
+const buildBlockQuotes = (builder, section) => {
+  section.querySelectorAll('.cmp-quotation').forEach((bq) => {
+    const image = bq.querySelector('.quotation-image');
+    const name = bq.querySelector('.quotation-person_name');
+    const title = bq.querySelector('.quotation-person_title');
+    const quote = bq.querySelector('.quotation-text blockquote');
+    builder.replace(bq, () => {
+      builder
+        .block('Blockquote', 2, true)
+        .append(image).append(name).append(title)
+        .column().append(...quote.children);
+    });
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
   buildEmbed(builder, section);
@@ -290,6 +339,8 @@ const buildSectionContent = (builder, section) => {
   // Carousels inside columns are a special case, so do standalone carousels last
   buildCarousel(builder, section);
   buildAccordions(builder, section);
+  buildButtons(builder, section);
+  buildBlockQuotes(builder, section);
   builder.append(section);
 };
 
@@ -444,6 +495,77 @@ const restoreIcons = (document, originalDocument) => {
   });
 };
 
+/**
+   * Return a path that describes the document being transformed (file name, nesting...).
+   * The path is then used to create the corresponding Word document.
+   * @param {HTMLDocument} document The document
+   * @param {string} url The url of the page imported
+   * @param {string} html The raw html (the document is cleaned up during preprocessing)
+   * @param {object} params Object containing some parameters given by the import process.
+   * @return {string} The path
+   */
+const generateDocumentPath = ({
+  document, url, html, params,
+}) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, ''));
+
+const updateLinks = (document) => {
+  document.querySelectorAll('a').forEach((a) => {
+    let { href } = a;
+    if (href) {
+      if (href.startsWith('/')) {
+        href = `https://www.stewart.com${href}`;
+      }
+      const aURL = new URL(href);
+
+      if (aURL.hostname === 'www.stewart.com') {
+        // sanitze local links
+        if (!aURL.pathname.startsWith('/content/dam/')) {
+          aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+        }
+      }
+      a.href = aURL.toString();
+    }
+  });
+};
+
+const preocessHeadingIcons = (document) => {
+  document.querySelectorAll('.ss-heading-icon-location').forEach((iconHeadingWrapper) => {
+    const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading) {
+      heading.textContent = `:fal-map-marker-alt: ${heading.textContent}`;
+    }
+  });
+  document.querySelectorAll('.ss-heading-icon-check').forEach((iconHeadingWrapper) => {
+    const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading) {
+      heading.textContent = `:fal-check-circle: ${heading.textContent}`;
+    }
+  });
+};
+
+const gatherBlockNames = (document) => {
+  const blocksArr = [...document.querySelectorAll('table')]
+    .map((table) => {
+      const header = table.querySelector('tr > th');
+      if (header) {
+        return header.textContent;
+      }
+
+      return '';
+    })
+    .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
+  const blocks = new Set(blocksArr);
+  return [...blocks].join(', ');
+};
+
+const gatherAssetLinks = (document) => {
+  const assetLinks = new Set();
+  document.querySelectorAll('a[href*="/content/dam"]').forEach((a) => {
+    assetLinks.add(a.href);
+  });
+  return [...assetLinks].join(', ');
+};
+
 export default {
   /**
    * Apply DOM operations to the provided document and return
@@ -454,7 +576,7 @@ export default {
    * @param {object} params Object containing some parameters given by the import process.
    * @returns {HTMLElement} The root element to be transformed
    */
-  transformDOM: ({
+  transform: ({
     // eslint-disable-next-line no-unused-vars
     document, url, html, params,
   }) => {
@@ -476,23 +598,30 @@ export default {
     // Build document and store into main element
     builder.replaceChildren(document.body);
 
+    // make all links absolute
+    updateLinks(document);
+
+    // add icon markup to headings with icons
+    preocessHeadingIcons(document);
+
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
-    return document.body;
-  },
+    const report = {
+      blocks: gatherBlockNames(document),
+      assetLinks: gatherAssetLinks(document),
+    };
 
-  /**
-   * Return a path that describes the document being transformed (file name, nesting...).
-   * The path is then used to create the corresponding Word document.
-   * @param {HTMLDocument} document The document
-   * @param {string} url The url of the page imported
-   * @param {string} html The raw html (the document is cleaned up during preprocessing)
-   * @param {object} params Object containing some parameters given by the import process.
-   * @return {string} The path
-   */
-  generateDocumentPath: ({
-    document, url, html, params,
-  }) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, '')),
+    return [{
+      element: document.body,
+      path: generateDocumentPath({
+        document,
+        url,
+        html,
+        params,
+      }),
+      report,
+    }];
+  },
 };
