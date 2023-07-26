@@ -61,7 +61,7 @@ main .carousel .carousel-slide-control {
 
 main .carousel .carousel-slide-control:hover,
 main .carousel .carousel-slide-control:focus {
-  background-color: #757575;
+  background-color: var(--clr-gray-dark);
   border: 1px solid #43464a
 }
 

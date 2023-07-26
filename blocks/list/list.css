@@ -1,0 +1,196 @@
+.list-container ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.list-container ul .list-item {
+  font-size: var(--body-font-size-xs);
+  line-height: 1.125rem;
+  letter-spacing: 0.0138rem;
+  padding-bottom: 1rem;
+}
+
+.list-container ul .list-item a {
+  color: var(--clr-teal);
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.list-container ul .list-item .list-inner-wrapper{
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.list-container ul .list-item .fa-icon {
+  display: inline-block;
+  border-radius: 100%;
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+  font-size: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.0125rem;
+  text-align: center;
+  flex: 0 0 2.5rem;
+  margin-inline-end: 1rem;
+}
+
+.list-container ul .list-item .link-text {
+  font-weight: 600;
+}
+
+.list-container ul .list-item .text-wrapper strong {
+  font-size: 1rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.01rem;
+  margin-bottom: 0.5rem;
+}
+
+.list-container .card {
+  background-color: var(--clr-white);
+  box-shadow: 0.0625rem 0.0625rem 0.1875rem 0 rgb(0 0 0 / 15%);
+  border: .0625rem solid var(--clr-gray-light);
+  padding: 1.5rem 1rem;
+}
+
+.list-container .white-opacity {
+  background-color: rgb(255 255 255 / 85%);
+}
+
+/* Style the default content whihc is ouside of List block - START */
+
+.list-container .default-content-wrapper h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.list-container.white-card .default-content-wrapper h2 {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.list-container .default-content-wrapper h3 {
+  margin-bottom: 2rem;
+  font-size: var(--body-font-size-l);
+  line-height: 1.375rem;
+  letter-spacing: 0.0113rem;
+}
+
+.list-container .default-content-wrapper p {
+  margin-bottom: 2.5rem;
+  font-size: var(--body-font-size-m);
+  line-height: 1.25rem;
+  letter-spacing: 0.01rem;
+}
+
+.list-container .default-content-wrapper:last-child {
+  padding-top: 2.5rem;
+}
+
+.list-container .default-content-wrapper:last-child p {
+  margin-bottom: 1rem;
+  font-size: var(--body-font-size-xxs);
+  line-height: 1.125rem;
+  letter-spacing: 0.0075rem;
+  font-weight: 400;
+}
+
+.list-container .default-content-wrapper:last-child a{
+  color: var(--clr-primary);
+}
+
+/* Style the default content which is ouside of List block - END */
+
+.list-container ul .list-item .text-wrapper h4,
+.list-container ul .list-item .text-wrapper p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+  letter-spacing: 0.0138rem;
+}
+
+@media (min-width: 900px) {
+  .list-container ul {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .list-container ul .list-item {
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .list-container ul .list-item.with-icon {
+    padding-bottom: 2.5rem;
+  }
+
+  .list-container ul .list-item:nth-child(odd) {
+    padding-inline-end: 2.5rem;
+    border-inline-end: .0625rem solid var(--clr-gray-dark);
+  }
+
+  .list-container ul .list-item:nth-child(2n) {
+    padding-inline-start: 2.5rem;
+  }
+
+  .list-container ul .list-item .fa-icon {
+    font-size: 3.125rem;
+    width: 6rem;
+    height: 6rem;
+    letter-spacing: 0.0313rem;
+    line-height: 6rem;
+    flex: 0 0 6rem;
+  }
+
+  .list-container ul .list-item .link-text {
+    padding-inline-start: 2.5rem;
+  }
+
+  .list-container ul .list-item .text-wrapper strong {
+    font-size: 1.625rem;
+    line-height: 2.375rem;
+    letter-spacing: 0.0163rem;
+    margin-bottom: 0;
+  }
+
+  .list-container .card {
+    box-shadow: 0 0.25rem 0.25rem 0 rgb(0 0 0 / 25%);
+    border: .0625rem solid var(--clr-gray-dark);
+    padding: 4.5rem 4rem;
+  }
+
+  /* Style the default content whihc is ouside of List block - START */
+
+  .list-container .default-content-wrapper h2 {
+    margin-bottom: 4rem;
+  }
+  
+  .list-container .default-content-wrapper h3 {
+    margin-bottom: 4rem;
+  }
+
+  .list-container .default-content-wrapper p {
+    margin-bottom: 3.5rem;
+    font-size: var(--body-font-size-xxl);
+    line-height: 2.375rem;
+    letter-spacing: 0.0163rem;
+  }
+
+  .list-container .default-content-wrapper:last-child p {
+    font-size: var(--body-font-size-l);
+    line-height: 1.625rem;
+    letter-spacing: 0.0113rem;
+  }
+
+  /* Style the default content which is ouside of List block - END */
+
+  .list-container ul .list-item .text-wrapper h4,
+  .list-container ul .list-item .text-wrapper p {
+    font-size: 1.375rem;
+    line-height: 2rem;
+  }
+}
