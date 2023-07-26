@@ -118,7 +118,7 @@ const extractMetadata = (document) => {
     metadata.image = img;
   }
   const publishDate = getPublishDate(document);
-  if (publishDate) { metadata['Publish Date'] = publishDate; }
+  if (publishDate) { metadata['Publication Date'] = publishDate; }
   const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
   if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
   return metadata;
@@ -512,6 +512,21 @@ const updateLinks = (document) => {
   });
 };
 
+const preocessHeadingIcons = (document) => {
+  document.querySelectorAll('.ss-heading-icon-location').forEach((iconHeadingWrapper) => {
+    const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading) {
+      heading.textContent = `:fal-map-marker-alt: ${heading.textContent}`;
+    }
+  });
+  document.querySelectorAll('.ss-heading-icon-check').forEach((iconHeadingWrapper) => {
+    const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
+    if (heading) {
+      heading.textContent = `:fal-check-circle: ${heading.textContent}`;
+    }
+  });
+};
+
 const gatherBlockNames = (document) => {
   const blocksArr = [...document.querySelectorAll('table')]
     .map((table) => {
@@ -569,6 +584,9 @@ export default {
 
     // make all links absolute
     updateLinks(document);
+
+    // add icon markup to headings with icons
+    preocessHeadingIcons(document);
 
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
