@@ -50,7 +50,6 @@ function getListItemRestructured(parent) {
  */
 export default async function decorate(block) {
   const list = document.createElement('ul');
-  list.className = 'ul';
 
   [...block.children].forEach((ele) => {
     list.append(getListItemRestructured(ele.querySelector(':scope > div')));

@@ -1,29 +1,29 @@
-.list-container .ul {
+.list-container ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.list-container .ul .list-item {
+.list-container ul .list-item {
   font-size: var(--body-font-size-xs);
   line-height: 1.125rem;
   letter-spacing: 0.0138rem;
   padding-bottom: 1rem;
 }
 
-.list-container .ul .list-item a {
+.list-container ul .list-item a {
   color: var(--clr-teal);
   text-decoration: none;
   background-color: transparent;
 }
 
-.list-container .ul .list-item .list-inner-wrapper{
+.list-container ul .list-item .list-inner-wrapper{
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
 }
 
-.list-container .ul .list-item .fa-icon {
+.list-container ul .list-item .fa-icon {
   display: inline-block;
   border-radius: 100%;
   background-color: var(--clr-teal);
@@ -38,19 +38,19 @@
   margin-inline-end: 1rem;
 }
 
-.list-container .ul .list-item .link-text {
+.list-container ul .list-item .link-text {
   font-weight: 600;
 }
 
-.list-container .ul .list-item .text-wrapper h4,
-.list-container .ul .list-item .text-wrapper p {
+.list-container ul .list-item .text-wrapper h4,
+.list-container ul .list-item .text-wrapper p {
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.125rem;
   letter-spacing: 0.0138rem;
 }
 
-.list-container .ul .list-item .text-wrapper strong {
+.list-container ul .list-item .text-wrapper strong {
   font-size: 1rem;
   line-height: 1.25rem;
   letter-spacing: 0.01rem;
@@ -69,31 +69,31 @@
 }
 
 @media (min-width: 900px) {
-  .list-container .ul {
+  .list-container ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .list-container .ul .list-item {
+  .list-container ul .list-item {
     font-size: var(--body-font-size-xl);
     line-height: 2rem;
     padding-bottom: 1.5rem;
   }
 
-  .list-container .ul .list-item.with-icon {
+  .list-container ul .list-item.with-icon {
     padding-bottom: 2.5rem;
   }
 
-  .list-container .ul .list-item:nth-child(odd) {
+  .list-container ul .list-item:nth-child(odd) {
     padding-inline-end: 2.5rem;
     border-inline-end: .0625rem solid var(--clr-gray-dark);
   }
 
-  .list-container .ul .list-item:nth-child(2n) {
+  .list-container ul .list-item:nth-child(2n) {
     padding-inline-start: 2.5rem;
   }
 
-  .list-container .ul .list-item .fa-icon {
+  .list-container ul .list-item .fa-icon {
     font-size: 3.125rem;
     width: 6rem;
     height: 6rem;
@@ -102,17 +102,17 @@
     flex: 0 0 6rem;
   }
 
-  .list-container .ul .list-item .link-text {
+  .list-container ul .list-item .link-text {
     padding-inline-start: 2.5rem;
   }
 
-  .list-container .ul .list-item .text-wrapper h4,
-  .list-container .ul .list-item .text-wrapper p {
+  .list-container ul .list-item .text-wrapper h4,
+  .list-container ul .list-item .text-wrapper p {
     font-size: 1.375rem;
     line-height: 2rem;
   }
 
-  .list-container .ul .list-item .text-wrapper strong {
+  .list-container ul .list-item .text-wrapper strong {
     font-size: 1.625rem;
     line-height: 2.375rem;
     letter-spacing: 0.0163rem;
