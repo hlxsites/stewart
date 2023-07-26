@@ -87,6 +87,12 @@ main .hero .align-end a {
   margin-block-end: 0;
 }
 
+@media (min-width: 600px) {
+  .section.narrow.hero-container {
+    max-width: 100%;
+  }
+}
+
 @media (min-width: 900px) {
   main .hero {
     padding: 6.25rem 8.5rem;
@@ -100,5 +106,13 @@ main .hero .align-end a {
 
   main .hero .align-end {
     margin-top: 5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .section.narrow.hero-container h1,
+  .section.narrow.hero-container h2 {
+    max-width: 60%;
+    margin-left: 0;
   }
 }
