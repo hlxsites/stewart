@@ -161,7 +161,23 @@ const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) =
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
 
-const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+// const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+const buildTables = (builder, section) => {
+  section.querySelectorAll('table').forEach((table) => {
+    let maxCols = 1;
+    table.querySelectorAll('tr').forEach((tr) => {
+      const cols = tr.querySelectorAll('td');
+      if (cols.length > maxCols) maxCols = cols.length;
+    });
+
+    builder.replace(table, () => {
+      builder.block('Table', maxCols, false).upToTag('table');
+      [...table.querySelectorAll('tr')].forEach((tr) => {
+        builder.append(tr);
+      });
+    });
+  });
+};
 
 const buildColumnsBlock = (builder, section) => {
   const rows = getGridRows(section);
@@ -476,6 +492,49 @@ const generateDocumentPath = ({
   document, url, html, params,
 }) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, ''));
 
+const updateLinks = (document) => {
+  document.querySelectorAll('a').forEach((a) => {
+    let { href } = a;
+    if (href) {
+      if (href.startsWith('/')) {
+        href = `https://www.stewart.com${href}`;
+      }
+      const aURL = new URL(href);
+
+      if (aURL.hostname === 'www.stewart.com') {
+        // sanitze local links
+        if (!aURL.pathname.startsWith('/content/dam/')) {
+          aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+        }
+      }
+      a.href = aURL.toString();
+    }
+  });
+};
+
+const gatherBlockNames = (document) => {
+  const blocksArr = [...document.querySelectorAll('table')]
+    .map((table) => {
+      const header = table.querySelector('tr > th');
+      if (header) {
+        return header.textContent;
+      }
+
+      return '';
+    })
+    .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
+  const blocks = new Set(blocksArr);
+  return [...blocks].join(', ');
+};
+
+const gatherAssetLinks = (document) => {
+  const assetLinks = new Set();
+  document.querySelectorAll('a[href*="/content/dam"]').forEach((a) => {
+    assetLinks.add(a.href);
+  });
+  return [...assetLinks].join(', ');
+};
+
 export default {
   /**
    * Apply DOM operations to the provided document and return
@@ -509,39 +568,16 @@ export default {
     builder.replaceChildren(document.body);
 
     // make all links absolute
-    document.querySelectorAll('a').forEach((a) => {
-      let { href } = a;
-      if (href) {
-        if (href.startsWith('/')) {
-          href = `https://www.stewart.com${href}`;
-        }
-        const aURL = new URL(href);
-
-        if (aURL.hostname === 'www.stewart.com') {
-          // sanitze local links
-          if (!aURL.pathname.startsWith('/content/dam/')) {
-            aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
-          }
-        }
-        a.href = aURL.toString();
-      }
-    });
+    updateLinks(document);
 
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
-    const blocksArr = [...document.querySelectorAll('table')]
-      .map((table) => {
-        const header = table.querySelector('tr > th');
-        if (header) {
-          return header.textContent;
-        }
-
-        return '';
-      })
-      .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
-    const blocks = new Set(blocksArr);
+    const report = {
+      blocks: gatherBlockNames(document),
+      assetLinks: gatherAssetLinks(document),
+    };
 
     return [{
       element: document.body,
@@ -551,9 +587,7 @@ export default {
         html,
         params,
       }),
-      report: {
-        blocks: [...blocks].join(', '),
-      },
+      report,
     }];
   },
 };
