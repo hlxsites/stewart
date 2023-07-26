@@ -262,6 +262,7 @@ header nav .nav-tools ul {
   padding-left: 0;
   margin: 0;
   font-size: var(--body-font-size-xxs);
+  position: relative;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
@@ -462,5 +463,15 @@ header nav .nav-mobile-menu {
 @media (min-width: 900px) {
   header nav .nav-mobile-menu {
     display: none;
+  }
+}
+
+/*** Search ***/
+@media (min-width: 900px) {
+  header .search-form-container .search-form {
+    position: absolute;
+    background-color: var(--clr-gray-light);
+    padding: 10px;
+    z-index: 2; 
   }
 }

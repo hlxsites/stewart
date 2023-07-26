@@ -13,6 +13,7 @@ import {
   loadBlocks,
   loadCSS,
   toClassName,
+  getMetadata,
 } from './lib-franklin.js';
 
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
@@ -173,6 +174,17 @@ export function wrapImgsInLinks(container) {
       pic.replaceWith(link);
     }
   });
+}
+
+/**
+ * fetches the navigation markup
+ */
+export async function fetchNavigationHTML() {
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
+
+  const response = await fetch(`${navPath}.plain.html`);
+  return response.text();
 }
 
 /**
