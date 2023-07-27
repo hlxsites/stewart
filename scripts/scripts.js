@@ -1,6 +1,7 @@
 import {
   sampleRUM,
   buildBlock,
+  decorateBlock,
   loadHeader,
   loadFooter,
   decorateButtons,
@@ -12,6 +13,7 @@ import {
   loadBlocks,
   loadCSS,
   toClassName,
+  getMetadata,
 } from './lib-franklin.js';
 
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
@@ -101,6 +103,17 @@ function buildHeroBlock(main) {
   main.prepend(section);
 }
 
+function buildEmbedBlocks(main) {
+  // For every youtube link, convert to an embed block
+  main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
+    // Get picture if it exists and move it to the block
+    const picture = a.closest('div').querySelector('picture');
+    const block = buildBlock('embed', { elems: picture ? [picture, a.cloneNode()] : [a.cloneNode()] });
+    a.replaceWith(block);
+    decorateBlock(block);
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -108,6 +121,7 @@ function buildHeroBlock(main) {
 function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
+    buildEmbedBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -160,6 +174,17 @@ export function wrapImgsInLinks(container) {
       pic.replaceWith(link);
     }
   });
+}
+
+/**
+ * fetches the navigation markup
+ */
+export async function fetchNavigationHTML() {
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
+
+  const response = await fetch(`${navPath}.plain.html`);
+  return response.text();
 }
 
 /**
