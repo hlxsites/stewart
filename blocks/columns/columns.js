@@ -28,10 +28,12 @@ export default async function decorate(block) {
   const cols = [...block.firstElementChild.children];
 
   block.classList.add(`columns-${cols.length}-cols`);
+  if (block.closest('.section').classList.contains('has-bg-image')) {
+    block.classList.add('opacity');
+  }
 
   const rowCount = [...block.children].length;
 
-  // setup image columns
   [...block.children].forEach((row, rdx) => {
     /*
     The columns of first row should occupy full width when more than one row exists.
@@ -44,6 +46,8 @@ export default async function decorate(block) {
     }
     [...row.children].forEach((col, cdx) => {
       col.className = `column column-${cdx + 1}`;
+
+      // setup image columns
       const pic = col.querySelector('picture');
       if (pic) {
         const picWrapper = pic.closest('div');

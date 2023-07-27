@@ -23,6 +23,35 @@
   display: block;
 }
 
+.columns.card .row .column {
+  background-color: var(--clr-white);
+  box-shadow: 0.0625rem 0.0625rem 0.1875rem 0 rgb(0 0 0 / 15%);
+  border: .0625rem solid var(--clr-gray-light);
+  padding: 1.5rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.columns.card .row .column:last-child {
+  margin-bottom: 0;
+}
+
+.columns.card.opacity .row .column {
+  background-color: rgb(255 255 255 / 75%);
+}
+
+.columns.card.dark .row .column {
+  background-color: var(--clr-black);
+}
+
+.columns.card.dark.opacity .row .column {
+  background-color: rgb(0 0 0 / 50%);
+}
+
+.columns.card.gray .row .column:last-child {
+  background-color: var(--clr-gray);
+  border: .0625rem solid var(--clr-gray-dark);
+}
+
 .columns-container .columns.left-border .row .column-1 {
   border-inline-start: 0.25rem solid var(--clr-white);
   padding-inline-start: 1rem;
@@ -34,7 +63,7 @@
 }
 
 @media (min-width: 900px) {
-  .columns > div {
+  .columns .row {
     align-items: center;
     flex-direction: unset;
     gap: 32px;
@@ -55,6 +84,26 @@
 
   .columns-container.content-break {
     padding: 7.5rem;
+  }
+
+  .columns.card .row {
+    align-items: stretch;
+  }
+
+  .columns.card .row .column {
+    box-shadow: 0 0.25rem 0.25rem 0 rgba(0 0 0 / 25%);
+    border: .0625rem solid var(--clr-gray-dark);
+    padding: 4.5rem 4rem;
+    margin-bottom: 2.5rem;
+    min-width: 0;
+  }
+
+  .columns.card .row .column:last-child {
+    margin-bottom: 2.5rem;
+  }
+
+  .columns.card.gray .row .column:last-child {
+    padding: 3.5rem;
   }
 
   .columns-container .columns.left-border .row .column-1 {
