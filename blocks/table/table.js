@@ -11,6 +11,12 @@ function buildCell(rowIndex) {
 }
 
 export default async function decorate(block) {
+  // if the block has one child which is a table, replace the block with the table
+  if (block.children.length === 1 || block.children[0].tagName === 'TABLE') {
+    block.innerHTML = block.children[0].innerHTML;
+    return;
+  }
+
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
