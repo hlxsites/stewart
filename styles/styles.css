@@ -511,6 +511,15 @@ main .section>div {
   color: var(--clr-white);
 }
 
+.section.black a {
+  color: var(--clr-teal);
+}
+
+.section.black p {
+  font-size: var(--body-font-size-xs);
+  line-height: 1.5rem;
+}
+
 .section.blue {
   background-color: var(--clr-teal);
   color: var(--clr-white);
