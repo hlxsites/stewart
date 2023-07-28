@@ -108,20 +108,14 @@
   letter-spacing: 0.0138rem;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 600px) {
   .list-container ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .list-container ul .list-item {
-    font-size: var(--body-font-size-xl);
-    line-height: 2rem;
-    padding-bottom: 1.5rem;
-  }
-
   .list-container ul .list-item.with-icon {
-    padding-bottom: 2.5rem;
+    padding-bottom: 1rem;
   }
 
   .list-container ul .list-item:nth-child(odd) {
@@ -131,6 +125,14 @@
 
   .list-container ul .list-item:nth-child(2n) {
     padding-inline-start: 2.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .list-container ul .list-item {
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+    padding-bottom: 1.5rem;
   }
 
   .list-container ul .list-item .fa-icon {

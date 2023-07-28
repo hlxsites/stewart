@@ -217,14 +217,14 @@ const buildColumnsBlock = (builder, section) => {
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                name += '(Card gray)';
+                name += ' Card gray';
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  name += '(Card dark)';
+                  name += ' Card dark';
                 } else {
-                  name += '(Card)';
+                  name += ' Card';
                 }
               }
 
