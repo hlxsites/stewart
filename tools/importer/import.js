@@ -214,6 +214,22 @@ const buildColumnsBlock = (builder, section) => {
                 name += ' (Carousel)';
               }
 
+              /* When a new variation added, update blocks/columns.js to support that - START */
+
+              if (col.querySelector('.ss-containerpresentationtype-box')) {
+                name += ' Card gray';
+              }
+
+              if (col.querySelector('.ss-containerpresentationtype-card')) {
+                if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
+                  name += ' Card dark';
+                } else {
+                  name += ' Card';
+                }
+              }
+
+              /* When a new variation added, update blocks/columns.js to support that - END */
+
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;

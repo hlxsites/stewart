@@ -49,6 +49,9 @@ function getListItemRestructured(parent) {
  * @param {Element} block The list block element
  */
 export default async function decorate(block) {
+  if (block.closest('.section').classList.contains('has-bg-image')) {
+    block.closest('.section').classList.add('card-wrapper');
+  }
   const list = document.createElement('ul');
 
   [...block.children].forEach((ele) => {
@@ -59,9 +62,9 @@ export default async function decorate(block) {
 
   const section = block.closest('.section');
 
-  if (section.classList.value.split(' ').includes('white-card')) {
+  if (block.closest('.section').classList.contains('has-bg-image')) {
     const cardWrapper = document.createElement('div');
-    cardWrapper.className = 'card white-opacity';
+    cardWrapper.className = 'card';
     [...section.children].forEach((ele) => {
       cardWrapper.append(ele);
     });
