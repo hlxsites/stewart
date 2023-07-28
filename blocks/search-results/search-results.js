@@ -1,6 +1,6 @@
-import { readBlockConfig, toCamelCase } from '../../scripts/lib-franklin.js';
-import { createSearchForm, SearchConstants } from '../../scripts/search-utils.js';
+import { createSearchForm, getSearchConfig } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
+import { createElement } from '../../scripts/scripts.js';
 
 const blockName = 'search-results';
 
@@ -17,17 +17,9 @@ const resetBlock = (block) => {
   block.innerHTML = '';
 };
 
-const setBlockConfig = (block) => {
-  const config = readBlockConfig(block);
-
-  Object.keys(config).forEach((key) => {
-    block.dataset[toCamelCase(key)] = config[key];
-  });
-};
-
 const getSearchParams = (searchParams) => {
   const currentPageParam = new URLSearchParams(searchParams).get('page');
-  const searchTerm = new URLSearchParams(searchParams).get('q');
+  const searchTerm = new URLSearchParams(searchParams).get('q') || '';
   const currentPage = !currentPageParam ? 1 : parseInt(currentPageParam, 10);
 
   return {
@@ -140,13 +132,28 @@ const createPaginationButton = (page, currentPage) => {
 };
 
 const createResultItem = (entry) => {
-  const markup = `<li><h4><a href="${entry.path}">${entry.title}</a></h4>${entry.description}</li>`;
-  return markup;
+  const item = createElement('li', {}, [
+    createElement('h4', {}, [
+      createElement('a', { href: entry.path }, entry.title),
+    ]),
+    createElement('p', {}, entry.description),
+  ]);
+
+  if (entry.date) {
+    const dateAuthor = createElement('span', {}, entry.date);
+    if (entry.author) {
+      dateAuthor.innerHTML += `| ${entry.author}`;
+    }
+    item.querySelector('h4').insertAdjacentElement('afterend', dateAuthor);
+  }
+
+  return item;
 };
 
 const createResultsPerPage = (currentPage, results, resultsPerPage) => {
-  const markup = `${results.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage).map((entry) => createResultItem(entry)).join('')}`;
-  return markup;
+  const elements = results.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage)
+    .map((entry) => createResultItem(entry));
+  return elements;
 };
 
 const createPagination = (paginationArray, currentPage) => paginationArray.map((page) => createPaginationButton(page, currentPage)).join('');
@@ -157,24 +164,49 @@ const createResultsContainer = () => {
   return resultsContainer;
 };
 
-const fetchResults = async () => ffetch(SearchConstants.QUERY_INDEX).all();
+const fetchResults = async (cfg, query) => {
+  const results = ffetch(cfg.queryIndex)
+    .filter((page) => {
+      if (page.path.startsWith(cfg.path)) {
+        let tagMatch = true;
+        let queryMatch = true;
 
-const renderResults = (block, results, searchTerm, resultsPerPage) => {
+        if (cfg.tag) {
+          const tags = JSON.parse(page.tags);
+          tagMatch = tags.includes(cfg.tag);
+        }
+
+        if (query) {
+          const regex = new RegExp(query, 'id');
+          queryMatch = regex.test(page.title) || regex.test(page.description);
+        }
+
+        return queryMatch && tagMatch;
+      }
+
+      return false;
+    });
+
+  return results.all();
+};
+
+const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
   let currentPage = Number(getQueryParamFromURL('page')) || 1;
-  const filteredResults = results.filter((entry) => `${entry.title} ${entry.description}`.toLowerCase().includes(searchTerm.toLowerCase()));
   const filteredResultsSize = filteredResults.length;
   const resultsContainer = createResultsContainer();
-  const perPage = parseInt(resultsPerPage || SearchConstants.DEFAULT_LIMIT, 10);
+  const perPage = parseInt(resultsPerPage, 10);
   const totalPages = Math.ceil(filteredResults.length / perPage);
 
   resultsContainer.innerHTML = `<h2>Search results for "${searchTerm}"</h2>
     <h3>${filteredResultsSize} ${filteredResultsSize > 1 ? 'results' : 'result'} found</h3>
     <ul class="${classNames.searchResultsDataList}">
-      ${createResultsPerPage(currentPage, filteredResults, perPage)}
     </ul>
     <nav class="${classNames.searchResultsNav}" aria-label="${classNames.searchResultsPagination}">
       <ul class="${classNames.searchResultsPagination}"></ul>
     </nav>`;
+
+  const results = createResultsPerPage(currentPage, filteredResults, perPage);
+  resultsContainer.querySelector(`.${classNames.searchResultsDataList}`).replaceChildren(...results);
 
   block.append(resultsContainer);
 
@@ -200,7 +232,8 @@ const renderResults = (block, results, searchTerm, resultsPerPage) => {
         paginationContainer.innerHTML = createPagination(paginationArray, currentPage);
         target.classList.add('active');
         addQueryParamToURL('page', currentPage);
-        searchUl.innerHTML = createResultsPerPage(currentPage, filteredResults, perPage);
+        const newResults = createResultsPerPage(currentPage, filteredResults, perPage);
+        searchUl.replaceChildren(...newResults);
         resultsContainer.scrollIntoView();
       }
     });
@@ -208,13 +241,12 @@ const renderResults = (block, results, searchTerm, resultsPerPage) => {
 };
 
 export default async function decorate(block) {
-  setBlockConfig(block);
+  const cfg = getSearchConfig(block);
   resetBlock(block);
   await setupSearchForm(block);
 
   const { searchTerm } = getSearchParams(window.location.search);
-  const { dataset: { resultsPerPage } } = block;
 
-  const results = await fetchResults();
-  renderResults(block, results, searchTerm, resultsPerPage);
+  const results = await fetchResults(cfg, searchTerm);
+  renderResults(block, results, searchTerm, Number(cfg['page-size']));
 }
