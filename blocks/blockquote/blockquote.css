@@ -1,0 +1,140 @@
+main .blockquote {
+  background-color: var(--clr-gray);
+  box-shadow: 0 .25rem .25rem 0 rgba(0 0 0 / 15%);
+  display: grid;
+  grid-template-columns: 4.375rem 1rem 1fr;
+  padding: 1rem;
+}
+
+main .blockquote .blockquote-image-container img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+main .blockquote .blockquote-title {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+}
+
+main .blockquote .blockquote-title h4 {
+  border-bottom: 0.0625rem solid #757575;
+  color: #43464a;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+main .blockquote .blockquote-title p {
+  color: var(--clr-purple);
+  font-weight: 700;
+  margin: 0;
+  font-size: var(--body-font-size-xs);
+  padding-top: 0.5rem;
+}
+
+main .blockquote .blockquote-content {
+  grid-column: 1/span 3;
+  grid-row: 2;
+}
+
+main .blockquote .blockquote-content p {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+main .blockquote .blockquote-content > blockquote {
+  text-indent: initial;
+  margin: 1rem 1rem 0 0;
+}
+
+main .blockquote .blockquote-content > blockquote > p {
+  display: flex;
+  flex-flow: row nowrap;
+  font-style: normal;
+}
+
+main .blockquote .blockquote-content > blockquote > p::after,
+main .blockquote .blockquote-content > blockquote > p::before {
+  color: var(--clr-purple);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.19;
+  letter-spacing: -.03rem;
+  height: 1.125rem 
+}
+
+main .blockquote .blockquote-content > blockquote > p::before {
+  content: "“";
+  margin-right: 0.50rem;
+}
+
+main .blockquote .blockquote-content > blockquote > p::after {
+  content: "”";
+  margin-left: .25rem;
+  align-self: flex-end;
+}
+
+@media (min-width: 900px) {
+  main .blockquote {
+    grid-template-columns: 8.1875rem 3rem 1fr;
+  }
+
+  main .blockquote .blockquote-title {
+    margin-top: 1.5rem;
+  }
+
+  main .blockquote .blockquote-content > blockquote > p::before {
+    margin-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  main .blockquote {
+    box-shadow: 0 .25rem .25rem 0 rgba(0 0 0 / 25%);
+    padding: 0 4rem 0 0;
+    grid-template-columns: 22.1875rem 3rem 1fr;
+  }
+
+  main .blockquote .blockquote-image-container {
+    grid-column: 1;
+    grid-row: 1/span 2;
+    display: flex;
+  }
+
+  main .blockquote .blockquote-title {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 3rem;
+  }
+
+  main .blockquote .blockquote-title p {
+    padding-top: 0;
+  }
+
+  main .blockquote .blockquote-content {
+    grid-column: 3;
+    grid-row: 2;
+    margin-top: 2rem 
+  }
+
+  main .blockquote .blockquote-content p {
+    font-size: var(--body-font-size-xxl);
+    font-weight: 400;
+    line-height: 1.46;
+    letter-spacing: .0162rem 
+  }
+
+  main .blockquote .blockquote-content > blockquote > p::after,
+  main .blockquote .blockquote-content > blockquote > p::before {
+    font-size: var(--heading-font-size-xxl);
+    font-weight: 800;
+    line-height: 1.29;
+    letter-spacing: -.0612rem;
+    height: 3.4375rem 
+  }
+
+  main .blockquote .blockquote-content > blockquote > p::after {
+    margin-left: 1.5rem 
+  }
+}
