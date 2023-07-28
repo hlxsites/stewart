@@ -50,24 +50,20 @@
 }
 
 .list-container .card {
-  background-color: var(--clr-white);
+  background-color: rgb(255 255 255 / 85%);
   box-shadow: 0.0625rem 0.0625rem 0.1875rem 0 rgb(0 0 0 / 15%);
   border: .0625rem solid var(--clr-gray-light);
   padding: 1.5rem 1rem;
 }
 
-.list-container .white-opacity {
-  background-color: rgb(255 255 255 / 85%);
-}
-
-/* Style the default content whihc is ouside of List block - START */
+/* Style the default content which is ouside of List block - START */
 
 .list-container .default-content-wrapper h2 {
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.list-container.white-card .default-content-wrapper h2 {
+.list-container.card-wrapper .default-content-wrapper h2 {
   text-align: left;
   margin-bottom: 0.5rem;
 }
@@ -112,20 +108,14 @@
   letter-spacing: 0.0138rem;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 600px) {
   .list-container ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .list-container ul .list-item {
-    font-size: var(--body-font-size-xl);
-    line-height: 2rem;
-    padding-bottom: 1.5rem;
-  }
-
   .list-container ul .list-item.with-icon {
-    padding-bottom: 2.5rem;
+    padding-bottom: 1rem;
   }
 
   .list-container ul .list-item:nth-child(odd) {
@@ -135,6 +125,14 @@
 
   .list-container ul .list-item:nth-child(2n) {
     padding-inline-start: 2.5rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .list-container ul .list-item {
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+    padding-bottom: 1.5rem;
   }
 
   .list-container ul .list-item .fa-icon {
@@ -161,6 +159,7 @@
     box-shadow: 0 0.25rem 0.25rem 0 rgb(0 0 0 / 25%);
     border: .0625rem solid var(--clr-gray-dark);
     padding: 4.5rem 4rem;
+    margin: 0 8%;
   }
 
   /* Style the default content whihc is ouside of List block - START */

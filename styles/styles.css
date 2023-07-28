@@ -282,7 +282,7 @@ button {
   text-decoration: none;
   border: 1px solid var(--clr-primary);
   padding: .5rem;
-  min-width: 10rem;
+  min-width: min(10rem, 100%);
   text-align: center;
   font-style: normal;
   font-weight: 600;
@@ -298,7 +298,7 @@ button {
 @media (min-width: 900px) {
   a.button:any-link, button {
     padding: 1rem;
-    min-width: 17.5rem;
+    min-width: min(17.5rem, 100%);
   }
 }
 
@@ -531,9 +531,16 @@ main .section>div {
   }
   
   .section.narrow {
-    margin: 0 8%;
+    margin-inline-start: 8%;
+    margin-inline-end: 8%;
     width: auto;
     max-width: 64rem;
+  }
+
+  .section.narrow.has-bg-image {
+    max-width: 100%;
+    margin-inline-start: unset;
+    margin-inline-end: unset;
   }
 }
 
