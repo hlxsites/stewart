@@ -130,13 +130,18 @@ const getPublishDate = (document) => {
 
 const extractMetadata = (document) => {
   const metadata = {};
-  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
+  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
   metadataProperties.forEach((prop) => {
     const val = getMetadata(document, prop);
     if (val) {
-      metadata[prop.replaceAll('og:', '')] = val;
+      if (prop === 'keywords') {
+        metadata.tags = val;
+      } else {
+        metadata[prop.replaceAll('og:', '')] = val;
+      }
     }
   });
+
   if (metadata.image) {
     const img = document.createElement('img');
     img.src = metadata.image;

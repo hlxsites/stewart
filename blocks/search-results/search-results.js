@@ -1,11 +1,15 @@
 import { createSearchForm, getSearchConfig } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
+import { toClassName } from '../../scripts/lib-franklin.js';
 
 const blockName = 'search-results';
 
 const classNames = {
-  searchResultsData: `${blockName}-data`,
+  searchResultsData: `${blockName}-container`,
+  searchResultsListContainer: `${blockName}-list-container`,
+  searchResultsFilterContainer: `${blockName}-filter-container`,
+  searchResultsInfo: `${blockName}-info-container`,
   searchResultsDataList: `${blockName}-data-list`,
   searchResultsNav: `${blockName}-nav`,
   searchResultsPagination: `${blockName}-pagination`,
@@ -140,9 +144,13 @@ const createResultItem = (entry) => {
   ]);
 
   if (entry.date) {
-    const dateAuthor = createElement('span', {}, entry.date);
+    const dateinMs = Number(entry.date) * 1000;
+    const postDate = new Date(dateinMs);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = postDate.toLocaleDateString('en-us', options);
+    const dateAuthor = createElement('span', {}, dateStr);
     if (entry.author) {
-      dateAuthor.innerHTML += `| ${entry.author}`;
+      dateAuthor.innerHTML += ` | ${entry.author}`;
     }
     item.querySelector('h4').insertAdjacentElement('afterend', dateAuthor);
   }
@@ -190,6 +198,40 @@ const fetchResults = async (cfg, query) => {
   return results.all();
 };
 
+const buildFacets = (filteredResults, facetContainer) => {
+  facetContainer.append(createElement('h4', {}, 'Filter By:'));
+  facetContainer.append(createElement('div', { class: 'search-results-facet-container' }, [
+    createElement('h5', {}, 'Content Types'),
+    createElement('ul'),
+  ]));
+
+  const tagData = {};
+  filteredResults.forEach((page) => {
+    JSON.parse(page.tags).forEach((tag) => {
+      let tagCount = tagData[tag];
+      if (tagCount) {
+        tagCount += 1;
+      } else {
+        tagCount = 1;
+      }
+      tagData[tag] = tagCount;
+    });
+  });
+
+  facetContainer.querySelector('ul').replaceChildren(...Object.keys(tagData).map((tagName) => createElement('li', {}, [
+    createElement('input', {
+      type: 'checkbox',
+      name: 'content-types',
+      title: tagName,
+      value: tagName,
+      id: `${toClassName(tagName)}-facet-input`,
+    }),
+    createElement('label', {
+      for: `${toClassName(tagName)}-facet-input`,
+    }, `${tagName} (${tagData[tagName]})`),
+  ])));
+};
+
 const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
   let currentPage = Number(getQueryParamFromURL('page')) || 1;
   const filteredResultsSize = filteredResults.length;
@@ -197,18 +239,28 @@ const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
   const perPage = parseInt(resultsPerPage, 10);
   const totalPages = Math.ceil(filteredResults.length / perPage);
 
-  resultsContainer.innerHTML = `<h2>Search results for "${searchTerm}"</h2>
-    <h3>${filteredResultsSize} ${filteredResultsSize > 1 ? 'results' : 'result'} found</h3>
-    <ul class="${classNames.searchResultsDataList}">
-    </ul>
-    <nav class="${classNames.searchResultsNav}" aria-label="${classNames.searchResultsPagination}">
-      <ul class="${classNames.searchResultsPagination}"></ul>
-    </nav>`;
+  resultsContainer.innerHTML = `
+    <div class="${classNames.searchResultsInfo}">
+      <h2>Search results for "${searchTerm}"</h2>
+      <h3>${filteredResultsSize} ${filteredResultsSize > 1 ? 'results' : 'result'} found</h3>
+    </div>
+    <div class="${classNames.searchResultsFilterContainer}"></div>
+    <div class="${classNames.searchResultsListContainer}">
+      <ul class="${classNames.searchResultsDataList}">
+      </ul>
+      <nav class="${classNames.searchResultsNav}" aria-label="${classNames.searchResultsPagination}">
+        <ul class="${classNames.searchResultsPagination}"></ul>
+      </nav>
+    </div>`;
 
   const results = createResultsPerPage(currentPage, filteredResults, perPage);
   resultsContainer.querySelector(`.${classNames.searchResultsDataList}`).replaceChildren(...results);
 
   block.append(resultsContainer);
+
+  if (block.classList.contains('tag-facet')) {
+    buildFacets(filteredResults, resultsContainer.querySelector(`.${classNames.searchResultsFilterContainer}`));
+  }
 
   const hasPages = totalPages > 1;
 
@@ -243,6 +295,10 @@ const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
 export default async function decorate(block) {
   const cfg = getSearchConfig(block);
   resetBlock(block);
+
+  if (cfg.tagFacet) {
+    block.classList.add('tag-facet');
+  }
   await setupSearchForm(block);
 
   const { searchTerm } = getSearchParams(window.location.search);
