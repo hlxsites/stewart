@@ -230,9 +230,16 @@ const buildFacets = (filteredResults, facetContainer) => {
       for: `${toClassName(tagName)}-facet-input`,
     }, `${tagName} (${tagData[tagName]})`),
   ])));
+
+  facetContainer.querySelectorAll('input').forEach((cbx) => {
+    cbx.addEventListener('change', () => {
+      // todo update results
+    });
+  });
 };
 
-const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
+const renderResults = (block, filteredResults, searchTerm, cfg) => {
+  const resultsPerPage = Number(cfg['page-size']);
   let currentPage = Number(getQueryParamFromURL('page')) || 1;
   const filteredResultsSize = filteredResults.length;
   const resultsContainer = createResultsContainer();
@@ -258,7 +265,7 @@ const renderResults = (block, filteredResults, searchTerm, resultsPerPage) => {
 
   block.append(resultsContainer);
 
-  if (block.classList.contains('tag-facet')) {
+  if (cfg.tagFacet) {
     buildFacets(filteredResults, resultsContainer.querySelector(`.${classNames.searchResultsFilterContainer}`));
   }
 
@@ -304,5 +311,5 @@ export default async function decorate(block) {
   const { searchTerm } = getSearchParams(window.location.search);
 
   const results = await fetchResults(cfg, searchTerm);
-  renderResults(block, results, searchTerm, Number(cfg['page-size']));
+  renderResults(block, results, searchTerm, cfg);
 }
