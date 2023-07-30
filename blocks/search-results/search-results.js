@@ -198,12 +198,18 @@ const fetchResults = async (cfg, query) => {
   return results.all();
 };
 
-const buildFacets = (filteredResults, facetContainer) => {
-  facetContainer.append(createElement('h4', {}, 'Filter By:'));
-  facetContainer.append(createElement('div', { class: 'search-results-facet-container' }, [
+const buildFacets = (filteredResults, filterContainer) => {
+  filterContainer.append(createElement('h4', { class: 'search-results-filterby' }, 'Filter By:'));
+  filterContainer.append(createElement('div', { class: 'search-results-facet-container', 'aria-expanded': 'false' }, [
     createElement('h5', {}, 'Content Types'),
     createElement('ul'),
   ]));
+
+  filterContainer.querySelector('.search-results-filterby').addEventListener('click', () => {
+    const facetContainer = filterContainer.querySelector('.search-results-facet-container');
+    const expanded = facetContainer.getAttribute('aria-expanded') === 'true';
+    filterContainer.querySelector('.search-results-facet-container').setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  });
 
   const tagData = {};
   filteredResults.forEach((page) => {
@@ -218,7 +224,7 @@ const buildFacets = (filteredResults, facetContainer) => {
     });
   });
 
-  facetContainer.querySelector('ul').replaceChildren(...Object.keys(tagData).map((tagName) => createElement('li', {}, [
+  filterContainer.querySelector('ul').replaceChildren(...Object.keys(tagData).map((tagName) => createElement('li', {}, [
     createElement('input', {
       type: 'checkbox',
       name: 'content-types',
@@ -231,7 +237,7 @@ const buildFacets = (filteredResults, facetContainer) => {
     }, `${tagName} (${tagData[tagName]})`),
   ])));
 
-  facetContainer.querySelectorAll('input').forEach((cbx) => {
+  filterContainer.querySelectorAll('input').forEach((cbx) => {
     cbx.addEventListener('change', () => {
       // todo update results
     });

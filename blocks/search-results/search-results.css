@@ -105,8 +105,63 @@ main .search-results .search-results-pagination .search-results-pagination-item 
 /* tag facets */
 main .search-results .search-results-filter-container {
   display: none;
+  border: 3px solid  var(--clr-primary);
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
 }
 
 main .search-results.tag-facet .search-results-filter-container {
   display: unset;
+}
+
+main .search-results .search-results-filterby {
+  color: var(--clr-primary);
+  font-weight: 700;
+  font-size: var(--body-font-size-m);
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+main .search-results .search-results-facet-container {
+  display: none;
+}
+
+main .search-results .search-results-facet-container :is(h5, label) {
+  font-size: var(--body-font-size-xxs);
+  font-weight: 400;
+  letter-spacing: .0075rem;
+}
+
+main .search-results .search-results-facet-container[aria-expanded="true"] {
+  display: block;
+  padding-block: 1rem;
+}
+
+main .search-results .search-results-facet-container ul {
+  list-style: none;
+  padding-inline: 0;
+}
+
+main .search-results .search-results-facet-container ul > li {
+  margin-bottom: .25rem;
+}
+
+main .search-results .search-results-facet-container ul > li input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  margin-inline-end: 0.9rem;
+  filter: invert(0) sepia(99%) saturate(5000%) hue-rotate(176deg) brightness(93%) contrast(126%);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+main .search-results .search-results-facet-container ul > li label {
+  /* height: 1.5rem; */
+  display: inline-block;
+  vertical-align: middle;
 }
