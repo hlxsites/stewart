@@ -204,7 +204,14 @@ const buildFacets = (filteredResults, block, cfg, q, selectedTag) => {
     });
   });
 
-  filterContainer.querySelector('ul').replaceChildren(...Object.keys(tagData).map((tagName) => createElement('li', {}, [
+  const sortedKeys = Object.keys(tagData).sort((keyA, keyB) => {
+    const countA = tagData[keyA];
+    const countB = tagData[keyB];
+
+    return countB - countA;
+  });
+
+  filterContainer.querySelector('ul').replaceChildren(...sortedKeys.map((tagName) => createElement('li', {}, [
     createElement('input', {
       type: 'checkbox',
       name: 'content-types',
