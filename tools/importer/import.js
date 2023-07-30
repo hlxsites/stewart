@@ -654,19 +654,23 @@ export default {
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
+    const docPath = generateDocumentPath({
+      document,
+      url,
+      html,
+      params,
+    });
     const report = {
       blocks: gatherBlockNames(document),
       assetLinks: gatherAssetLinks(document),
+      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      prodUrl: `https://www.stewart.com${docPath}`,
     };
 
     return [{
       element: document.body,
-      path: generateDocumentPath({
-        document,
-        url,
-        html,
-        params,
-      }),
+      path: docPath,
       report,
     }];
   },
