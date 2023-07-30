@@ -3,6 +3,9 @@ import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
 import { toClassName } from '../../scripts/lib-franklin.js';
 
+// media query match that indicates mobile/tablet width
+const isDesktop = window.matchMedia('(min-width: 900px)');
+
 const blockName = 'search-results';
 
 const classNames = {
@@ -19,17 +22,6 @@ const classNames = {
 
 const resetBlock = (block) => {
   block.innerHTML = '';
-};
-
-const getSearchParams = (searchParams) => {
-  const currentPageParam = new URLSearchParams(searchParams).get('page');
-  const searchTerm = new URLSearchParams(searchParams).get('q') || '';
-  const currentPage = !currentPageParam ? 1 : parseInt(currentPageParam, 10);
-
-  return {
-    searchTerm,
-    currentPage,
-  };
 };
 
 const generatePaginationData = (currentPage, totalPages) => {
@@ -158,35 +150,27 @@ const createResultItem = (entry) => {
   return item;
 };
 
-const createResultsPerPage = (currentPage, results, resultsPerPage) => {
-  const elements = results.slice((currentPage - 1) * resultsPerPage, currentPage * resultsPerPage)
-    .map((entry) => createResultItem(entry));
-  return elements;
-};
-
 const createPagination = (paginationArray, currentPage) => paginationArray.map((page) => createPaginationButton(page, currentPage)).join('');
 
-const createResultsContainer = () => {
-  const resultsContainer = document.createElement('div');
-  resultsContainer.classList.add(classNames.searchResultsData);
-  return resultsContainer;
-};
-
-const fetchResults = async (cfg, query) => {
+const fetchResults = (cfg, query, tag, pageNum) => {
   const results = ffetch(cfg.queryIndex)
-    .filter((page) => {
-      if (page.path.startsWith(cfg.path)) {
+    .filter((entry) => {
+      if (entry.path.startsWith(cfg.path)) {
         let tagMatch = true;
         let queryMatch = true;
 
+        const tags = JSON.parse(entry.tags);
         if (cfg.tag) {
-          const tags = JSON.parse(page.tags);
           tagMatch = tags.includes(cfg.tag);
+        }
+
+        if (tag) {
+          tagMatch = tagMatch && tags.includes(tag);
         }
 
         if (query) {
           const regex = new RegExp(query, 'id');
-          queryMatch = regex.test(page.title) || regex.test(page.description);
+          queryMatch = regex.test(entry.title) || regex.test(entry.description);
         }
 
         return queryMatch && tagMatch;
@@ -195,21 +179,17 @@ const fetchResults = async (cfg, query) => {
       return false;
     });
 
-  return results.all();
+  if (pageNum < 1) {
+    return results;
+  }
+
+  const resultsPerPage = Number(cfg['page-size']);
+  const offset = (pageNum - 1) * resultsPerPage;
+  return results.slice(offset, offset + resultsPerPage);
 };
 
-const buildFacets = (filteredResults, filterContainer) => {
-  filterContainer.append(createElement('h4', { class: 'search-results-filterby' }, 'Filter By:'));
-  filterContainer.append(createElement('div', { class: 'search-results-facet-container', 'aria-expanded': 'false' }, [
-    createElement('h5', {}, 'Content Types'),
-    createElement('ul'),
-  ]));
-
-  filterContainer.querySelector('.search-results-filterby').addEventListener('click', () => {
-    const facetContainer = filterContainer.querySelector('.search-results-facet-container');
-    const expanded = facetContainer.getAttribute('aria-expanded') === 'true';
-    filterContainer.querySelector('.search-results-facet-container').setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  });
+const buildFacets = (filteredResults, block, cfg, q, selectedTag) => {
+  const filterContainer = block.querySelector(`.${classNames.searchResultsFilterContainer}`);
 
   const tagData = {};
   filteredResults.forEach((page) => {
@@ -237,73 +217,88 @@ const buildFacets = (filteredResults, filterContainer) => {
     }, `${tagName} (${tagData[tagName]})`),
   ])));
 
-  filterContainer.querySelectorAll('input').forEach((cbx) => {
+  if (selectedTag) {
+    const tagCbx = filterContainer.querySelector(`input[value="${selectedTag}"]`);
+    if (tagCbx) tagCbx.checked = true;
+  }
+
+  const allCheckBoxes = filterContainer.querySelectorAll('input');
+
+  allCheckBoxes.forEach((cbx) => {
     cbx.addEventListener('change', () => {
-      // todo update results
+      allCheckBoxes.forEach((otherCbx) => {
+        if (otherCbx !== cbx) otherCbx.checked = false;
+      });
+
+      // eslint-disable-next-line no-use-before-define
+      renderSearchResults(block, cfg, q, cbx.checked ? cbx.value : '', '1').then(() => {
+        block.scrollIntoView({
+          behavior: 'smooth',
+        });
+      });
     });
   });
 };
 
-const renderResults = (block, filteredResults, searchTerm, cfg) => {
-  const resultsPerPage = Number(cfg['page-size']);
-  let currentPage = Number(getQueryParamFromURL('page')) || 1;
-  const filteredResultsSize = filteredResults.length;
-  const resultsContainer = createResultsContainer();
-  const perPage = parseInt(resultsPerPage, 10);
-  const totalPages = Math.ceil(filteredResults.length / perPage);
-
-  resultsContainer.innerHTML = `
-    <div class="${classNames.searchResultsInfo}">
-      <h2>Search results for "${searchTerm}"</h2>
-      <h3>${filteredResultsSize} ${filteredResultsSize > 1 ? 'results' : 'result'} found</h3>
-    </div>
-    <div class="${classNames.searchResultsFilterContainer}"></div>
-    <div class="${classNames.searchResultsListContainer}">
-      <ul class="${classNames.searchResultsDataList}">
-      </ul>
-      <nav class="${classNames.searchResultsNav}" aria-label="${classNames.searchResultsPagination}">
-        <ul class="${classNames.searchResultsPagination}"></ul>
-      </nav>
-    </div>`;
-
-  const results = createResultsPerPage(currentPage, filteredResults, perPage);
-  resultsContainer.querySelector(`.${classNames.searchResultsDataList}`).replaceChildren(...results);
-
-  block.append(resultsContainer);
-
-  if (cfg.tagFacet) {
-    buildFacets(filteredResults, resultsContainer.querySelector(`.${classNames.searchResultsFilterContainer}`));
+const renderResults = async (block, filteredResults, searchTerm) => {
+  const resultsUl = block.querySelector('.search-results-data-list');
+  resultsUl.innerHTML = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const entry of filteredResults) {
+    const li = createResultItem(entry);
+    resultsUl.append(li);
   }
 
-  const hasPages = totalPages > 1;
-
-  if (hasPages) {
-    let paginationArray = generatePaginationData(currentPage, totalPages);
-    const paginationContainer = resultsContainer.querySelector(`.${classNames.searchResultsNav} > .${classNames.searchResultsPagination}`);
-    paginationContainer.innerHTML = createPagination(paginationArray, currentPage);
-
-    const paginationList = resultsContainer.querySelector(`.${classNames.searchResultsPagination}`);
-    const searchUl = resultsContainer.querySelector(`.${classNames.searchResultsDataList}`);
-    const paginationButtons = resultsContainer.querySelectorAll(`.${classNames.searchResultsPaginationButton}`);
-
-    paginationList.addEventListener('click', (event) => {
-      const { target } = event;
-      const shouldUpdate = (target.matches('button') || target.matches('span.fa-icon')) && target.dataset.page !== '…';
-
-      if (shouldUpdate) {
-        currentPage = target.matches('span.fa-icon') ? Number(target.parentElement.dataset.page) : Number(target.dataset.page);
-        [...paginationButtons].forEach((button) => button.classList.remove('active'));
-        paginationArray = generatePaginationData(currentPage, totalPages);
-        paginationContainer.innerHTML = createPagination(paginationArray, currentPage);
-        target.classList.add('active');
-        addQueryParamToURL('page', currentPage);
-        const newResults = createResultsPerPage(currentPage, filteredResults, perPage);
-        searchUl.replaceChildren(...newResults);
-        resultsContainer.scrollIntoView();
-      }
-    });
-  }
+  block.querySelector('.search-results-term').textContent = `"${searchTerm}"`;
 };
+
+function renderSearchResultsScaffolding() {
+  return createElement('div', { class: classNames.searchResultsData }, [
+    createElement('div', { class: classNames.searchResultsInfo }, [
+      createElement('h2', {}, 'Search results for <span class="search-results-term"></span>'),
+      createElement('h3', { class: 'search-result-count' }),
+    ]),
+    createElement('div', { class: classNames.searchResultsFilterContainer }, [
+      createElement('h4', { class: 'search-results-filterby' }, 'Filter By:'),
+      createElement('div', { class: 'search-results-facet-container', 'aria-expanded': 'false' }, [
+        createElement('h5', {}, 'Content Types'),
+        createElement('ul'),
+      ]),
+    ]),
+    createElement('div', { class: classNames.searchResultsListContainer }, [
+      createElement('ul', { class: classNames.searchResultsDataList }),
+      createElement('nav', { class: classNames.searchResultsNav, 'aria-label': 'Search Results Pagination' }, [
+        createElement('ul', { class: classNames.searchResultsPagination }),
+      ]),
+    ]),
+  ]);
+}
+
+async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
+  const pageNum = Number(page);
+  const resultsForPage = fetchResults(cfg, q, tag, pageNum);
+  await renderResults(block, resultsForPage, q);
+
+  const allResults = fetchResults(cfg, q, tag, -1);
+  allResults.all().then((resArray) => {
+    const allResCount = resArray.length;
+    const resultsPerPage = Number(cfg['page-size']);
+
+    if (!partial) {
+      block.querySelector('.search-result-count').textContent = `${allResCount} Results Found`;
+      buildFacets(resArray, block, cfg, q, tag);
+    }
+
+    const totalPages = Math.ceil(allResCount / resultsPerPage);
+    const paginationContainer = block.querySelector(`.${classNames.searchResultsNav} > .${classNames.searchResultsPagination}`);
+    if (totalPages > 1) {
+      const paginationArray = generatePaginationData(pageNum, totalPages);
+      paginationContainer.innerHTML = createPagination(paginationArray, pageNum);
+    } else {
+      paginationContainer.innerHTML = '';
+    }
+  });
+}
 
 export default async function decorate(block) {
   const cfg = getSearchConfig(block);
@@ -313,9 +308,61 @@ export default async function decorate(block) {
     block.classList.add('tag-facet');
   }
   await setupSearchForm(block);
+  const form = block.querySelector('form.search-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // update results, preserve tag facet if present
+    const searchTerm = form.querySelector('input[name="q"').value;
+    renderSearchResults(block, cfg, searchTerm, '', '1');
+    addQueryParamToURL('page', '1');
+    addQueryParamToURL('q', searchTerm);
+  });
 
-  const { searchTerm } = getSearchParams(window.location.search);
+  block.append(renderSearchResultsScaffolding());
 
-  const results = await fetchResults(cfg, searchTerm);
-  renderResults(block, results, searchTerm, cfg);
+  const usp = new URLSearchParams(window.location.search);
+  const q = usp.get('q') || '';
+  const page = usp.get('page') || '1';
+  await renderSearchResults(block, cfg, q, '', page);
+
+  const filterContainer = block.querySelector(`.${classNames.searchResultsFilterContainer}`);
+  const facetContainer = filterContainer.querySelector('.search-results-facet-container');
+
+  filterContainer.querySelector('.search-results-filterby').addEventListener('click', () => {
+    if (isDesktop.matches) {
+      return;
+    }
+    const expanded = facetContainer.getAttribute('aria-expanded') === 'true';
+    facetContainer.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  });
+  isDesktop.addEventListener('change', () => {
+    if (isDesktop.matches) {
+      facetContainer.setAttribute('aria-expanded', 'true');
+    } else {
+      facetContainer.setAttribute('aria-expanded', 'false');
+    }
+  });
+  if (isDesktop.matches) {
+    facetContainer.setAttribute('aria-expanded', 'true');
+  }
+
+  const pager = block.querySelector(`.${classNames.searchResultsPagination}`);
+  pager.addEventListener('click', (event) => {
+    const { target } = event;
+    const shouldUpdate = (target.matches('button') || target.matches('span.fa-icon')) && target.dataset.page !== '…';
+
+    if (shouldUpdate) {
+      const newPage = target.matches('span.fa-icon') ? Number(target.parentElement.dataset.page) : Number(target.dataset.page);
+      const curPage = Number(pager.querySelector('.search-results-pagination-button.active').dataset.page);
+      if (newPage !== curPage) {
+        const searchTerm = form.querySelector('input[name="q"').value;
+        renderSearchResults(block, cfg, searchTerm, '', newPage, true).then(() => {
+          block.scrollIntoView({
+            behavior: 'smooth',
+          });
+        });
+        addQueryParamToURL('page', newPage);
+      }
+    }
+  });
 }
