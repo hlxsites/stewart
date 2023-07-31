@@ -60,29 +60,6 @@ export function createElement(tagName, props, html) {
 }
 
 /**
- *
- * @param {HTMLElement} oldElement
- * @param {String} newTagName
- * @param {Array<String>} newElementClassNames
- * @returns {HTMLElement} the new element
- */
-export const replaceElementTagName = (oldElement, newTagName, newElementClassNames) => {
-  const newElement = document.createElement(newTagName);
-  newElement.innerHTML = oldElement.innerHTML;
-  oldElement.parentNode.replaceChild(newElement, oldElement);
-
-  if (newElementClassNames) {
-    newElement.classList.add(...newElementClassNames);
-  }
-
-  return newElement;
-};
-
-export default {
-  replaceElementTagName,
-};
-
-/**
  * Extension of decorateIcons from lib-franklin.
  * adds special handing for fa icons from icon font
  * @param {Element} element the container element

@@ -1,33 +1,34 @@
-import { replaceElementTagName } from '../../scripts/scripts.js';
+import { createElement } from '../../scripts/scripts.js';
 
 const blockName = 'blockquote';
 
 const classNames = {
+  blockquoteContainer: `${blockName}-container`,
   blockquoteImageContainer: `${blockName}-image-container`,
   blockquoteTitle: `${blockName}-title`,
   blockquoteContent: `${blockName}-content`,
 };
 
-const setupContainerClasses = (block) => {
-  const selectors = ['img', 'h4'];
+export default function decorate(block) {
+  const blockQuote = block.querySelector('blockquote');
+  const blockQuoteContentElement = createElement('div', {}, createElement('blockquote', {}, blockQuote.innerHTML));
+
+  const blockContainer = block.children[0];
+
+  block.append(...blockContainer.childNodes);
+  block.append(blockQuoteContentElement);
+  blockQuote.remove();
+  blockContainer.remove();
+
+  const selectors = ['img', 'h4', 'blockquote'];
   const classes = {
     img: classNames.blockquoteImageContainer,
     h4: classNames.blockquoteTitle,
+    blockquote: classNames.blockquoteContent,
   };
 
   [...block.children].forEach((child) => {
     const selector = selectors.find((className) => child.querySelector(className));
-    child.classList.add(selector ? classes[selector] : classNames.blockquoteContent);
+    child.classList.add(classes[selector]);
   });
-};
-
-const wrapQuote = (block) => {
-  const quote = block.querySelector(`.${classNames.blockquoteContent} > div`);
-  const blockQuoteElement = replaceElementTagName(quote, 'blockquote');
-  blockQuoteElement.innerHTML = `<p>${quote.innerHTML}</p>`;
-};
-
-export default function decorate(block) {
-  setupContainerClasses(block);
-  wrapQuote(block);
 }

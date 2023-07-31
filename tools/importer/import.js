@@ -318,12 +318,17 @@ const buildButtons = (builder, section) => {
 const buildBlockQuotes = (builder, section) => {
   section.querySelectorAll('.cmp-quotation').forEach((bq) => {
     const image = bq.querySelector('.quotation-image');
-    const title = bq.querySelector('.quotation-person');
+    const name = bq.querySelector('.quotation-person_name');
+    const title = bq.querySelector('.quotation-person_title');
     const quote = bq.querySelector('.quotation-text blockquote');
+    const bqElement = builder.doc.createElement('blockquote');
+    bqElement.textContent = quote.textContent;
+
     builder.replace(bq, () => {
       builder
-        .block('Blockquote', 1, true)
-        .append(image).row().append(title).row().append(...quote.children);
+        .block('Blockquote', 2, true)
+        .append(image)
+        .column().append(name).append(title).append(bqElement);
     });
   });
 };
