@@ -8,7 +8,7 @@ main .search-results .search-results-container {
 
 @media (min-width: 900px) {
   main .search-results .search-results-container {
-    grid-template-columns: 26rem auto;
+    grid-template-columns: auto auto;
     gap: 2rem;
   }
 
@@ -162,9 +162,9 @@ main .search-results .search-results-facet-container ul > li input {
 }
 
 main .search-results .search-results-facet-container ul > li label {
-  /* height: 1.5rem; */
   display: inline-block;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 @media (min-width: 900px) {
