@@ -14,7 +14,6 @@
   /* these colors came from legecy css commented out ones are not used anywhere...yet
   --clr-blue: #007bff;
   --clr-indigo: #6610f2;
-  --clr-purple: #53469c;
   --clr-pink: #e83e8c;
   --clr-red: #dc3545;
   --clr-orange: #fd7e14;
@@ -41,6 +40,7 @@
   --clr-gray-dark: #757575;
   --clr-teal: #006781;
   --clr-teal-light: #248464;
+  --clr-purple: #53469c;
   
 
   /* element colors */
