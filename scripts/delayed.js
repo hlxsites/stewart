@@ -11,7 +11,7 @@ function loadGoogleTagManager(placeholders) {
 }
 
 function loadOneTrust(placeholders) {
-  const otId = placeholders.onetrustid;
+  const otId = placeholders.onetrustId;
   if (otId) {
     window.OptanonWrapper = () => { };
 
