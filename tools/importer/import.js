@@ -94,24 +94,54 @@ class BlockBuilder {
 
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
-const pressReleaseDateFormat1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?[0-9]{1,2}, [12][0-9]{3}/i;
-const pressReleaseDateFormat2 = /[0-9]{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?[12][0-9]{3}/i;
+const pressReleaseDateFormat1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?([0-9]{1,2}), ([12][0-9]{3})/i;
+const pressReleaseDateFormat2 = /([0-9]{1,2}) (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?([12][0-9]{3})/i;
 const getPublishDate = (document) => {
+  let month;
+  let day;
+  let year;
+  let date;
+
+  const calProjection = document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+  if (calProjection) {
+    date = new Date(Date.parse(calProjection.textContent));
+  }
+
   const publishDate = document.querySelector('.contentcontainer > .cmp-container')?.textContent;
-  if (publishDate && publishDate.match(pressReleaseDateFormat1)) { return publishDate.match(pressReleaseDateFormat1)[0]; }
-  if (publishDate && publishDate.match(pressReleaseDateFormat2)) { return publishDate.match(pressReleaseDateFormat2)[0]; }
-  return document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+  if (publishDate && publishDate.match(pressReleaseDateFormat1)) {
+    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat1)[0]));
+  }
+  if (publishDate && publishDate.match(pressReleaseDateFormat2)) {
+    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat2)[0]));
+  }
+
+  if (date) {
+    month = date.getUTCMonth() + 1;
+    year = date.getUTCFullYear();
+    day = date.getUTCDate();
+    if (day < 10) day = `0${day}`;
+    if (month < 10) month = `0${month}`;
+
+    return `${month}/${day}/${year}`;
+  }
+
+  return '';
 };
 
 const extractMetadata = (document) => {
   const metadata = {};
-  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
+  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
   metadataProperties.forEach((prop) => {
     const val = getMetadata(document, prop);
     if (val) {
-      metadata[prop.replaceAll('og:', '')] = val;
+      if (prop === 'keywords') {
+        metadata.tags = val;
+      } else {
+        metadata[prop.replaceAll('og:', '')] = val;
+      }
     }
   });
+
   if (metadata.image) {
     const img = document.createElement('img');
     img.src = metadata.image;
@@ -627,19 +657,23 @@ export default {
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
+    const docPath = generateDocumentPath({
+      document,
+      url,
+      html,
+      params,
+    });
     const report = {
       blocks: gatherBlockNames(document),
       assetLinks: gatherAssetLinks(document),
+      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      prodUrl: `https://www.stewart.com${docPath}`,
     };
 
     return [{
       element: document.body,
-      path: generateDocumentPath({
-        document,
-        url,
-        html,
-        params,
-      }),
+      path: docPath,
       report,
     }];
   },
