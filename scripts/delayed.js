@@ -23,10 +23,26 @@ function loadOneTrust(placeholders) {
   }
 }
 
+function initDataLayer() {
+  if (typeof (window.dataLayer) !== 'object') {
+    window.dataLayer = [];
+  }
+  const pageInfo = {
+    shortUrl: window.location.pathname,
+    pageName: document.querySelector('title').textContent,
+    // todo check on best way to populate these values
+    section: '',
+    sectionL2: '',
+    userId: '1ASN3A52', // revisit?
+  };
+  window.dataLayer.push(pageInfo);
+}
+
 async function runDelayed() {
   // Core Web Vitals RUM collection
   sampleRUM('cwv');
 
+  initDataLayer();
   const placeholders = await fetchPlaceholders();
   // add more delayed functionality here
   loadGoogleTagManager(placeholders);
