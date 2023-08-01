@@ -367,11 +367,14 @@ const buildBlockQuotes = (builder, section) => {
     const name = bq.querySelector('.quotation-person_name');
     const title = bq.querySelector('.quotation-person_title');
     const quote = bq.querySelector('.quotation-text blockquote');
+    const bqElement = builder.doc.createElement('blockquote');
+    bqElement.textContent = quote.textContent;
+
     builder.replace(bq, () => {
       builder
         .block('Blockquote', 2, true)
-        .append(image).append(name).append(title)
-        .column().append(...quote.children);
+        .append(image)
+        .column().append(name).append(title).append(bqElement);
     });
   });
 };
