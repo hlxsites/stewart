@@ -110,9 +110,14 @@ main .search-results .search-results-filter-container {
   margin-block-end: 1rem;
 }
 
-main .search-results.tag-facet .search-results-filter-container {
+main .search-results.tag-facet[data-result-count="0"] .search-results-filter-container {
   display: unset;
 }
+
+main .search-results.tag-facet[data-result-count="0"] .search-results-filter-container {
+  display: none;
+}
+
 
 main .search-results .search-results-filterby {
   color: var(--clr-primary);

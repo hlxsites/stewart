@@ -289,6 +289,7 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
   const allResults = fetchResults(cfg, q, tag, -1);
   allResults.all().then((resArray) => {
     const allResCount = resArray.length;
+    block.setAttribute('data-result-count', allResCount);
     const resultsPerPage = Number(cfg['page-size']);
 
     if (!partial) {
