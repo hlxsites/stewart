@@ -31,6 +31,8 @@ function initDataLayer() {
     shortUrl: window.location.pathname,
     pageName: document.querySelector('title').textContent,
     // todo check on best way to populate these values
+    // section probably from metadata (using spreadsheet to set bulk based on path)
+    // user id is always anon, so ???
     section: '',
     sectionL2: '',
     userId: '1ASN3A52', // revisit?
