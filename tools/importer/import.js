@@ -259,10 +259,6 @@ const buildColumnsBlock = (builder, section) => {
                 }
               }
 
-              if (col.closest('.ss-sectiontype-banner')) {
-                variants.add('Left Border');
-              }
-
               /* When a new variation added, update blocks/columns.js to support that - END */
               let name = blockName;
               if (variants.size > 0) {
@@ -420,6 +416,7 @@ const translateClassNames = (className) => {
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
     case 'contentbreak': return 'Content break';
+    case 'ss-sectiontype-banner': return 'Left Border';
     // These all get ignored
     case 'ss-overlay-left':
     case 'ss-margin-0':
@@ -428,7 +425,6 @@ const translateClassNames = (className) => {
     case 'pagehero':
     case 'pagesection':
     case 'genericpagesection':
-    case 'ss-sectiontype-banner':
     case 'aem-GridColumn':
     case 'aem-GridColumn--default--12':
     case 'backgroundablepagesection':
@@ -442,6 +438,11 @@ const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
+
+  if (section.querySelector('.offset-lg-7, .offset-md-7')) {
+    classes.push('Offset');
+  }
+
   classes.sort();
   let allSectionClasses = {};
   if (sessionStorage.getItem('allSectionClasses') !== null) {
