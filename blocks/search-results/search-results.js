@@ -20,10 +20,6 @@ const classNames = {
   searchResultsPaginationButton: `${blockName}-pagination-button`,
 };
 
-const resetBlock = (block) => {
-  block.innerHTML = '';
-};
-
 const generatePaginationData = (currentPage, totalPages) => {
   if (!currentPage || !totalPages) {
     return null;
@@ -152,7 +148,7 @@ const createResultItem = (entry) => {
 
 const createPagination = (paginationArray, currentPage) => paginationArray.map((page) => createPaginationButton(page, currentPage)).join('');
 
-const fetchResults = (cfg, query, tag, pageNum) => {
+export const fetchResults = (cfg, query, tag, pageNum) => {
   const results = ffetch(cfg.queryIndex)
     .filter((entry) => {
       if (entry.path.startsWith(cfg.path)) {
@@ -310,7 +306,7 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
 
 export default async function decorate(block) {
   const cfg = getSearchConfig(block);
-  resetBlock(block);
+  block.innerHTML = '';
 
   if (cfg.tagFacet) {
     block.classList.add('tag-facet');
