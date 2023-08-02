@@ -673,8 +673,8 @@ export default {
       params,
     });
     const report = {
-      blocks: gatherBlockNames(document),
-      assetLinks: gatherAssetLinks(document),
+      blocks: gatherBlockNames(document) || 'n/a',
+      assetLinks: gatherAssetLinks(document) || 'n/a',
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
