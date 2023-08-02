@@ -233,33 +233,41 @@ const buildColumnsBlock = (builder, section) => {
             builder.append(col);
           } else {
             if (!inTable) {
-              let name = 'Columns';
+              const blockName = 'Columns';
+              const variants = new Set();
               if (cols[0].classList.contains('col-md-8')) {
-                name += ' (Split 66-33)';
+                variants.add('Split 66-33');
               } else if (cols[0].classList.contains('col-md-9')) {
-                name += ' (Split 75-25)';
+                variants.add('Split 75-25');
               } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                name += ' (Split 33-33-33)';
+                variants.add('Split 33-33-33');
               } else if (child.querySelector('.carousel')) {
-                name += ' (Carousel)';
+                variants.add('Carousel');
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                name += ' Card gray';
+                variants.add('Card', 'gray');
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  name += ' Card dark';
+                  variants.add('Card', 'dark');
                 } else {
-                  name += ' Card';
+                  variants.add('Card');
                 }
               }
 
-              /* When a new variation added, update blocks/columns.js to support that - END */
+              if (col.closest('.ss-sectiontype-banner')) {
+                variants.add('Left Border');
+              }
 
+              /* When a new variation added, update blocks/columns.js to support that - END */
+              let name = blockName;
+              if (variants.size > 0) {
+                name += ` (${[...variants].join(', ')})`;
+              }
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;

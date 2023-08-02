@@ -240,7 +240,8 @@ function decorateSectionsExt(main) {
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
-      if (nextHasBg) {
+      const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
+      if (thisHasBg && nextHasBg) {
         section.classList.add('no-margin');
       }
     } else {
