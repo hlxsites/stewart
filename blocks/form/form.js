@@ -33,7 +33,7 @@ function buildForm(formData) {
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
     const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
-    const cols = attr(field, 'cols');
+    const cols = attr(field, 'cols') || 1;
     const help = attr(field, 'help');
     const helpUrl = attr(field, 'help url');
     const defaultValue = attr(field, 'default');
@@ -50,6 +50,9 @@ function buildForm(formData) {
     if (type === 'section') {
       currentSection = createElement('div');
       currentSection.classList = ['form-section'];
+      if (cols) {
+        currentSection.classList.add(`col-${cols}`);
+      }
       form.append(currentSection);
       const sectionTitle = createElement('h3');
       sectionTitle.textContent = field.Name;
@@ -59,6 +62,7 @@ function buildForm(formData) {
 
     const fieldDiv = createElement('div');
     fieldDiv.classList = ['form-field'];
+    fieldDiv.classList.add(`type-${type}`);
     if (cols) {
       fieldDiv.classList.add(`col-${cols}`);
     }
@@ -74,13 +78,13 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         if (required) { input.setAttribute('required', true); }
-        currentSection.append(input);
+        fieldDiv.append(input);
         break;
       case 'textarea':
         input = createElement('textarea');
         input.setAttribute('name', name);
         if (required) { input.setAttribute('required', true); }
-        currentSection.append(input);
+        fieldDiv.append(input);
         break;
       case 'select':
         input = createElement('select');
@@ -94,7 +98,7 @@ function buildForm(formData) {
           optionEle.textContent = selectionLabel;
           input.append(optionEle);
         });
-        currentSection.append(input);
+        fieldDiv.append(input);
         break;
       case 'radio':
         getOptions(formData, field.Options).forEach((option) => {
@@ -107,10 +111,10 @@ function buildForm(formData) {
           if (defaultValue === value) {
             input.setAttribute('checked', true);
           }
-          currentSection.append(input);
+          fieldDiv.append(input);
           const labelEle = createElement('label');
           labelEle.textContent = selectionLabel;
-          currentSection.append(labelEle);
+          fieldDiv.append(labelEle);
         });
         break;
       case 'checkbox':
@@ -118,7 +122,7 @@ function buildForm(formData) {
         input.setAttribute('name', name);
         input.setAttribute('type', 'checkbox');
         if (required) { input.setAttribute('required', true); }
-        currentSection.append(input);
+        fieldDiv.append(input);
         break;
       default:
         break;

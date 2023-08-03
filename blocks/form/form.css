@@ -1,0 +1,46 @@
+.form-section {
+    border: 1px solid var(--clr-black);
+    padding: 10px;
+    margin: 10px;
+    background-color: var(--clr-gray-light);
+    border-radius: 5px;
+    max-width: 90%;
+    display: flexbox;    
+}
+
+.form-section.col-2 {
+    width: 50%;
+    float:left;
+}
+
+.form-section .form-field {
+    display: inline-block;
+    padding: 1rem;
+}
+
+.form-section .form-field input {
+    display: inline-block;
+}
+
+.form-section .form-field.type-radio input {
+    display: inline;
+    width: 2em;
+}
+
+.form-section .form-field.type-radio label {
+    display: inline-block;
+}
+
+
+.form-section.col-6 .form-field.col-2 {
+    width: 33%;
+}
+
+.form-section.col-6 .form-field.col-3, .form-section.col-2 .form-field.col-1 {
+    width: 50%;
+}
+
+.form-field.col-wide, .form-section h3 {
+    width: 100%;
+    flex-grow: 1;
+}
