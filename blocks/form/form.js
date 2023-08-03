@@ -1,18 +1,16 @@
 import { createElement } from '../../scripts/scripts.js';
 
 function getOptions(formData, options) {
-  if (formData[options]) { 
-    return formData[options];
-  } else {
-    return options.split(",").map((option) => {
-      if (option.includes(":")) {
-        const [Display, Value] = option.split(":");
-        return { Display, Value };
-      } else {
-        return { Display: option, Value: option };
-      }
-    });
+  if (formData[options] || formData[options].data) {
+    return [...formData[options].data];
   }
+  return [...options].split(',').map((option) => {
+    if (option.includes(':')) {
+      const [display, value] = option.split(':');
+      return { display, value };
+    }
+    return { display: option, value: option };
+  });
 }
 
 function attr(object, name) {
@@ -89,23 +87,30 @@ function buildForm(formData) {
         input.setAttribute('name', name);
         if (required) { input.setAttribute('required', true); }
         getOptions(formData, options).forEach((option) => {
+          const selectionLabel = attr(option, 'label') || attr(option, 'display');
+          const value = attr(option, 'value');
           const optionEle = createElement('option');
-          optionEle.setAttribute('value', option.Value);
-          optionEle.textContent = option.Label;
+          optionEle.setAttribute('value', value);
+          optionEle.textContent = selectionLabel;
           input.append(optionEle);
         });
         currentSection.append(input);
         break;
       case 'radio':
         getOptions(formData, field.Options).forEach((option) => {
+          const selectionLabel = attr(option, 'label') || attr(option, 'display');
+          const value = attr(option, 'value');
           input = createElement('input');
           input.setAttribute('name', name);
           input.setAttribute('type', 'radio');
-          input.setAttribute('value', option.Value);
-          if (defaultValue === option.Value) {
+          input.setAttribute('value', value);
+          if (defaultValue === value) {
             input.setAttribute('checked', true);
           }
           currentSection.append(input);
+          const labelEle = createElement('label');
+          labelEle.textContent = selectionLabel;
+          currentSection.append(labelEle);
         });
         break;
       case 'checkbox':
@@ -141,10 +146,11 @@ function buildForm(formData) {
  * loads and generated the form
  * @param {Element} formEmbed The marker for the form embed
  */
-export default async function decorate(formEmbed) {
+export default async function decorate(block) {
+  const formId = block.textContent.trim();
   // The form id is everything after the colon in the text
-  const formId = formEmbed.textContent.split(':')[1].trim();
-  const formData = await fetch(`/form/${formId}.json`).json;
-  const form = buildForm(formData);
-  formEmbed.replaceWith(form);
+  const formData = await fetch(`/forms/${formId}.json`);
+  const formJson = await formData.json();
+  const form = buildForm(formJson);
+  block.replaceWith(form);
 }

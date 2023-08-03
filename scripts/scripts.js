@@ -103,6 +103,15 @@ function buildHeroBlock(main) {
   main.prepend(section);
 }
 
+function buildFormBlocks(main) {
+  main.querySelectorAll('p > code').forEach((code) => {
+    const formId = code.textContent.split(':')[1].trim();
+    const block = buildBlock('form', { elems: [formId] });
+    code.replaceWith(block);
+    decorateBlock(block);
+  });
+}
+
 function buildEmbedBlocks(main) {
   // For every youtube link, convert to an embed block
   main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
@@ -121,6 +130,7 @@ function buildEmbedBlocks(main) {
 function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
+    buildFormBlocks(main);
     buildEmbedBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
