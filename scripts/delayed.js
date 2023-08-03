@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { sampleRUM, fetchPlaceholders, loadScript } from './lib-franklin.js';
+import { sampleRUM, fetchPlaceholders, loadScript, getMetadata } from './lib-franklin.js';
 
 function loadGoogleTagManager(placeholders) {
   // google tag manager
@@ -21,12 +21,12 @@ function OTLoaded() {
   }
 }
 
-function loadOneTrust(placeholders) {
+async function loadOneTrust(placeholders) {
   const otId = placeholders.onetrustId;
   if (otId) {
     window.OptanonWrapper = OTLoaded;
 
-    loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
+    await loadScript('https://cdn.cookielaw.org/scripttemplates/otSDKStub.js', {
       type: 'text/javascript',
       charset: 'UTF-8',
       'data-domain-script': otId,
@@ -38,15 +38,23 @@ function initDataLayer() {
   if (typeof (window.dataLayer) !== 'object') {
     window.dataLayer = [];
   }
+
+  let section = getMetadata('section');
+  let sectionL2 = getMetadata('sectionL2');
+  if (!section) {
+    const nameParts = window.location.pathname.split('/');
+    section = nameParts[nameParts.length - 1];
+  }
+  if (!sectionL2) {
+    sectionL2 = section;
+  }
+
   const pageInfo = {
     shortUrl: window.location.pathname,
     pageName: document.querySelector('title').textContent,
-    // todo check on best way to populate these values
-    // section probably from metadata (using spreadsheet to set bulk based on path)
-    // user id is always anon, so ???
-    section: '',
-    sectionL2: '',
-    userId: '1ASN3A52', // revisit?
+    section,
+    sectionL2,
+    userId: '1ASN3A52', // user id is always anon, so ???
   };
   window.dataLayer.push(pageInfo);
 }
@@ -58,8 +66,8 @@ async function runDelayed() {
   initDataLayer();
   const placeholders = await fetchPlaceholders();
   // add more delayed functionality here
+  await loadOneTrust(placeholders);
   loadGoogleTagManager(placeholders);
-  loadOneTrust(placeholders);
 }
 
 runDelayed();
