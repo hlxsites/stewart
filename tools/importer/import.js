@@ -321,15 +321,40 @@ const buildTeaserLists = (builder, section) => {
 };
 
 const buildAccordions = (builder, section) => {
+  // first merge all subsequent accordions to one
+  const firstAcc = section.querySelector('.accordion');
+  let nextAccordion = firstAcc?.nextElementSibling;
+  while (nextAccordion && nextAccordion.classList.contains('accordion')) {
+    const items = nextAccordion.querySelectorAll('.cmp-accordion__item');
+    firstAcc.append(...items);
+    const nextNext = nextAccordion.nextElementSibling;
+    nextAccordion.remove();
+    nextAccordion = nextNext;
+  }
+
   section.querySelectorAll('.accordion')?.forEach((accordion) => {
-    builder.replace(accordion, () => {
-      builder.block('Accordion', 2, false);
-      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
-        const header = accordionItem.querySelector('.cmp-accordion__header');
-        const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
-        builder.row().append(header).column().append(panelContent);
-      });
+    const accDiv = builder.doc.createElement('div');
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+      const title = accordionItem.querySelector('.cmp-accordion__title');
+      const content = accordionItem.querySelector('.cmp-accordion__panel');
+
+      accDiv.insertAdjacentHTML('beforeend', `<h2>${title.textContent}</h2`);
+      accDiv.insertAdjacentHTML('beforeend', content.innerHTML);
     });
+    accDiv.insertAdjacentHTML('beforeend', `
+    <table>
+    <tr>
+      <th colspan="2">Section Metadata</th>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>Accordion</td>
+    </tr>
+  </table>
+    `);
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.replaceWith(accDiv);
   });
 };
 
