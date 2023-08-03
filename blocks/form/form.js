@@ -77,12 +77,14 @@ function buildForm(formData) {
       case 'text':
         input = createElement('input');
         input.setAttribute('name', name);
+        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;
       case 'textarea':
         input = createElement('textarea');
         input.setAttribute('name', name);
+        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;
@@ -121,6 +123,14 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         input.setAttribute('type', 'checkbox');
+        if (required) { input.setAttribute('required', true); }
+        fieldDiv.append(input);
+        break;
+      case 'date':
+        input = createElement('input');
+        input.setAttribute('name', name);
+        input.setAttribute('type', 'date');
+        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;

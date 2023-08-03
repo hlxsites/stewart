@@ -5,7 +5,6 @@
     background-color: var(--clr-gray-light);
     border-radius: 5px;
     max-width: 90%;
-    display: flexbox;    
 }
 
 .form-section.col-2 {
@@ -31,8 +30,19 @@
     display: inline-block;
 }
 
+.form-section .form-field select {
+    font-size: 1.25rem;
+    width: 100%;
+    max-width: 50rem;
+    display: block;
+    margin-block-end: 1rem;
+    padding: 0.75rem 0.6rem;
+    border-radius: 0.25rem;
+    box-sizing: border-box;
+    border: 1px solid var(--text-color);    
+}
 
-.form-section.col-6 .form-field.col-2 {
+.form-section.col-6 .form-field.col-2, .form-section.col-3 .form-field.col-1 {
     width: 33%;
 }
 
@@ -42,5 +52,8 @@
 
 .form-field.col-wide, .form-section h3 {
     width: 100%;
-    flex-grow: 1;
+}
+
+.form-section .help {
+    font-size: var(--body-font-size-xs);
 }
