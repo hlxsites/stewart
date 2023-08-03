@@ -51,7 +51,7 @@ function buildForm(formData) {
       currentSection = createElement('div');
       currentSection.classList = ['form-section'];
       form.append(currentSection);
-      const sectionTitle = createElement('h2');
+      const sectionTitle = createElement('h3');
       sectionTitle.textContent = field.Name;
       currentSection.append(sectionTitle);
       return;
