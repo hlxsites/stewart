@@ -4,33 +4,6 @@ main .accordion .accordion-item {
   border-bottom: 1px solid var(--clr-black);
 }
 
-main .accordion .accordion-item > h3 {
-  margin: 0;
-  display: flex;
-}
-
-main .accordion .accordion-item > h3 > .accordion-item-trigger {
-  width: 100%;
-  text-align: left;
-  background-color: transparent;
-  color: var(--clr-black);
-  padding: 20px 0;
-  border: 0;
-  margin: 0;
-  display: flex;
-  white-space: normal;
-}
-
-main .accordion .accordion-item-active > h3 > .accordion-item-trigger {
-  border: 0;
-}
-
-main .accordion .accordion-item > h3 > .accordion-item-trigger:hover,
-main .accordion .accordion-item > h3 > .accordion-item-trigger:active,
-main .accordion .accordion-item > h3 > .accordion-item-trigger:focus {
-  background-color: transparent;
-}
-
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
   font-family: var(--heading-font-family);
   font-size: var(--heading-font-size-s);
@@ -60,7 +33,19 @@ main .accordion .accordion-item-active .accordion-item-trigger > .accordion-item
 }
 
 main .accordion .accordion-item .accordion-panel {
-  padding:0 24px;
+    padding-top: 20px;
+    padding-left: 55px;
+    border-bottom: none;
+    transition: all .5s;
+    opacity: 0;
+    max-height: 0;
+}
+
+main .accordion .accordion-item .accordion-panel.accordion-item-active {
+    padding-top: 0;
+    opacity: 1;
+    padding-bottom: 55px;
+    max-height: none;
 }
 
 
@@ -69,8 +54,8 @@ main .accordion .accordion-item .accordion-panel {
     font-size: var(--heading-font-size-m);
   }
 
-  main .accordion .accordion-item .accordion-panel {
-    padding:0 50px;
-  }
+//  main .accordion .accordion-item .accordion-panel {
+//    padding:0 50px;
+//  }
 
 }
