@@ -1,5 +1,10 @@
 // eslint-disable-next-line import/no-cycle
-import { sampleRUM, fetchPlaceholders, loadScript, getMetadata } from './lib-franklin.js';
+import {
+  sampleRUM,
+  fetchPlaceholders,
+  loadScript,
+  getMetadata,
+} from './lib-franklin.js';
 
 function loadGoogleTagManager(placeholders) {
   // google tag manager
