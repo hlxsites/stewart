@@ -28,6 +28,7 @@ function buildForm(formData) {
   const formFieldData = formData.form.data;
   let currentSection = form;
   let input;
+  let previousIs2Col = false;
   formFieldData.forEach((field) => {
     const label = attr(field, 'label') || attr(field, 'name');
     const name = attr(field, 'name') || attr(field, 'label');
@@ -50,15 +51,32 @@ function buildForm(formData) {
     }
 
     if (type === 'section') {
-      currentSection = createElement('div');
-      currentSection.classList = ['form-section'];
+      const newSection = createElement('div');
+      newSection.classList = ['field-container'];
       if (cols) {
-        currentSection.classList.add(`col-${cols}`);
+        newSection.classList.add(`col-${cols}`);
       }
-      form.append(currentSection);
+      if (options === '2-col') {
+        newSection.classList.add('section-col-2');
+        if (previousIs2Col) {
+          previousIs2Col = false;
+          currentSection.parentElement.append(newSection);
+        } else {
+          previousIs2Col = true;
+          const sectionWrapper = createElement('div');
+          sectionWrapper.classList = ['form-section'];
+          sectionWrapper.classList.add('section-col-2-wrapper');
+          sectionWrapper.append(newSection);
+          form.append(sectionWrapper);
+        }
+      } else {
+        newSection.classList.add('form-section');
+        form.append(newSection);
+      }
       const sectionTitle = createElement('h3');
       sectionTitle.textContent = field.Label || field.Name;
-      currentSection.append(sectionTitle);
+      newSection.append(sectionTitle);
+      currentSection = newSection;
       return;
     }
 

@@ -1,59 +1,137 @@
 .form-section {
-    border: 1px solid var(--clr-black);
-    padding: 10px;
+    border: 1px solid var(--clr-gray-dark);
+    padding: 15px;
     margin: 10px;
-    background-color: var(--clr-gray-light);
+    background-color: var(--clr-light);
     border-radius: 5px;
-    max-width: 100%;
+    width: 100%;
+    font-size: var(--body-font-size-xs);
+    box-shadow: 0 5px 4px -2px rgb(0 0 0 / 15%);
+    margin-bottom: 2em;
 }
 
-.form-section.col-2 {
-    width: 50%;
-    float:left;
+.form-section h3 {
+    font-size: var(--heading-font-size-xs);
+    font-weight: bold;
+    margin-block-end: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
-.form-section .form-field {
-    display: inline-block;
+.section-col-2-wrapper .section-col-2 {
+    /* border: 2px solid red; */
+    display: inline-flex;
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+@media (min-width: 900px) {
+    .form-section.section-col-2-wrapper {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;    
+    }
+
+    .section-col-2-wrapper .section-col-2 {
+        width: 50%;
+    }
+
+    .section-col-2-wrapper .section-col-2:nth-of-type(1) {
+        padding-right: 1em;
+    }
+
+    /* put a black line between the two columns */
+    .section-col-2-wrapper .section-col-2:nth-of-type(2) {
+        border-left: 1px solid var(--clr-black);
+        padding-left: 1rem;
+    }
+
+    .section-col-2-wrapper .section-col-2:nth-of-type(2).col-1 .form-field:last-of-type textarea {
+        height: clamp(10em, 50vh, 21em);
+    }
+}
+
+.field-container, .section-col-2-wrapper .section-col-2 {
+    height: min-content;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    flex-basis: 100%;
+    column-gap:0.5em;
+}
+
+.field-container > * {
     padding: 0.25rem;
 }
 
-.form-section .form-field input {
-    display: inline-block;
+.field-container:not(.col-flex) .form-field, .field-container.col-1 .form-field.col-1,  .form-field.col-wide, .field-container.col-flex .form-field.col-wide, .field-container h3 {
+    width: 100%;
+    flex: unset;
 }
 
-.form-section .form-field.type-radio input {
+.field-container.col-flex .form-field {
+    flex: 1 0 32%;
+}
+
+.field-container.col-flex .form-field label {
+    white-space: nowrap;
+}
+
+@media (min-width: 600px) {
+    .field-container.col-6 .form-field.col-2, .field-container.col-3 .form-field.col-1 {
+        flex: 3 1 32%;
+        max-width: 32%;
+    }
+
+    .field-container.col-6 .form-field.col-3, .field-container.col-2 .form-field.col-1 {
+        flex: 2 1 49%;
+        max-width: 49.5%;
+    }
+}
+
+/* --- form fields --- */
+
+.field-container .form-field label, .field-container .form-field input {
+    display: block;
+}
+
+.field-container .form-field input {
+    padding: 0.5rem 0.4rem;
+    margin-block-end: 0.25rem;
+}
+
+.field-container .form-field.type-radio input {
     display: inline;
-    width: 2em;
+    width: 1.25em;
 }
 
-.form-section .form-field.type-radio label {
+.field-container .form-field.type-radio label:not(:first-of-type) {
     display: inline-block;
 }
 
-.form-section .form-field select {
+.field-container .form-field.type-radio input:checked + label {
+    color: var(--clr-primary);
+}
+
+.field-container .form-field textarea {
+    width: 100%;
+    min-height: 10em;
+}
+
+.field-container .form-field select {
     font-size: 1.25rem;
     width: 100%;
     max-width: 50rem;
     display: block;
     margin-block-end: 1rem;
-    padding: 0.75rem 0.6rem;
+    padding: 0.47rem 0.4rem;
     border-radius: 0.25rem;
     box-sizing: border-box;
     border: 1px solid var(--text-color);    
 }
 
-.form-section.col-6 .form-field.col-2, .form-section.col-3 .form-field.col-1 {
-    width: 33%;
-}
-
-.form-section.col-6 .form-field.col-3, .form-section.col-2 .form-field.col-1 {
-    width: 50%;
-}
-
-.form-field.col-wide, .form-section h3 {
-    width: 100%;
-}
-
-.form-section .help {
+.field-container .help {
     font-size: var(--body-font-size-xs);
+    display: block;
 }
