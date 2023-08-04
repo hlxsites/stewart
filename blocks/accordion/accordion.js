@@ -18,10 +18,7 @@ export default function decorate(block) {
 
   [...block.children].forEach((accordionItem, accordionItemIndex) => {
 
-console.log('found accordion item');
     accordionItem.classList.add(classNames.accordionItem);
-//    const headerDiv = accordionItem.firstChild;
-//    headerDiv.outerHTML = headerDiv.innerHTML;
 
     const header = accordionItem.querySelector('h2');
     const headerText = header.textContent;
@@ -39,24 +36,18 @@ console.log('found accordion item');
       class: classNames.accordionPanel,
       'role': 'region',
       'aria-labelledby': `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
-//      'hidden': '',
       id: `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
     });
 
     const panelText = accordionItem.querySelector('p');
-    panel.append(panelText);
-
+    if (panelText !== null) {
+        panel.append(panelText);
+    }
     const panelTable = accordionItem.querySelector('div.table');
-    panel.append(panelTable);
-
+    if (panelTable !== null) {
+        panel.append(panelTable);
+    }
     accordionItem.firstChild.append(panel);
-//    const panel = header.nextElementSibling;
-//
-//    panel.classList.add(classNames.accordionPanel);
-//    panel.setAttribute('id', `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`);
-//    panel.setAttribute('role', 'region');
-//    panel.setAttribute('aria-labelledby', `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`);
-//    panel.setAttribute('hidden', '');
   });
 
   const accordionTriggers = block.querySelectorAll(`.${classNames.accordionItemTrigger}`);
@@ -67,8 +58,7 @@ console.log('found accordion item');
       const panel = trigger.nextElementSibling;
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true' || false;
       trigger.setAttribute('aria-expanded', !isExpanded);
-      panel.classList.toggle(classNames.accordionItemActive)
-//      panel.hidden = !panel.hidden;
+      panel.classList.toggle(classNames.accordionItemActive);
     });
   });
 }

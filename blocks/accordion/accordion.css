@@ -1,16 +1,20 @@
 main .accordion .accordion-item {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--clr-black);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--clr-black);
+}
+
+main .accordion .accordion-item .accordion-item-trigger {
+    margin: 0px;
+    padding: 20px 0px;
 }
 
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
-  font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-s);
-  display: flex;
-  line-height: 46px;
+    font-family: var(--heading-font-family);
+    font-size: var(--heading-font-size-s);
+    display: flex;
+    line-height: 46px;
 }
-
 
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title::before {
     font-family: 'Font Awesome 5 Pro'; /* stylelint-disable-line font-family-no-missing-generic-family-keyword */
@@ -29,7 +33,7 @@ main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title:
 }
 
 main .accordion .accordion-item-active .accordion-item-trigger > .accordion-item-title::before {
-  transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 main .accordion .accordion-item .accordion-panel {
@@ -48,14 +52,18 @@ main .accordion .accordion-item .accordion-panel.accordion-item-active {
     max-height: none;
 }
 
-
 @media (min-width: 900px) {
-  main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
-    font-size: var(--heading-font-size-m);
-  }
+    main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
+        font-size: var(--heading-font-size-m);
+    }
+}
 
-//  main .accordion .accordion-item .accordion-panel {
-//    padding:0 50px;
-//  }
-
+main .accordion .accordion-item .accordion-panel .table th{
+    color: #fff;
+    background: -webkit-gradient(linear,left top,left bottom,from(#006781),to(#002f39));
+    background: linear-gradient(180deg,#006781,#002f39);
+    font-weight: 700;
+    font-size: 15px;
+    padding: 2px;
+    line-height: 1.5rem;
 }
