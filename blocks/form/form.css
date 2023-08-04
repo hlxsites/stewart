@@ -92,6 +92,7 @@
 
 /* --- form fields --- */
 
+/* stylelint-disable-next-line no-descending-specificity */
 .field-container .form-field label, .field-container .form-field input {
     display: block;
 }
