@@ -441,7 +441,7 @@ const translateClassNames = (className) => {
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
     case 'contentbreak': return 'Content break';
-    case 'ss-sectiontype-banner': return 'Left Border';
+    case 'ss-sectiontype-banner': return 'Banner';
     // These all get ignored
     case 'ss-overlay-left':
     case 'ss-margin-0':
