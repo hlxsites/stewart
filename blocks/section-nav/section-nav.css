@@ -1,0 +1,135 @@
+main .section-nav-container {
+  min-height: 40px;
+}
+
+main .section-nav {
+  display: none;
+}
+
+main .section-nav.appear {
+  display: unset;
+}
+
+main .section-nav nav {
+  margin-block-end: 2rem;
+}
+
+main .section-nav nav ul {
+  list-style: none;
+  margin-block-end: 0;
+  padding: 0 1rem;
+}
+
+main .section-nav nav > ul {
+  border: 1px solid var(--clr-gray-dark);
+  max-height: 2.5rem;
+  overflow: hidden;
+  transition: max-height .3s linear;
+  position: relative;
+  cursor: pointer;
+}
+
+main .section-nav nav > ul::after {
+  position: absolute;
+  content: "";
+  top: 13px;
+  right: 20px;
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
+  border-left: 0.5rem solid var(--clr-primary);
+  display: inline-block;
+  height: 0;
+  margin-left: 0.5rem;
+  width: 0;
+  vertical-align: middle;
+  transform: rotate(90deg);
+  transition: transform .3s linear;
+}
+
+main .section-nav nav[aria-expanded="true"] > ul {
+  max-height: min-content;
+}
+
+main .section-nav nav[aria-expanded="true"] > ul::after {
+  transform: rotate(270deg);
+}
+
+main .section-nav nav ul li {
+  line-height: 2.5rem;
+}
+
+main .section-nav nav ul li a {
+  color: var(--clr-black);
+}
+main .section-nav nav ul li[aria-current="page"] a {
+  border-bottom: 0.25rem solid var(--clr-primary);
+}
+
+
+main .section-nav .nav-drop ul {
+  padding: 0 .2rem;
+}
+
+main .section-nav .nav-drop ul li {
+  line-height: 18px;
+  font-size: var(--body-font-size-xxs);
+}
+
+@media (min-width: 900px) {
+  main .section-nav nav > ul {
+    border: none;
+    max-height: unset;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    cursor: unset;
+    overflow: visible;
+  }
+
+  main .section-nav nav > ul::after {
+    content: unset
+  }
+
+  main .section-nav nav ul > li {
+    font-weight: 700;
+    font-size: var(--heading-font-size-xs);
+  }
+
+  main .section-nav nav .nav-drop[aria-expanded="false"] > ul {
+    display: none;
+  }
+
+  main .section-nav nav .nav-drop {
+    position: relative;
+  }
+
+  main .section-nav nav .nav-drop::after {
+    content: "|";
+    color: var(--clr-gray-dark);
+    margin-left: 1rem;
+  }
+  
+  main .section-nav nav .nav-drop[aria-expanded="true"] > ul {
+    display: block;
+    position: absolute;
+    top: 100%;
+    transform: unset;
+    background-color: var(--background-color);
+    height: auto;
+    border-top: none;
+    box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
+    padding: 3rem;
+    z-index: 2;
+    min-width: 175px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  main .section-nav nav .nav-drop[aria-expanded="true"] > ul li a {
+    font-weight: 400;
+    font-size: var(--body-font-size-l);
+    white-space: nowrap;
+  }
+}
