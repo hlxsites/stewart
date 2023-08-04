@@ -546,7 +546,7 @@ main .section>div {
 
 @media(min-width: 900px) {
   .section.narrow {
-    margin: 0 auto;
+    margin-inline: auto;
     width: auto
   }
 }

@@ -233,33 +233,37 @@ const buildColumnsBlock = (builder, section) => {
             builder.append(col);
           } else {
             if (!inTable) {
-              let name = 'Columns';
+              const blockName = 'Columns';
+              const variants = new Set();
               if (cols[0].classList.contains('col-md-8')) {
-                name += ' (Split 66-33)';
+                variants.add('Split 66-33');
               } else if (cols[0].classList.contains('col-md-9')) {
-                name += ' (Split 75-25)';
+                variants.add('Split 75-25');
               } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                name += ' (Split 33-33-33)';
+                variants.add('Split 33-33-33');
               } else if (child.querySelector('.carousel')) {
-                name += ' (Carousel)';
+                variants.add('Carousel');
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                name += ' Card gray';
+                variants.add('Card', 'gray');
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  name += ' Card dark';
+                  variants.add('Card', 'dark');
                 } else {
-                  name += ' Card';
+                  variants.add('Card');
                 }
               }
 
               /* When a new variation added, update blocks/columns.js to support that - END */
-
+              let name = blockName;
+              if (variants.size > 0) {
+                name += ` (${[...variants].join(', ')})`;
+              }
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;
@@ -317,15 +321,40 @@ const buildTeaserLists = (builder, section) => {
 };
 
 const buildAccordions = (builder, section) => {
+  // first merge all subsequent accordions to one
+  const firstAcc = section.querySelector('.accordion');
+  let nextAccordion = firstAcc?.nextElementSibling;
+  while (nextAccordion && nextAccordion.classList.contains('accordion')) {
+    const items = nextAccordion.querySelectorAll('.cmp-accordion__item');
+    firstAcc.append(...items);
+    const nextNext = nextAccordion.nextElementSibling;
+    nextAccordion.remove();
+    nextAccordion = nextNext;
+  }
+
   section.querySelectorAll('.accordion')?.forEach((accordion) => {
-    builder.replace(accordion, () => {
-      builder.block('Accordion', 2, false);
-      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
-        const header = accordionItem.querySelector('.cmp-accordion__header');
-        const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
-        builder.row().append(header).column().append(panelContent);
-      });
+    const accDiv = builder.doc.createElement('div');
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+      const title = accordionItem.querySelector('.cmp-accordion__title');
+      const content = accordionItem.querySelector('.cmp-accordion__panel');
+
+      accDiv.insertAdjacentHTML('beforeend', `<h2>${title.textContent}</h2`);
+      accDiv.insertAdjacentHTML('beforeend', content.innerHTML);
     });
+    accDiv.insertAdjacentHTML('beforeend', `
+    <table>
+    <tr>
+      <th colspan="2">Section Metadata</th>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>Accordion</td>
+    </tr>
+  </table>
+    `);
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.replaceWith(accDiv);
   });
 };
 
@@ -412,6 +441,7 @@ const translateClassNames = (className) => {
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
     case 'contentbreak': return 'Content break';
+    case 'ss-sectiontype-banner': return 'Banner';
     // These all get ignored
     case 'ss-overlay-left':
     case 'ss-margin-0':
@@ -420,7 +450,6 @@ const translateClassNames = (className) => {
     case 'pagehero':
     case 'pagesection':
     case 'genericpagesection':
-    case 'ss-sectiontype-banner':
     case 'aem-GridColumn':
     case 'aem-GridColumn--default--12':
     case 'backgroundablepagesection':
@@ -434,6 +463,11 @@ const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
+
+  if (section.querySelector('.offset-lg-7, .offset-md-7')) {
+    classes.push('Offset');
+  }
+
   classes.sort();
   let allSectionClasses = {};
   if (sessionStorage.getItem('allSectionClasses') !== null) {
@@ -664,8 +698,8 @@ export default {
       params,
     });
     const report = {
-      blocks: gatherBlockNames(document),
-      assetLinks: gatherAssetLinks(document),
+      blocks: gatherBlockNames(document) || 'n/a',
+      assetLinks: gatherAssetLinks(document) || 'n/a',
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
