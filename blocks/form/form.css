@@ -4,7 +4,7 @@
     margin: 10px;
     background-color: var(--clr-gray-light);
     border-radius: 5px;
-    max-width: 90%;
+    max-width: 100%;
 }
 
 .form-section.col-2 {
@@ -14,7 +14,7 @@
 
 .form-section .form-field {
     display: inline-block;
-    padding: 1rem;
+    padding: 0.25rem;
 }
 
 .form-section .form-field input {

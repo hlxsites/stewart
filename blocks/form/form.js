@@ -29,7 +29,8 @@ function buildForm(formData) {
   let currentSection = form;
   let input;
   formFieldData.forEach((field) => {
-    const name = attr(field, 'name');
+    const label = attr(field, 'label') || attr(field, 'name');
+    const name = attr(field, 'name') || attr(field, 'label');
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
     const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
@@ -37,6 +38,7 @@ function buildForm(formData) {
     const help = attr(field, 'help');
     const helpUrl = attr(field, 'help url');
     const defaultValue = attr(field, 'default');
+    const placeholder = attr(field, 'placeholder');
 
     if (type === 'form') {
       if (name.toLowerCase() === 'url') {
@@ -55,7 +57,7 @@ function buildForm(formData) {
       }
       form.append(currentSection);
       const sectionTitle = createElement('h3');
-      sectionTitle.textContent = field.Name;
+      sectionTitle.textContent = field.Label || field.Name;
       currentSection.append(sectionTitle);
       return;
     }
@@ -68,23 +70,25 @@ function buildForm(formData) {
     }
     currentSection.append(fieldDiv);
 
-    const label = createElement('label');
-    label.setAttribute('for', name);
-    label.textContent = name;
-    fieldDiv.append(label);
+    const labelElem = createElement('label');
+    labelElem.setAttribute('for', name);
+    labelElem.textContent = label;
+    fieldDiv.append(labelElem);
 
     switch (type) {
       case 'text':
         input = createElement('input');
         input.setAttribute('name', name);
-        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
+        if (placeholder) { input.setAttribute('placeholder', placeholder); }
+        if (defaultValue) { input.textContent = defaultValue; }
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;
       case 'textarea':
         input = createElement('textarea');
         input.setAttribute('name', name);
-        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
+        if (placeholder) { input.setAttribute('placeholder', placeholder); }
+        if (defaultValue) { input.textContent = defaultValue; }
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;
@@ -98,6 +102,9 @@ function buildForm(formData) {
           const optionEle = createElement('option');
           optionEle.setAttribute('value', value);
           optionEle.textContent = selectionLabel;
+          if (defaultValue === value) {
+            optionEle.setAttribute('checked', true);
+          }
           input.append(optionEle);
         });
         fieldDiv.append(input);
@@ -130,8 +137,20 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         input.setAttribute('type', 'date');
-        if (defaultValue) { input.setAttribute('placeholder', defaultValue); }
+        input.setAttribute('placeholder', placeholder || 'mm/dd/yyyy');
         if (required) { input.setAttribute('required', true); }
+        if (defaultValue) { input.textContent = defaultValue; }
+        fieldDiv.append(input);
+        break;
+      case 'tel':
+      case 'telephone':
+      case 'phone':
+        input = createElement('input');
+        input.setAttribute('name', name);
+        input.setAttribute('type', 'tel');
+        input.setAttribute('placeholder', placeholder || '555-555-5555');
+        if (required) { input.setAttribute('required', true); }
+        if (defaultValue) { input.textContent = defaultValue; }
         fieldDiv.append(input);
         break;
       default:
