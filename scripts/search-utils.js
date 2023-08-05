@@ -19,6 +19,7 @@ const SearchConfigs = {
   insights: {
     path: '/en/insights/',
     queryIndex: '/query-index.json',
+    sheet: 'blog',
     tagFacet: true,
     'page-size': 10,
   },
@@ -26,6 +27,7 @@ const SearchConfigs = {
     path: '/en/news/press-releases/',
     tagFacet: false,
     queryIndex: '/query-index.json',
+    sheet: 'news',
     'page-size': 10,
   },
 };

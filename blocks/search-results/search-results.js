@@ -150,6 +150,7 @@ const createPagination = (paginationArray, currentPage) => paginationArray.map((
 
 export const fetchResults = (cfg, query, tag, pageNum) => {
   const results = ffetch(cfg.queryIndex)
+    .sheet(cfg.sheet || '')
     .filter((entry) => {
       if (entry.path.startsWith(cfg.path)) {
         let tagMatch = true;
