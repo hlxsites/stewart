@@ -147,6 +147,19 @@ export default async function decorate(block) {
 
           sectionLink.className = 'nav-section-heading';
           sectionLink.role = 'button';
+
+          const sectionUrl = new URL(sectionLink.href);
+          if (sectionUrl.pathname === window.location.pathname) {
+            navSection.setAttribute('aria-current', 'page');
+          } else {
+            const parentPath = window.location.pathname
+              .split('/')
+              .slice(0, -1)
+              .join('/');
+            if (sectionUrl.pathname === parentPath) {
+              navSection.setAttribute('aria-current', 'page');
+            }
+          }
           sectionLink.setAttribute('href', '#');
 
           bindMouseOverEvents(navSection, navSections);
