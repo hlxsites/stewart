@@ -78,7 +78,7 @@ async function buildNavList(block) {
   const navUl = block.querySelector('.nav-list');
   mappedResults.forEach((result) => {
     const li = createElement('li', { 'data-path': result.path }, [
-      createElement('a', { href: result.path }, result.navTitle || result.title),
+      createElement('a', { href: result.path }, result.navigationTitle || result.title),
     ]);
 
     let parent = navUl;
