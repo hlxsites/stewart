@@ -1,5 +1,5 @@
 main .section-nav-container {
-  min-height: 40px;
+  min-height: 3rem;
 }
 
 main .section-nav {
@@ -61,7 +61,7 @@ main .section-nav nav ul li {
 main .section-nav nav ul li a {
   color: var(--clr-black);
 }
-main .section-nav nav ul li[aria-current="page"] a {
+main .section-nav nav ul li[aria-current="page"] > a {
   border-bottom: 0.25rem solid var(--clr-primary);
 }
 
@@ -80,10 +80,12 @@ main .section-nav .nav-drop ul li {
     border: none;
     max-height: unset;
     display: flex;
+    gap: 1rem;
     flex-flow: row nowrap;
     justify-content: center;
     cursor: unset;
     overflow: visible;
+    white-space: nowrap;
   }
 
   main .section-nav nav > ul::after {
@@ -91,8 +93,14 @@ main .section-nav .nav-drop ul li {
   }
 
   main .section-nav nav ul > li {
-    font-weight: 700;
-    font-size: var(--heading-font-size-xs);
+    font-weight: 600;
+    font-size: var(--body-font-size-xs);
+  }
+
+  main .section-nav nav > ul > li:not(:last-child)::after {
+    content: "|";
+    color: var(--clr-gray-dark);
+    margin-left: 1rem;
   }
 
   main .section-nav nav .nav-drop[aria-expanded="false"] > ul {
@@ -101,12 +109,6 @@ main .section-nav .nav-drop ul li {
 
   main .section-nav nav .nav-drop {
     position: relative;
-  }
-
-  main .section-nav nav .nav-drop::after {
-    content: "|";
-    color: var(--clr-gray-dark);
-    margin-left: 1rem;
   }
   
   main .section-nav nav .nav-drop[aria-expanded="true"] > ul {
@@ -130,6 +132,12 @@ main .section-nav .nav-drop ul li {
   main .section-nav nav .nav-drop[aria-expanded="true"] > ul li a {
     font-weight: 400;
     font-size: var(--body-font-size-l);
-    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1200px) {
+  main .section-nav nav ul > li {
+    font-weight: 700;
+    font-size: var(--heading-font-size-xs);
   }
 }

@@ -117,6 +117,10 @@ async function buildNavList(block) {
     dropLi.addEventListener('click', (e) => {
       if (!isDesktop.matches) return;
 
+      if (e.target.tagName === 'A' && e.target !== dropLink) {
+        return;
+      }
+
       e.preventDefault();
       const expanded = dropLi.getAttribute('aria-expanded') === 'true';
       dropLi.setAttribute('aria-expanded', expanded ? 'false' : 'true');
