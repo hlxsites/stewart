@@ -61,11 +61,12 @@ main .section-nav nav ul li {
 main .section-nav nav ul li a {
   color: var(--clr-black);
 }
+
 main .section-nav nav ul li[aria-current="page"] > a {
   border-bottom: 0.25rem solid var(--clr-primary);
 }
 
-
+/* stylelint-disable-next-line  no-descending-specificity */
 main .section-nav .nav-drop ul {
   padding: 0 .2rem;
 }
@@ -112,7 +113,6 @@ main .section-nav .nav-drop ul li {
   }
   
   main .section-nav nav .nav-drop[aria-expanded="true"] > ul {
-    display: block;
     position: absolute;
     top: 100%;
     transform: unset;
