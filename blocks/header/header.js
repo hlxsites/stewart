@@ -109,7 +109,7 @@ function bindMouseOverEvents(section, sections) {
       if (!mouseEntered) {
         toggleNavDrop(section, sections, false);
       }
-    }, 400);
+    }, 200);
   });
 }
 

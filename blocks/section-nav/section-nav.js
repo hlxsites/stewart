@@ -24,7 +24,7 @@ function bindMouseOverEvents(navDrop, navList) {
       if (!mouseEntered) {
         navDrop.setAttribute('aria-expanded', false);
       }
-    }, 400);
+    }, 200);
   });
 }
 
