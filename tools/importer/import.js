@@ -71,7 +71,7 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    return (this.endBlock().element('table').element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
+    return (this.endBlock().element('table', { 'data-block': name }).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -165,6 +165,9 @@ const buildEmbed = (builder, section) => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
         builder.element('a', { href: src }).text(src).up();
+      } else if (embed.querySelector('.mktoForm')) {
+        const formId = embed.querySelector('.mktoForm').id.split('_')[1];
+        builder.block('Marketo Form', 2).append('Form Id').column().append(formId);
       } else if (embed.querySelector('form')) {
         builder.element('tt').withText(`${embed.querySelector('form').id}`);
       } else {
@@ -627,15 +630,8 @@ const preocessHeadingIcons = (document) => {
 };
 
 const gatherBlockNames = (document) => {
-  const blocksArr = [...document.querySelectorAll('table')]
-    .map((table) => {
-      const header = table.querySelector('tr > th');
-      if (header) {
-        return header.textContent;
-      }
-
-      return '';
-    })
+  const blocksArr = [...document.querySelectorAll('table[data-block]')]
+    .map((table) => table.getAttribute('data-block'))
     .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
   const blocks = new Set(blocksArr);
   return [...blocks].join(', ');
@@ -647,6 +643,28 @@ const gatherAssetLinks = (document) => {
     assetLinks.add(a.href);
   });
   return [...assetLinks].join(', ');
+};
+
+const processFragments = (document) => {
+  const fragments = [];
+  // find marketo forms inside of columns, this should be made more generic probably to handle all possible fragments inside of columns?
+  document.querySelectorAll('[data-block="Columns"] [data-block="Marketo Form"]').forEach((mktoForm) => {
+    const formId = mktoForm.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
+    const path = `/en/fragments/marketo-forms/${formId}`;
+    const div = document.createElement('div');
+    div.append(mktoForm.cloneNode(true));
+    fragments.push({
+      element: div,
+      path,
+    });
+
+    const link = document.createElement('a');
+    link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
+    link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
+    mktoForm.replaceWith(link);
+  });
+
+  return fragments;
 };
 
 export default {
@@ -687,6 +705,8 @@ export default {
     // add icon markup to headings with icons
     preocessHeadingIcons(document);
 
+    const fragments = processFragments(document);
+
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
@@ -705,10 +725,11 @@ export default {
       prodUrl: `https://www.stewart.com${docPath}`,
     };
 
-    return [{
+    fragments.push({
       element: document.body,
       path: docPath,
       report,
-    }];
+    });
+    return fragments;
   },
 };
