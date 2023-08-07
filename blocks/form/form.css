@@ -78,6 +78,13 @@
     white-space: nowrap;
 }
 
+.field-container .form-field label.optional::after {
+    white-space: nowrap;
+    content: " (Optional)";
+    color: var(--clr-gray-dark);
+}
+
+
 @media (min-width: 600px) {
     .field-container.col-6 .form-field.col-2, .field-container.col-3 .form-field.col-1 {
         flex: 3 1 32%;
@@ -137,4 +144,28 @@
 .field-container .help {
     font-size: var(--body-font-size-xs);
     display: block;
+}
+
+/** Completion messages **/
+
+p.form-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    padding: 1.5em;
+    width: 50vw;
+    text-align: center;
+    margin: auto;
+    font-size: var(--heading-font-size-s);
+}
+
+p.form-failure {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    padding: 1.5em;
+    width: 50vw;
+    text-align: center;
+    margin: auto;
+    font-size: var(--heading-font-size-s);
 }

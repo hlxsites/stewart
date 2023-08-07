@@ -32,6 +32,8 @@ function buildForm(formData, defaultAction) {
   let input;
   let previousIs2Col = false;
   let usesDefaultAction = true;
+  let successMessage = '*Success!* Thank you for your submission.';
+  let failureMessage = 'We\'re sorry, there was an error processing your submission. Please try again later.';
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
     const label = attr(field, 'label') || attr(field, 'name');
@@ -58,6 +60,10 @@ function buildForm(formData, defaultAction) {
         usesDefaultAction = false;
       } else if (field.Name.toLowerCase() === 'method') {
         form.setAttribute('method', options || defaultValue);
+      } else if (field.Name.toLowerCase() === 'success') {
+        successMessage = options || defaultValue;
+      } else if (field.Name.toLowerCase() === 'failure') {
+        failureMessage = options || defaultValue;
       }
       return;
     }
@@ -104,6 +110,9 @@ function buildForm(formData, defaultAction) {
     labelElem.setAttribute('for', name);
     labelElem.setAttribute('id', labelId);
     labelElem.textContent = label;
+    if (!required && type !== 'radio' && type !== 'checkbox') {
+      labelElem.classList.add('optional');
+    }
     fieldDiv.append(labelElem);
 
     switch (type) {
@@ -225,11 +234,24 @@ function buildForm(formData, defaultAction) {
         },
         body: JSON.stringify({ data }),
       });
+      let message;
       if (response.ok) {
-        form.append('<p>Thank you for your submission!</p>');
+        // Create success message at the top of the form and scroll to it.
+        message = createElement('p', { class: 'form-success' });
+        message.textContent = successMessage;
       } else {
-        form.append('<p>There was an error submitting your form. Please try again later.</p>');
+        message = createElement('p', { class: 'form-failure' });
+        message.textContent = failureMessage;
       }
+      // Convert any text content surrounded by asterisks to boldface
+      message.innerHTML = message.innerHTML.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+
+      if (form.previousElementSibling) {
+        form.previousElementSibling.replaceWith(message);
+      } else {
+        form.prepend(message);
+      }
+      message.parentElement.scrollIntoView();
     });
   }
   return form;
