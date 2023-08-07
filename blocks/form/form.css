@@ -111,9 +111,11 @@
     display: inline-block;
 }
 
+/* This results in worse accessibility due to poor contrast
 .field-container .form-field.type-radio input:checked + label {
     color: var(--clr-primary);
 }
+*/
 
 .field-container .form-field textarea {
     width: 100%;

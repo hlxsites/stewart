@@ -29,10 +29,16 @@ function buildForm(formData) {
   let currentSection = form;
   let input;
   let previousIs2Col = false;
+  const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
     const label = attr(field, 'label') || attr(field, 'name');
     const name = attr(field, 'name') || attr(field, 'label');
-    const labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}--label`;
+    let labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}--label`;
+    let labelSuffix = 1;
+    while (encounteredFieldLabels.has(labelId)) {
+      labelSuffix += 1;
+      labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}${labelSuffix}--label`;
+    }
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
     const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
