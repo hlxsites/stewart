@@ -39,6 +39,7 @@ function buildForm(formData) {
       labelSuffix += 1;
       labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}${labelSuffix}--label`;
     }
+    encounteredFieldLabels.add(labelId);
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
     const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
