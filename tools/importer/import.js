@@ -136,6 +136,12 @@ const extractMetadata = (document, url) => {
     if (val) {
       if (prop === 'keywords') {
         metadata.tags = val;
+      } else if (prop === 'template') {
+        const templateMap = {
+          'stewart-homepage': 'Homepage',
+          // todo add more values here
+        };
+        metadata.Template = templateMap[val] || val;
       } else {
         metadata[prop.replaceAll('og:', '')] = val;
       }
