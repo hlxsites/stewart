@@ -114,6 +114,24 @@ function buildEmbedBlocks(main) {
   });
 }
 
+function buildFragmentBlocks(main) {
+  const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
+  // links to /fragments/* become fragment blocks
+  main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
+    if (a.href) {
+      const url = new URL(a.href);
+
+      // for safety, we do a host match, and make sure the text content matches the path
+      const hostMatch = hosts.some((host) => url.hostname.includes(host));
+      if (hostMatch && a.textContent.includes(url.pathname)) {
+        const block = buildBlock('fragment', { elems: a });
+        a.replaceWith(block);
+        decorateBlock(block);
+      }
+    }
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -122,6 +140,7 @@ function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
     buildEmbedBlocks(main);
+    buildFragmentBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
