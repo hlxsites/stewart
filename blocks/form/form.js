@@ -213,11 +213,19 @@ function buildForm(formData) {
  * loads and generated the form
  * @param {Element} formEmbed The marker for the form embed
  */
-export default async function decorate(block) {
-  const formId = block.textContent.trim();
-  // The form id is everything after the colon in the text
-  const formData = await fetch(`/forms/${formId}.json`);
-  const formJson = await formData.json();
-  const form = buildForm(formJson);
-  block.replaceWith(form);
+export default function decorate(block) {
+  const observer = new IntersectionObserver(async (entries) => {
+    entries.forEach(async (entry) => {
+      if (entry.isIntersecting) {
+        observer.disconnect();
+        const formId = block.textContent.trim();
+        // The form id is everything after the colon in the text
+        const formData = await fetch(`/forms/${formId}.json`);
+        const formJson = await formData.json();
+        const form = buildForm(formJson);
+        block.replaceWith(form);
+      }
+    });
+  });
+  observer.observe(block);
 }
