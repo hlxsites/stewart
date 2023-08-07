@@ -1,283 +1,79 @@
-/*
-  this css sucks and should be rewritten to modern standards 
-  the problem is there are a bunch of :poop: style injected by marketo that we can't control
-  so to an extent, limited by that.
- */
-/* stylelint-disable */
-.marketo-form {
-  min-height: 800px;
+main .marketo-form {
+  min-height: 500px;
 }
 
-.marketo-form form label {
-  display: block;
-  margin-bottom: 7px;
-  font-size: 16px;
-  width: 100% !important;
-  font-family: var(--body-font-family) !important;
-  color: var(--text-color) !important;
-}
-
-.highlight-dark-purple .marketo-form form label {
-  color: var(--clr-white) !important;
-}
-
-
-.marketo-form form {
-  margin: 0 auto;
+main .marketo-form .mktoForm {
   width: 100% !important;
 }
 
-.marketo-form form .mktoOffset {
-  height: 1.2em !important;
-  display: none;
-}
-
-.mktoFormCol {
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol {
+  float: none;
   width: 100%;
 }
 
-.mktoFieldWrap {
-  width: 100%;
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoOffset,
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap .mktoGutter {
+  display: none !important;
 }
 
-.mktoFieldWrap select {
-  appearance: none;
-  background-image: url(../../icons/chevron-down.svg);
-  background-size: 13px 8px;
-  background-repeat: no-repeat;
-  background-position: 95% 50%;
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap {
+  float: none;
+  margin-bottom: 1rem;
 }
 
-
-.mktoFieldWrap select.mktoField::after {
-  content: "";
-  width: 13px;
-  height: 8px;
-  position: absolute;
-  right: 26px;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-  pointer-events: none;
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap label {
+  font-weight: 700;
+  padding-left: 13px;
+  font-size: var(--body-font-size-m);
 }
 
-.marketo-form form .mktoField:not([type=radio]) {
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap input.mktoField, 
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap select.mktoField, 
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap textarea.mktoField {
   width: 100% !important;
-  font-size: 16px !important;
-  height: 56px !important;
-  padding: 0 32px !important;
-  background-color: var(--clr-white);
-  border-radius: 2px;
-  border-color: #b1b1b4;
-  border-style: solid;
-  outline: none;
-  border-width: 1px;
+}
+
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap input.mktoField {
+  border: 1px solid #6e6e6e;
+  border-radius: 0;
   box-shadow: none;
-  font-family: var(--body-font-family);
-  color: var(--text-color);
+  color: var(--clr-black);
+  height: 50px;
+  padding: 0 9pt;
 }
 
-.marketo-form form .mktoFieldWrap textarea.mktoField {
-  height: 150px !important;
-  padding: 20px 32px !important;
-}
-
-.mktoField:focus {
-  outline: none;
-  border-color: var(--clr-purple);
-  box-shadow: inset 0 0 0 1px var(--clr-purple);
-}
-
-.marketo-form form .mktoRequiredField label.mktoLabel {
-  font-weight: normal !important;
-}
-
-.mktoLabel {
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap input.mktoField, 
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap select.mktoField,
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap textarea.mktoField {
   display: block;
-  float: none !important;
-  margin-bottom: 16px !important;
-}
-
-.mktoGutter {
-  display: none;
-}
-
-.mktoButtonRow {
   width: 100%;
-  text-align: center !important;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.mktoButtonWrap {
-  text-align: center !important;
-  margin: 0 !important;
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap select.mktoField[multiple],
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap select.mktoField[size],
+main .marketo-form .mktoForm .mktoFormRow .mktoFormCol .mktoFieldWrap textarea.mktoField {
+  height: auto;
 }
 
-.marketo-form form .mktoButton {
-  background-image: none !important;
-  font-family: var(--body-font-family);
-  display: inline-block;
-  box-sizing: border-box;
-  text-decoration: none;
-  border: 2px solid transparent !important;
-  padding: 14px 30px !important;
-  text-align: center;
-  font-style: normal; 
-  font-weight: 600 !important;
-  cursor: pointer;
-  margin: 16px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-radius: 30px;
-  transition-property: color, border, background-color;
-  transition-duration: .25s, .25s, .25s;
-  transition-timing-function: ease, ease, ease;
-  color: var(--background-color) !important;
-  background-color: var(--link-color) !important;
-  min-width: 150px;
+main .marketo-form .mktoForm .mktoButtonRow {
+  display: block;
 }
 
-
-.marketo-form form .mktoButton:hover,
-.marketo-form form .mktoButton:focus {
-  background-color: var(--link-hover-color) !important;
+main .marketo-form .mktoForm .mktoButtonRow .mktoButtonWrap {
+  margin-left: 0!important;
 }
 
-.highlight-dark-purple .marketo-form form .mktoButton {
-  background-color: var(--clr-white) !important;
-  color: var(--text-color) !important;
-}
-
-.highlight-dark-purple .marketo-form form .mktoButton:hover,
-.highlight-dark-purple .marketo-form form .mktoButton:focus {
-  background-color: var(--clr-purple) !important;
-  color: var(--clr-white) !important;
-}
-
-#LblmktoOptIn {
-  margin-left: 30px;
-}
-
-#LblmktoOptIn .mktoAsterix {
-  display: none !important;
-}
-
-.mktoCheckboxList {
-  width: 0 !important;
-  padding: 0 !important;
-}
-
-.marketo-form form .mktoFormCol {
-  position: relative !important;
-}
-
-.mktoCheckboxList input {
-  cursor: pointer;
-  height: 0 !important;
-  width: 0;
-  opacity: 0 !important;
-}
-
-.marketo-form form .mktoCheckboxList input~label:before {
-  content: "";
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  left: 0px;
-  top: 6px;
-  border: 1px solid var(--clr-off-white);
-  border-radius: 2px;
-}
-
-.marketo-form form :not(.mktoForm) .mktoCheckboxList input~label:before {
-  top: 4px;
-}
-
-.marketo-form form .mktoCheckboxList input:checked~label:before {
-  background-color: var(--clr-dark-purple);
-}
-
-.marketo-form form .mktoCheckboxList input:checked~label:after {
-  content: "";
-  position: absolute;
-  height: 5px;
-  width: 11px;
-  top: 10px;
-  left: 3px;
-  border-bottom: 2px solid var(--clr-white);
-  border-left: 2px solid var(--clr-white);
-  -webkit-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  transform: rotate(-45deg);
-}
-
-.marketo-form form :not(.mktoForm) .mktoCheckboxList input:checked~label:after {
-  top: 8px;
-}
-
-.marketo-form form .mktoRequiredField .mktoAsterix {
-  display: none !important;
-}
-
-.mktoForm .mktoError {
-  position: initial !important;
-}
-
-.mktoErrorArrow {
-  display: none !important;
-}
-
-.marketo-form form .mktoError .mktoErrorMsg {
-  margin-top: 0 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #FF3C3C !important;
-  font-size: 1em;
-  max-width: none !important;
-  padding: 0 !important;
-  text-shadow: none !important;
-  line-height: 1.6em !important;
-}
-
-.highlight-dark-purple .marketo-form form .mktoError .mktoErrorMsg {
-  color:var(--clr-white) !important;
-}
-
-.marketo-form form .mktoInstruction {
-  display: none !important;
-}
-
-@media (min-width: 600px) {
-  .mkto-form {
-    padding: 110px 10px;
-  }
-
-  .marketo-form form {
-    max-width: 720px;
-  }
-
-  .marketo-form form .mktoOffset {
-    display: block;
-  }
-
-  .marketo-form form .mktoCheckboxList input~label:before {
-    top: 21px;
-    left: 0px;
-  }
-
-  .marketo-form form :not(.mktoForm) .mktoCheckboxList input~label:before {
-    top: 20px;
-  }
-
-  .marketo-form form .mktoCheckboxList input:checked~label:after {
-    top: 25px;
-    left: 3px;
-  }
-
-  .marketo-form form :not(.mktoForm) .mktoCheckboxList input:checked~label:after {
-    top: 24px;
-  }
+main .marketo-form .mktoForm .mktoButtonRow .mktoButtonWrap button[type=submit].mktoButton {
+  width: 100%;
 }
