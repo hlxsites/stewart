@@ -7,9 +7,7 @@ import { buildBlock } from '../../scripts/lib-franklin.js';
  */
 export function buildSectionNav(main) {
   const navSection = createElement('div');
-  const block = buildBlock('section-nav', [
-    ['level', 'parent'],
-  ]);
+  const block = buildBlock('section-nav', '');
   navSection.append(block);
   const heroSection = main.querySelector('div');
   heroSection.insertAdjacentElement('afterend', navSection);
