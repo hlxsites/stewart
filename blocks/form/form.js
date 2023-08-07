@@ -47,7 +47,7 @@ function buildForm(formData, defaultAction) {
     encounteredFieldLabels.add(labelId);
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
-    const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
+    const required = (attr(field, 'required') || 'n').toLowerCase() !== 'n';
     const cols = attr(field, 'cols') || 1;
     const help = attr(field, 'help');
     const helpUrl = attr(field, 'help url');
