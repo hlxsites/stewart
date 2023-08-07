@@ -23,12 +23,15 @@ function attr(object, name) {
   return val;
 }
 
-function buildForm(formData) {
+function buildForm(formData, defaultAction) {
   const form = createElement('form');
+  form.setAttribute('action', defaultAction);
+  form.setAttribute('method', 'POST');
   const formFieldData = formData.form.data;
   let currentSection = form;
   let input;
   let previousIs2Col = false;
+  let usesDefaultAction = true;
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
     const label = attr(field, 'label') || attr(field, 'name');
@@ -52,6 +55,7 @@ function buildForm(formData) {
     if (type === 'form') {
       if (name.toLowerCase() === 'url') {
         form.setAttribute('action', options || defaultValue);
+        usesDefaultAction = false;
       } else if (field.Name.toLowerCase() === 'method') {
         form.setAttribute('method', options || defaultValue);
       }
@@ -206,6 +210,28 @@ function buildForm(formData) {
     }
   });
 
+  form.append(createElement('input', { type: 'submit', value: 'Submit' }));
+  if (usesDefaultAction) {
+    // Default action uses AJAX to post the form
+    form.addEventListener('submit', async (event) => {
+      const data = {};
+      event.preventDefault();
+      (new FormData(form)).forEach((value, key) => { data[key] = value; });
+      const response = await fetch(form.getAttribute('action'), {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data }),
+      });
+      if (response.ok) {
+        form.append('<p>Thank you for your submission!</p>');
+      } else {
+        form.append('<p>There was an error submitting your form. Please try again later.</p>');
+      }
+    });
+  }
   return form;
 }
 
@@ -222,7 +248,7 @@ export default function decorate(block) {
         // The form id is everything after the colon in the text
         const formData = await fetch(`/forms/${formId}.json`);
         const formJson = await formData.json();
-        const form = buildForm(formJson);
+        const form = buildForm(formJson, `/forms/${formId}`);
         block.replaceWith(form);
       }
     });
