@@ -32,6 +32,7 @@ function buildForm(formData) {
   formFieldData.forEach((field) => {
     const label = attr(field, 'label') || attr(field, 'name');
     const name = attr(field, 'name') || attr(field, 'label');
+    const labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}--label`;
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
     const required = (attr(field, 'required') || 'n').toLowerCase().startsWith('y');
@@ -90,6 +91,7 @@ function buildForm(formData) {
 
     const labelElem = createElement('label');
     labelElem.setAttribute('for', name);
+    labelElem.setAttribute('id', labelId);
     labelElem.textContent = label;
     fieldDiv.append(labelElem);
 
@@ -97,6 +99,7 @@ function buildForm(formData) {
       case 'text':
         input = createElement('input');
         input.setAttribute('name', name);
+        input.setAttribute('aria-labelledby', labelId);
         if (placeholder) { input.setAttribute('placeholder', placeholder); }
         if (defaultValue) { input.textContent = defaultValue; }
         if (required) { input.setAttribute('required', true); }
@@ -105,6 +108,7 @@ function buildForm(formData) {
       case 'textarea':
         input = createElement('textarea');
         input.setAttribute('name', name);
+        input.setAttribute('aria-labelledby', labelId);
         if (placeholder) { input.setAttribute('placeholder', placeholder); }
         if (defaultValue) { input.textContent = defaultValue; }
         if (required) { input.setAttribute('required', true); }
@@ -113,6 +117,7 @@ function buildForm(formData) {
       case 'select':
         input = createElement('select');
         input.setAttribute('name', name);
+        input.setAttribute('aria-labelledby', labelId);
         if (required) { input.setAttribute('required', true); }
         getOptions(formData, options).forEach((option) => {
           const selectionLabel = attr(option, 'label') || attr(option, 'display');
@@ -133,6 +138,7 @@ function buildForm(formData) {
           const value = attr(option, 'value');
           input = createElement('input');
           input.setAttribute('name', name);
+          input.setAttribute('aria-labelledby', labelId);
           input.setAttribute('type', 'radio');
           input.setAttribute('value', value);
           if (defaultValue === value) {
@@ -148,6 +154,7 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         input.setAttribute('type', 'checkbox');
+        input.setAttribute('aria-labelledby', labelId);
         if (required) { input.setAttribute('required', true); }
         fieldDiv.append(input);
         break;
@@ -155,6 +162,7 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         input.setAttribute('type', 'date');
+        input.setAttribute('aria-labelledby', labelId);
         input.setAttribute('placeholder', placeholder || 'mm/dd/yyyy');
         if (required) { input.setAttribute('required', true); }
         if (defaultValue) { input.textContent = defaultValue; }
@@ -166,6 +174,7 @@ function buildForm(formData) {
         input = createElement('input');
         input.setAttribute('name', name);
         input.setAttribute('type', 'tel');
+        input.setAttribute('aria-labelledby', labelId);
         input.setAttribute('placeholder', placeholder || '555-555-5555');
         if (required) { input.setAttribute('required', true); }
         if (defaultValue) { input.textContent = defaultValue; }
