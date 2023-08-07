@@ -124,7 +124,7 @@ function buildFragmentBlocks(main) {
       // for safety, we do a host match, and make sure the text content matches the path
       const hostMatch = hosts.some((host) => url.hostname.includes(host));
       if (hostMatch && a.textContent.includes(url.pathname)) {
-        const block = buildBlock('fragment', { elems: a });
+        const block = buildBlock('fragment', a.cloneNode(true));
         a.replaceWith(block);
         decorateBlock(block);
       }

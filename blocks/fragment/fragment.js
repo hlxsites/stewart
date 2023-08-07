@@ -31,6 +31,10 @@ async function loadFragment(path) {
   return null;
 }
 
+/**
+ * decorate the fragment block
+ * @param {Element} block the block element
+ */
 export default async function decorate(block) {
   const link = block.querySelector('a');
   const path = link ? link.getAttribute('href') : block.textContent.trim();
@@ -39,7 +43,11 @@ export default async function decorate(block) {
     const fragmentSection = fragment.querySelector(':scope .section');
     if (fragmentSection) {
       block.closest('.section').classList.add(...fragmentSection.classList);
-      block.closest('.fragment-wrapper').replaceWith(...fragmentSection.childNodes);
+      if (block.closest('.fragment-wrapper')) {
+        block.closest('.fragment-wrapper').replaceWith(...fragmentSection.childNodes);
+      } else {
+        block.replaceChildren(...fragmentSection.childNodes);
+      }
     }
   }
 }
