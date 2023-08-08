@@ -65,7 +65,7 @@
     padding: 0.25rem;
 }
 
-.field-container:not(.col-flex) .form-field, .field-container.col-1 .form-field.col-1,  .form-field.col-wide, .field-container.col-flex .form-field.col-wide, .field-container h3 {
+.field-container:not(.col-flex) .form-field, .field-container.col-1 .form-field.col-1,  .form-field.col-wide, .field-container.col-flex .form-field.col-wide, .field-container h3, .field-container.col-2 .form-field.col-2,  .field-container.col-3 .form-field.col-3, .field-container.col-6 .form-field.col-6 {
     width: 100%;
     flex: unset;
 }
@@ -86,6 +86,11 @@
 
 
 @media (min-width: 600px) {
+    .field-container.col-6 .form-field.col-1 {
+        flex: 1 1 16%;
+        max-width: 16%;
+    }
+
     .field-container.col-6 .form-field.col-2, .field-container.col-3 .form-field.col-1 {
         flex: 3 1 32%;
         max-width: 32%;
@@ -94,6 +99,16 @@
     .field-container.col-6 .form-field.col-3, .field-container.col-2 .form-field.col-1 {
         flex: 2 1 49%;
         max-width: 49.5%;
+    }
+
+    .field-container.col-6 .form-field.col-4, .field-container.col-3 .form-field.col-2 {
+        flex: 4 1 65%;
+        max-width: 65%;
+    }
+
+    .field-container.col-6 .form-field.col-5 {
+        flex: 5 1 82%;
+        max-width: 82%;
     }
 }
 
