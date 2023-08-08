@@ -286,6 +286,15 @@ export function decorateButtons(element) {
           let keepWalking = true;
           let hasEm = false;
           let hasStrong = false;
+          /*
+          walk up the tree til either:
+            a) we find a valid container (div or p)
+            b) we get to a parent with more than one child.
+
+            if a, this is a button.
+            use what we found while walking the tree to determine the button type
+            if b, it's not a button
+          */
           while (keepWalking) {
             if (container.tagName === 'EM') hasEm = true;
             if (container.tagName === 'STRONG') hasStrong = true;
