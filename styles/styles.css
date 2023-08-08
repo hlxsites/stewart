@@ -286,7 +286,7 @@ button {
   font-style: normal;
   font-weight: 600;
   cursor: pointer;
-  color: var(--background-color);
+  color: var(--clr-white);
   background-color: var(--clr-primary);
   margin-block-end: 1rem;
   white-space: nowrap;
