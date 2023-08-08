@@ -58,7 +58,16 @@ main .accordion .accordion-item .accordion-panel.accordion-item-active {
     }
 }
 
-main .accordion .accordion-item .accordion-panel .table th{
+main .accordion .accordion-item .accordion-panel .table th, main .accordion .accordion-item .accordion-panel .table td {
+    border: solid 1px;
+    border-color: gray;
+    font-weight: 300;
+    font-size: 20px;
+    padding: 0px;
+    line-height: normal;
+}
+
+main .accordion .accordion-item .accordion-panel .table th {
     color: #fff;
     background: -webkit-gradient(linear,left top,left bottom,from(#006781),to(#002f39));
     background: linear-gradient(180deg,#006781,#002f39);
@@ -67,3 +76,23 @@ main .accordion .accordion-item .accordion-panel .table th{
     padding: 2px;
     line-height: 1.5rem;
 }
+
+main .accordion .accordion-item .accordion-panel .table tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+main .accordion .accordion-item .accordion-panel .table a:any-link {
+    color: #007dbd;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    min-width: 0px;
+    font-weight: inherit;
+}
+
+main .accordion .accordion-item .accordion-panel .table a:hover {
+  text-decoration: underline;
+}
+

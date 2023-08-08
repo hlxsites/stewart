@@ -37,6 +37,7 @@ export default function decorate(block) {
       'role': 'region',
       'aria-labelledby': `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
       id: `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
+      'hidden': ''
     });
 
     const panelText = accordionItem.querySelector('p');
@@ -59,6 +60,7 @@ export default function decorate(block) {
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true' || false;
       trigger.setAttribute('aria-expanded', !isExpanded);
       panel.classList.toggle(classNames.accordionItemActive);
+      panel.hidden = !panel.hidden;
     });
   });
 }
