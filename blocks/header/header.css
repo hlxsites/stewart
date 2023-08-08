@@ -217,6 +217,10 @@ header nav[aria-expanded="true"] .nav-sections.nav-sections-mobile {
     padding: 0;
   }
 
+  header nav .nav-sections > ul > li[aria-current="page"] > a {
+    border-bottom: 0.25rem solid var(--clr-primary);
+  }
+
   header nav .nav-sections ul > li > ul > li {
     font-weight: 400;
     font-size: var(--body-font-size-l);
@@ -427,7 +431,7 @@ header nav .nav-tools .nav-drop[aria-expanded="true"] .nav-section-heading::afte
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   header nav .nav-drop:last-child[aria-expanded="true"] > ul {

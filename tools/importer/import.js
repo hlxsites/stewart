@@ -128,7 +128,7 @@ const getPublishDate = (document) => {
   return '';
 };
 
-const extractMetadata = (document) => {
+const extractMetadata = (document, url) => {
   const metadata = {};
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
   metadataProperties.forEach((prop) => {
@@ -136,11 +136,27 @@ const extractMetadata = (document) => {
     if (val) {
       if (prop === 'keywords') {
         metadata.tags = val;
+      } else if (prop === 'template') {
+        const templateMap = {
+          'stewart-homepage': 'Homepage',
+          // todo add more values here
+        };
+        metadata.Template = templateMap[val] || val;
       } else {
         metadata[prop.replaceAll('og:', '')] = val;
       }
     }
   });
+
+  const navTitle = [...document.querySelectorAll('nav a')].find((a) => {
+    const docUrl = new URL(url);
+    const linkUrl = new URL(a.href, 'https://www.stewart.com');
+
+    return docUrl.pathname === linkUrl.pathname;
+  })?.textContent;
+  if (navTitle) {
+    metadata['Navigation Title'] = navTitle;
+  }
 
   if (metadata.image) {
     const img = document.createElement('img');
@@ -664,7 +680,7 @@ export default {
     document, url, html, params,
   }) => {
     // define the main element: the one that will be transformed to Markdown
-    const builder = new BlockBuilder(document, extractMetadata(document));
+    const builder = new BlockBuilder(document, extractMetadata(document, url));
 
     const parser = new DOMParser();
     const originalDoc = parser.parseFromString(html, 'text/html');
