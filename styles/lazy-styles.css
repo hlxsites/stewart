@@ -9,6 +9,6 @@ h3 .fa-icon,
 h4 .fa-icon,
 h5 .fa-icon,
 h6 .fa-icon {
-  margin-inline-end: 1ch;
+  margin-inline-end: .5ch;
   color: #96e0ff;
 }

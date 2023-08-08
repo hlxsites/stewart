@@ -60,7 +60,7 @@
   --body-font-size-l: 1.125rem; /* 18px */
   --body-font-size-m: 1rem; /* 16px */
   --body-font-size-s: .9375rem; /* 15px */
-  --body-font-size-xs: .875rem; /* 15px */
+  --body-font-size-xs: .875rem; /* 14px */
   --body-font-size-xxs: 0.75rem; /* 12px */
   --body-font-size-xxxs: .5rem;/* 8px */
 
@@ -293,6 +293,14 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: box-shadow .15s ease-in-out;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  a.button:any-link,
+  button {
+    transition: none;
+  }
 }
 
 @media (min-width: 900px) {
@@ -309,6 +317,7 @@ button:focus {
   background-color: #006497;
   border-color: #005b8a;
   cursor: pointer;
+  box-shadow: 0 0 0 0 rgba(38 145 199 / 50%);
 }
 
 button:disabled,
