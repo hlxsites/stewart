@@ -385,10 +385,12 @@ const buildButtons = (builder, section) => {
       button.textContent = '';
       button.append(em);
     } if (parent.classList.contains('ss-buttonstyle-tertiary')) {
+      const em = builder.doc.createElement('em');
       const strong = builder.doc.createElement('strong');
+      em.append(strong);
       strong.textContent = button.textContent;
       button.textContent = '';
-      button.append(strong);
+      button.append(em);
     }
   });
 };
