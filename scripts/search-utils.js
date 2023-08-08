@@ -30,6 +30,13 @@ const SearchConfigs = {
     sheet: 'news',
     'page-size': 10,
   },
+  'real-estate-dictionary': {
+    path: '/en/real-estate-dictionary/',
+    tagFacet: false,
+    queryIndex: '/query-index.json',
+    sheet: 'real-estate-dictionary',
+    'page-size': 25,
+  },
 };
 
 export const getSearchConfig = (block) => {
