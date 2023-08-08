@@ -1,6 +1,24 @@
 import { readBlockConfig, fetchPlaceholders, loadScript } from '../../scripts/lib-franklin.js';
 
 /**
+ * Remove all marketo injected styles.
+ * This allows us to provide a sane set of styles and
+ * not have to use !important to override the marketo injected junk
+ *
+ * @param {Element} block block element
+ */
+function clearMarketoStyles(block) {
+  document.querySelectorAll('link[rel="stylesheet"]').forEach((styleSheet) => {
+    if (styleSheet.href.includes('mktoweb.com')) {
+      styleSheet.remove();
+    }
+  });
+
+  block.querySelectorAll('style').forEach((style) => style.remove());
+  block.querySelectorAll('[style]').forEach((style) => style.removeAttribute('style'));
+}
+
+/**
  * decorate the block
  * @param {Element} block the block
  */
@@ -25,6 +43,7 @@ export default async function decorate(block) {
           formId,
           (form) => {
             if (form) {
+              clearMarketoStyles(block);
               form.onSuccess(() => {
                 window.dataLayer = window.dataLayer || [];
                 window.dataLayer.push({
