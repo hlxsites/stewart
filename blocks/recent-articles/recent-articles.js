@@ -57,9 +57,9 @@ const buildTeaserListFromResults = async (results, block) => {
 
 export default async function decorate(block) {
   const config = getSearchConfig(block);
+  block.innerHTML = '';
   const { count } = config;
   const results = fetchResults(config, '', '', -1).limit(Number(count));
 
-  block.innerHTML = '';
-  buildTeaserListFromResults(results, block);
+  await buildTeaserListFromResults(results, block);
 }
