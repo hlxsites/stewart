@@ -392,21 +392,25 @@ const buildGenericLists = (builder, section) => {
 };
 
 const buildButtons = (builder, section) => {
-  section.querySelectorAll('.btn').forEach((button) => {
-    const parent = button.parentElement;
+  section.querySelectorAll('.linkcalltoaction').forEach((ctaDiv) => {
+    const button = ctaDiv.querySelector('a.btn');
+    if (button) {
+      const par = builder.doc.createElement('p');
+      let inner = par;
+      if (ctaDiv.classList.contains('ss-buttonstyle-secondary')) {
+        const em = builder.doc.createElement('em');
+        inner.append(em);
+        inner = em;
+      }
 
-    if (parent.classList.contains('ss-buttonstyle-secondary')) {
-      const em = builder.doc.createElement('em');
-      em.textContent = button.textContent;
-      button.textContent = '';
-      button.append(em);
-    } if (parent.classList.contains('ss-buttonstyle-tertiary')) {
-      const em = builder.doc.createElement('em');
-      const strong = builder.doc.createElement('strong');
-      em.append(strong);
-      strong.textContent = button.textContent;
-      button.textContent = '';
-      button.append(em);
+      if (ctaDiv.classList.contains('ss-buttonstyle-tertiary')) {
+        const strong = builder.doc.createElement('strong');
+        inner.append(strong);
+        inner = strong;
+      }
+
+      inner.append(button.cloneNode(true));
+      ctaDiv.replaceWith(par);
     }
   });
 };

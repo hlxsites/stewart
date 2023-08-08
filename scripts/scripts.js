@@ -287,41 +287,18 @@ export function decorateButtons(element) {
         if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
           a.className = 'button primary'; // default
           up.classList.add('button-container');
-        } else if (up.childNodes.length === 1) {
-          let container = up;
-          let keepWalking = true;
-          let hasEm = false;
-          let hasStrong = false;
-          /*
-          walk up the tree til either:
-            a) we find a valid container (div or p)
-            b) we get to a parent with more than one child.
+        }
 
-            if a, this is a button.
-            use what we found while walking the tree to determine the button type
-            if b, it's not a button
-          */
-          while (keepWalking) {
-            if (container.tagName === 'EM') hasEm = true;
-            if (container.tagName === 'STRONG') hasStrong = true;
-            if (container.tagName === 'P' || container.tagName === 'DIV') {
-              keepWalking = false;
-            } else {
-              container = container.parentElement;
-              if (container.childNodes.length > 1) {
-                container = null;
-                keepWalking = false;
-              }
-            }
-          }
-
-          if (container) {
-            container.classList.add('button-container');
-            a.classList.add('button');
-            if (hasEm && hasStrong) a.classList.add('tertiary');
-            if (hasEm && !hasStrong) a.classList.add('secondary');
-            if (!hasEm) a.classList.add('primary');
-          }
+        const twoup = a.parentElement.parentElement;
+        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
+          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
+          a.className = 'button tertiary';
+          twoup.classList.add('button-container');
+        }
+        if (up.childNodes.length === 1 && up.tagName === 'EM'
+          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
+          a.className = 'button secondary';
+          twoup.classList.add('button-container');
         }
       }
     }
