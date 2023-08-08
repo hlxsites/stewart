@@ -400,6 +400,11 @@ main .section>div {
   margin-block-end: 0;
 }
 
+/* margin for sidekick library */
+.sidekick-library .section:not(.has-bg) {
+  margin-top: 2.5rem;
+}
+
 /* background styles and colors */
 .section.has-bg {
   padding: 2.5rem 1.5rem;
