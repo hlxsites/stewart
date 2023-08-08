@@ -17,7 +17,6 @@ export default function decorate(block) {
   blockIndex += 1;
 
   [...block.children].forEach((accordionItem, accordionItemIndex) => {
-
     accordionItem.classList.add(classNames.accordionItem);
 
     const header = accordionItem.querySelector('h2');
@@ -31,22 +30,22 @@ export default function decorate(block) {
       id: `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
     }, createElement('span', { class: classNames.accordionItemTitle }, headerText));
 
-    header.outerHTML=  newHeader.outerHTML;
-    let panel = createElement('div', {
+    header.outerHTML = newHeader.outerHTML;
+    const panel = createElement('div', {
       class: classNames.accordionPanel,
-      'role': 'region',
+      role: 'region',
       'aria-labelledby': `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
       id: `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
-      'hidden': ''
+      hidden: '',
     });
 
     const panelText = accordionItem.querySelector('p');
     if (panelText !== null) {
-        panel.append(panelText);
+      panel.append(panelText);
     }
     const panelTable = accordionItem.querySelector('div.table');
     if (panelTable !== null) {
-        panel.append(panelTable);
+      panel.append(panelTable);
     }
     accordionItem.firstChild.append(panel);
   });

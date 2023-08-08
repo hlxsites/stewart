@@ -221,7 +221,6 @@ function decorateSectionBackgroundImages(main) {
 function buildAccordions(main) {
   const accordionSectionContainers = main.querySelectorAll('.section.accordion');
   accordionSectionContainers.forEach((accordion) => {
-console.log('found accordion');
     const contentWrappers = accordion.querySelectorAll(':scope > div');
     const blockTable = [];
     let row;
@@ -244,7 +243,6 @@ console.log('found accordion');
           removeWrapper = false;
         }
       });
-
       if (removeWrapper) wrapper.remove();
     });
     // add last row

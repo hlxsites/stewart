@@ -5,8 +5,8 @@ main .accordion .accordion-item {
 }
 
 main .accordion .accordion-item .accordion-item-trigger {
-    margin: 0px;
-    padding: 20px 0px;
+    margin: 0;
+    padding: 20px 0;
 }
 
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
@@ -63,7 +63,7 @@ main .accordion .accordion-item .accordion-panel .table th, main .accordion .acc
     border-color: gray;
     font-weight: 300;
     font-size: 20px;
-    padding: 0px;
+    padding: 0;
     line-height: normal;
 }
 
@@ -86,9 +86,9 @@ main .accordion .accordion-item .accordion-panel .table a:any-link {
     text-decoration: none;
     background-color: transparent;
     border: none;
-    padding: 0px;
-    margin: 0px;
-    min-width: 0px;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
     font-weight: inherit;
 }
 
