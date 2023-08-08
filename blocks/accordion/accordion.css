@@ -91,6 +91,7 @@ main .accordion .accordion-item .accordion-panel .table a:any-link {
     min-width: 0;
     font-weight: inherit;
     text-wrap: wrap;
+    text-align: left;
 }
 
 main .accordion .accordion-item .accordion-panel .table a:hover {
