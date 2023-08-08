@@ -90,6 +90,7 @@ main .accordion .accordion-item .accordion-panel .table a:any-link {
     margin: 0;
     min-width: 0;
     font-weight: inherit;
+    text-wrap: wrap;
 }
 
 main .accordion .accordion-item .accordion-panel .table a:hover {
