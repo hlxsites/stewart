@@ -563,7 +563,12 @@ main .section>div {
 
   .section.offset > .default-content-wrapper {
     max-width: 41.6667%;
-    margin-left: 58.3333%;
+    margin-inline: 58.3333% auto;
+  }
+
+  .section.offset.right > .default-content-wrapper {
+    max-width: 41.6667%;
+    margin-inline: auto 58.3333%;
   }
 }
 
