@@ -77,11 +77,14 @@ async function runDelayed() {
   // Core Web Vitals RUM collection
   sampleRUM('cwv');
 
-  initDataLayer();
-  const placeholders = await fetchPlaceholders();
-  // add more delayed functionality here
-  await loadOneTrust(placeholders);
-  loadGoogleTagManager(placeholders);
+  // skip analytics stuff when in library
+  if (!document.body.classList.contains('sidekick-library')) {
+    initDataLayer();
+    const placeholders = await fetchPlaceholders();
+    // add more delayed functionality here
+    await loadOneTrust(placeholders);
+    loadGoogleTagManager(placeholders);
+  }
 }
 
 runDelayed();
