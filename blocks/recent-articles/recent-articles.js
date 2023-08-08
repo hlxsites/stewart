@@ -61,5 +61,5 @@ export default async function decorate(block) {
   const { count } = config;
   const results = fetchResults(config, '', '', -1).limit(Number(count));
 
-  await buildTeaserListFromResults(results, block);
+  buildTeaserListFromResults(results, block);
 }
