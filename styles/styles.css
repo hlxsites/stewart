@@ -401,7 +401,7 @@ main .section>div {
 }
 
 /* margin for sidekick library */
-.sidekick-library .section:not(.has-bg):not(.hero-container) {
+.sidekick-library .section:not(.has-bg, .hero-container) {
   margin-top: 2.5rem;
 }
 
