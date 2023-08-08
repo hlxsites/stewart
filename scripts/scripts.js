@@ -4,7 +4,6 @@ import {
   decorateBlock,
   loadHeader,
   loadFooter,
-  decorateButtons,
   decorateIcons as libFranklinDecorateIcons,
   decorateSections,
   decorateBlocks,
@@ -267,6 +266,51 @@ function decorateSectionsExt(main) {
       section.classList.add('no-margin');
     }
   }
+}
+
+/**
+ * Decorates paragraphs containing a single link as buttons.
+ * @param {Element} element container element
+ */
+export function decorateButtons(element) {
+  element.querySelectorAll('a').forEach((a) => {
+    a.title = a.title || a.textContent;
+    if (a.href !== a.textContent) {
+      if (!a.querySelector('img')) {
+        const up = a.parentElement;
+        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+          a.className = 'button primary'; // default
+          up.classList.add('button-container');
+        } else if (up.childNodes.length === 1) {
+          let container = up;
+          let keepWalking = true;
+          let hasEm = false;
+          let hasStrong = false;
+          while (keepWalking) {
+            if (container.tagName === 'EM') hasEm = true;
+            if (container.tagName === 'STRONG') hasStrong = true;
+            if (container.tagName === 'P' || container.tagName === 'DIV') {
+              keepWalking = false;
+            } else {
+              container = container.parentElement;
+              if (container.childNodes.length > 1) {
+                container = null;
+                keepWalking = false;
+              }
+            }
+          }
+
+          if (container) {
+            container.classList.add('button-container');
+            a.classList.add('button');
+            if (hasEm && hasStrong) a.classList.add('tertiary');
+            if (hasEm && !hasStrong) a.classList.add('secondary');
+            if (!hasEm) a.classList.add('primary');
+          }
+        }
+      }
+    }
+  });
 }
 
 /**

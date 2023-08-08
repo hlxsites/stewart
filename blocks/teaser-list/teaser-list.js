@@ -29,6 +29,7 @@ const assignContentClasses = (teaser) => {
   const teaserContent = teaser.querySelector(`.${classNames.teaserContent}`);
   const cta = teaserContent.querySelector(':scope a:not(h3 *)');
   cta.classList.add(classNames.teaserLink);
+  cta.classList.remove('button');
 
   const subhead = teaserContent.querySelector('p:first-child');
 

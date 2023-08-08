@@ -293,6 +293,14 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: box-shadow .15s ease-in-out;
+}
+
+@media (prefers-reduced-motion:reduce) {
+  a.button:any-link,
+  button {
+    transition: none;
+  }
 }
 
 @media (min-width: 900px) {
@@ -309,12 +317,32 @@ button:focus {
   background-color: #006497;
   border-color: #005b8a;
   cursor: pointer;
+  box-shadow: 0 0 0 0 rgba(38, 145, 199, .5);
 }
 
 button:disabled,
 button:disabled:hover {
   background-color: var(--clr-gray-light);
   cursor: unset;
+}
+
+a.button.secondary,
+button.secodary {
+  background-color: transparent;
+  border: 0;
+}
+
+a.button.secondary::after,
+button.secodary::after {
+  content: "";
+  border-top: .5625rem solid transparent;
+  border-bottom: .5625rem solid transparent;
+  border-left: .65625rem solid #53469c;
+  display: inline-block;
+  height: 0;
+  margin-left: 1.125rem;
+  width: 0;
+  vertical-align: middle
 }
 
 main input {
