@@ -19,7 +19,6 @@
   --clr-orange: #fd7e14;
   --clr-yellow: #ffc107;
   --clr-green: #28a745;
-  --clr-cyan: #96e0ff;
   --clr-gray-dark: #343a40;
   --clr-secondary: #007dbd;
   --clr-success: #28a745;
@@ -41,6 +40,7 @@
   --clr-teal: #006781;
   --clr-teal-light: #248464;
   --clr-purple: #53469c;
+  --clr-cyan: #96e0ff;
   
 
   /* element colors */
@@ -280,7 +280,6 @@ button {
   display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
-  border: 1px solid var(--clr-primary);
   padding: .5rem;
   min-width: min(10rem, 100%);
   text-align: center;
@@ -293,14 +292,6 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: box-shadow .15s ease-in-out;
-}
-
-@media (prefers-reduced-motion:reduce) {
-  a.button:any-link,
-  button {
-    transition: none;
-  }
 }
 
 @media (min-width: 900px) {
@@ -310,20 +301,50 @@ button {
   }
 }
 
-a.button:hover,
-a.button:focus,
-button:hover,
-button:focus {
+a.button:hover, a.button:focus, a.button:active,
+button:hover, button:focus, button:active {
   background-color: #006497;
-  border-color: #005b8a;
   cursor: pointer;
   box-shadow: 0 0 0 0 rgba(38 145 199 / 50%);
+}
+
+a.button:focus-visible,
+a.button:focus,
+button:focus,
+button:focus-visible {
+  outline: 3px auto -webkit-focus-ring-color;
+  outline-offset: 3px;
 }
 
 button:disabled,
 button:disabled:hover {
   background-color: var(--clr-gray-light);
   cursor: unset;
+}
+
+a.button.secondary,
+a.button.tertiary  {
+  background-color: transparent;
+  border: 3px solid currentColor;
+}
+
+a.button.tertiary {
+  border: none;
+  padding: 1px;
+}
+
+a.button.tertiary::after {
+  content: "";
+  border-top: 0.75rem solid transparent;
+  border-bottom: 0.75rem solid transparent;
+  border-left: 0.875rem solid var(--clr-purple);
+  margin-left: 1.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.section.dark a.button.tertiary::after {
+  border-left: 0.875rem solid var(--clr-cyan);
 }
 
 main input {
