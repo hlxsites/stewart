@@ -434,18 +434,20 @@ main .section>div {
   --_bg-opacty-angle: 270deg;
   --_bg-overlay-opacity-no-gradient: 1;
 
-  background: linear-gradient(var(--_bg-opacty-angle), 
-    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-1)) var(--_bg-overlay-opacity-stop-1), 
-    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-2)) var(--_bg-overlay-opacity-stop-2), 
-    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-3)) var(--_bg-overlay-opacity-stop-3))
+  background: rgba(0 0 0 / var(--_bg-overlay-opacity-no-gradient));
 }
 
 .section.has-opacity.right {
   --_bg-opacty-angle: 90deg;
 }
 
-.section.has-opacity.no-gradient {
-  background: rgba(0 0 0 / var(--_bg-overlay-opacity-no-gradient));
+@media (min-width: 900px) {
+  .section.has-opacity:not(.no-gradient) {
+    background: linear-gradient(var(--_bg-opacty-angle), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-1)) var(--_bg-overlay-opacity-stop-1), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-2)) var(--_bg-overlay-opacity-stop-2), 
+    rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-3)) var(--_bg-overlay-opacity-stop-3))
+  }
 }
 
 .section.has-bg-image.opacity-100 {
@@ -548,6 +550,11 @@ main .section>div {
   .section.narrow {
     margin-inline: auto;
     width: auto
+  }
+
+  .section.offset > .default-content-wrapper {
+    max-width: 41.6667%;
+    margin-left: 58.3333%;
   }
 }
 
