@@ -63,16 +63,6 @@
   margin-bottom: 1.5rem;
 }
 
-.columns-container .columns.left-border .row .column-1 {
-  border-inline-start: 0.25rem solid var(--clr-white);
-  padding-inline-start: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-.columns-container.grey .columns.left-border .row .column-1 {
-  border-inline-start: 0.25rem solid var(--clr-teal);
-}
-
 @media (min-width: 600px) {
   .columns .row {
     align-items: center;
@@ -120,11 +110,6 @@
 
   .columns.card .row .column:last-child {
     margin-bottom: 1rem;
-  }
-
-  .columns-container .columns.left-border .row .column-1 {
-    padding-inline-start: 1.5rem;
-    margin-bottom: 0;
   }
 }
 
