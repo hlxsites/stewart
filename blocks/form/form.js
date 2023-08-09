@@ -121,7 +121,10 @@ function buildForm(formData, defaultAction) {
       if (cols) {
         newSection.classList.add(`col-${cols}`);
       }
-      if (options === '2-col') {
+      if (options.includes('transparent')) {
+        newSection.classList.add('transparent');
+      }
+      if (options.includes('2-col')) {
         newSection.classList.add('section-col-2');
         if (previousIs2Col) {
           previousIs2Col = false;

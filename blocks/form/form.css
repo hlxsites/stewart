@@ -1,14 +1,33 @@
+.form-wrapper form input[type="submit"] {
+    width: 10em;
+    background-color: #007dbd;
+    border-color: #007dbd;
+    color: var(--clr-white);
+    margin-left: 0.5em;
+}
+
+.form-wrapper form input[type="submit"]:hover {
+    background-color: #006dad;
+    border-color: #006dad;
+}
+
+.form-wrapper form input[type="submit"]:active {
+    box-shadow: inset 0 3px 5px rgb(0 0 0 / 50%);
+}
 
 .form-section {
-    border: 1px solid var(--clr-gray-dark);
     padding: 15px;
     margin: 10px;
-    background-color: var(--clr-light);
-    border-radius: 5px;
     width: 100%;
     font-size: var(--body-font-size-xs);
-    box-shadow: 0 5px 4px -2px rgb(0 0 0 / 15%);
     margin-bottom: 2em;
+}
+
+.form-section:not(.transparent) {
+    background-color: var(--clr-light);
+    border: 1px solid var(--clr-gray-dark);
+    border-radius: 5px;
+    box-shadow: 0 5px 4px -2px rgb(0 0 0 / 15%);
 }
 
 .form-section h3 {
