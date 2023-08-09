@@ -102,7 +102,7 @@ function buildForm(formData, defaultAction) {
     const placeholder = attr(field, 'placeholder');
 
     if (type === 'form') {
-      if (name.toLowerCase() === 'url') {
+      if (name.toLowerCase() === 'url' || name.toLowerCase() === 'action') {
         form.setAttribute('action', options || defaultValue);
         usesDefaultAction = false;
       } else if (field.Name.toLowerCase() === 'method') {
