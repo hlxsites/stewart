@@ -23,7 +23,7 @@ export default function decorate(block) {
     const headerText = header.textContent;
     header.innerHTML = '';
 
-    const newHeader = createElement('h2', {
+    const newHeader = createElement('button', {
       class: classNames.accordionItemTrigger,
       'aria-expanded': 'false',
       'aria-controls': `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
@@ -36,18 +36,16 @@ export default function decorate(block) {
       role: 'region',
       'aria-labelledby': `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
       id: `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
-      hidden: '',
     });
 
-    const panelText = accordionItem.querySelector('p');
-    if (panelText !== null) {
-      panel.append(panelText);
-    }
-    const panelTable = accordionItem.querySelector('div.table');
-    if (panelTable !== null) {
-      panel.append(panelTable);
-    }
-    accordionItem.firstChild.append(panel);
+    const panelParent = accordionItem.firstChild;
+    const panelElements = [...panelParent.children];
+    [...panelElements].forEach((element) => {
+        if (!element.classList.contains('accordion-item-trigger')) {
+        panel.append(element);
+        }
+    });
+    panelParent.append(panel);
   });
 
   const accordionTriggers = block.querySelectorAll(`.${classNames.accordionItemTrigger}`);
@@ -59,7 +57,6 @@ export default function decorate(block) {
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true' || false;
       trigger.setAttribute('aria-expanded', !isExpanded);
       panel.classList.toggle(classNames.accordionItemActive);
-      panel.hidden = !panel.hidden;
     });
   });
 }
