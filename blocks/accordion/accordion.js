@@ -41,9 +41,9 @@ export default function decorate(block) {
     const panelParent = accordionItem.firstChild;
     const panelElements = [...panelParent.children];
     [...panelElements].forEach((element) => {
-        if (!element.classList.contains('accordion-item-trigger')) {
+      if (!element.classList.contains('accordion-item-trigger')) {
         panel.append(element);
-        }
+      }
     });
     panelParent.append(panel);
   });
