@@ -79,8 +79,8 @@ function buildForm(formData, defaultAction) {
   let input;
   let previousIs2Col = false;
   let usesDefaultAction = true;
-  let successMessage = '*Success!* Thank you for your submission.';
-  let failureMessage = 'We\'re sorry, there was an error processing your submission. Please try again later.';
+  let successMessage = '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.';
+  let failureMessage = '*An error has occurred!* Please contact webmaster@stewart.com and let us know the name and URL of the form you just tried to complete. Something happened and it didn\'t accept your information. We apologize!';
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
     const label = attr(field, 'label');
