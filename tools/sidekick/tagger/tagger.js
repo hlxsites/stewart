@@ -10,9 +10,9 @@ function renderItem(item, catId) {
 }
 
 function renderItems(item, catId) {
-  let html = renderItem(item, catId);
+  let html = item.hide ? '' : renderItem(item, catId);
   Object.keys(item).forEach((key) => {
-    if (!['title', 'name', 'path'].includes(key)) {
+    if (!['title', 'name', 'path', 'hide'].includes(key)) {
       html += renderItems(item[key], catId);
     }
   });
@@ -26,7 +26,7 @@ function initTaxonomy(taxonomy) {
     html += '<div class="category">';
     html += `<h2>${cat.title}</h2>`;
     Object.keys(cat).forEach((key) => {
-      if (!['title', 'name', 'path'].includes(key)) {
+      if (!['title', 'name', 'path', 'hide'].includes(key)) {
         html += renderItems(cat[key], idx);
       }
     });

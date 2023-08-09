@@ -24,6 +24,7 @@ function fetchTaxonomy() {
                 title: curType,
                 name: titleToName(curType),
                 path: titleToName(curType),
+                hide: row.hide,
               };
             }
 
@@ -33,6 +34,7 @@ function fetchTaxonomy() {
                 title: l1,
                 name: titleToName(l1),
                 path: `${titleToName(curType)}/${titleToName(l1)}`,
+                hide: row.hide,
               };
             }
 
@@ -42,6 +44,7 @@ function fetchTaxonomy() {
                 title: l2,
                 name: titleToName(l2),
                 path: `${titleToName(curType)}/${titleToName(l1)}/${titleToName(l2)}`,
+                hide: row.hide,
               };
             }
 
@@ -51,6 +54,7 @@ function fetchTaxonomy() {
                 title: l3,
                 name: titleToName(l3),
                 path: `${titleToName(curType)}/${titleToName(l1)}/${titleToName(l2)}/${titleToName(l3)}`,
+                hide: row.hide,
               };
             }
           });

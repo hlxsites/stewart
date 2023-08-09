@@ -198,7 +198,7 @@ const buildFacets = async (filteredResults, block, cfg, q, selectedTag) => {
     }
 
     Object.keys(data).forEach((key) => {
-      if (!['title', 'name', 'path'].includes(key)) {
+      if (!['title', 'name', 'path', 'hide'].includes(key)) {
         recurse(data[key]);
       }
     });
