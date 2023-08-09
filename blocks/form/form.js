@@ -160,7 +160,7 @@ function buildForm(formData, defaultAction) {
       labelElem.setAttribute('for', name);
       labelElem.setAttribute('id', labelId);
       labelElem.textContent = label;
-      if (!required && type !== 'radio' && type !== 'checkbox') {
+      if (!required && type !== 'radio' && type !== 'checkbox' && type !== 'label') {
         labelElem.classList.add('optional');
       }
       fieldDiv.append(labelElem);
