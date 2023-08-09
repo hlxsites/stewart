@@ -1,5 +1,7 @@
 import { createElement } from '../../scripts/scripts.js';
 
+let isCmdShiftPressed = false;
+
 function getOptions(formData, options) {
   if (formData[options] || formData[options].data) {
     return [...formData[options].data];
@@ -226,32 +228,36 @@ function buildForm(formData, defaultAction) {
       const data = {};
       event.preventDefault();
       (new FormData(form)).forEach((value, key) => { data[key] = value; });
-      const response = await fetch(form.getAttribute('action'), {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data }),
-      });
-      let message;
-      if (response.ok) {
-        // Create success message at the top of the form and scroll to it.
-        message = createElement('p', { class: 'form-success' });
-        message.textContent = successMessage;
-      } else {
-        message = createElement('p', { class: 'form-failure' });
-        message.textContent = failureMessage;
+      let action = form.getAttribute('action');
+      if (isCmdShiftPressed) {
+        action = `https://admin.hlx.page/form/hlxsites/stewart/main${action}.json`;
       }
-      // Convert any text content surrounded by asterisks to boldface
-      message.innerHTML = message.innerHTML.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
-
-      if (form.previousElementSibling) {
-        form.previousElementSibling.replaceWith(message);
-      } else {
+      let response;
+      try {
+        response = await fetch(action, {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ data }),
+        });
+      } finally {
+        let message;
+        if (response && response.ok) {
+          // Create success message at the top of the form and scroll to it.
+          message = createElement('p', { class: 'form-success' });
+          message.textContent = successMessage;
+        } else {
+          message = createElement('p', { class: 'form-failure' });
+          message.textContent = failureMessage;
+        }
+        // Convert any text content surrounded by asterisks to boldface
+        message.innerHTML = message.innerHTML.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+        form.querySelectorAll('.form-success, .form-failure').forEach((ele) => ele.remove());
         form.prepend(message);
+        message.parentElement.scrollIntoView();
       }
-      message.parentElement.scrollIntoView();
     });
   }
   return form;
@@ -272,8 +278,40 @@ export default function decorate(block) {
         const formJson = await formData.json();
         const form = buildForm(formJson, `/forms/${formId}`);
         block.replaceWith(form);
+
+        // If domain is localhost or contains hlxsites.hlx then track keboard events
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('hlxsites.hlx')) {
+          const handler = (event) => {
+            isCmdShiftPressed = (event.ctrlKey || event.metaKey) && event.shiftKey;
+          };
+          document.addEventListener('keydown', handler);
+          document.addEventListener('keyup', handler);
+          // Cmd+Shift+DoubleClick autofills everything with test data
+          form.addEventListener('dblclick', () => {
+            if (!isCmdShiftPressed) return;
+            const inputs = form.querySelectorAll('input, textarea, select');
+            inputs.forEach((input) => {
+              const type = input.getAttribute('type');
+              const name = input.getAttribute('name');
+              if (type === 'radio' || type === 'checkbox') {
+                if (Math.random() > 0.5) input.checked = true;
+              } else if (type === 'date') {
+                input.value = '2020-01-01';
+              } else if (type === 'tel') {
+                input.value = '555-555-5555';
+              } else if (type === 'email') {
+                input.value = 'test@test.test';
+              } else if (input.tagName === 'SELECT') {
+                input.selectedIndex = 1 + (Math.floor(Math.random() * input.options.length - 1));
+              } else if (name) {
+                input.value = name;
+              }
+            });
+          });
+        }
       }
     });
   });
+
   observer.observe(block);
 }
