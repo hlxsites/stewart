@@ -138,9 +138,11 @@ function buildForm(formData, defaultAction) {
         newSection.classList.add('form-section');
         form.append(newSection);
       }
-      const sectionTitle = createElement('h3');
-      sectionTitle.textContent = field.Label || field.Name;
-      newSection.append(sectionTitle);
+      if (label) {
+        const sectionTitle = createElement('h3');
+        sectionTitle.textContent = label;
+        newSection.append(sectionTitle);
+      }
       currentSection = newSection;
       return;
     }
@@ -200,7 +202,7 @@ function buildForm(formData, defaultAction) {
         fieldDiv.append(input);
         break;
       case 'radio':
-        getOptions(formData, field.Options).forEach((option) => {
+        getOptions(formData, options).forEach((option) => {
           const selectionLabel = attr(option, 'label') || attr(option, 'display');
           const value = attr(option, 'value');
           input = createElement('input');
