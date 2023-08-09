@@ -109,11 +109,13 @@ export function buildHeroBlock(main) {
 }
 
 function buildFormBlocks(main) {
-  main.querySelectorAll('p > code').forEach((code) => {
-    const formId = code.textContent.split(':')[1].trim();
-    const block = buildBlock('form', { elems: [formId] });
-    code.replaceWith(block);
-    decorateBlock(block);
+  main.querySelectorAll('code').forEach((code) => {
+    if (code.textContent.toLowerCase().startsWith('form:')) {
+      const formId = code.textContent.split(':')[1].trim();
+      const block = buildBlock('form', { elems: [formId] });
+      code.replaceWith(block);
+      decorateBlock(block);
+    }
   });
 }
 
