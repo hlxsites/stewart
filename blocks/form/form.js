@@ -74,7 +74,7 @@ function buildForm(formData, defaultAction) {
   const form = createElement('form');
   form.setAttribute('action', defaultAction);
   form.setAttribute('method', 'POST');
-  const formFieldData = formData.form.data;
+  const formFieldData = formData?.form?.data || formData.data;
   let currentSection = form;
   let input;
   let previousIs2Col = false;

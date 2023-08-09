@@ -139,7 +139,7 @@
 }
 */
 
-.field-container .form-field textarea {
+.form-field textarea {
     width: 100%;
     min-height: 10em;
 }
