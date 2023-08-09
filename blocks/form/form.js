@@ -155,14 +155,22 @@ function buildForm(formData, defaultAction) {
     }
     currentSection.append(fieldDiv);
 
-    const labelElem = createElement('label');
-    labelElem.setAttribute('for', name);
-    labelElem.setAttribute('id', labelId);
-    labelElem.textContent = label;
-    if (!required && type !== 'radio' && type !== 'checkbox') {
-      labelElem.classList.add('optional');
+    if (label) {
+      const labelElem = createElement('label');
+      labelElem.setAttribute('for', name);
+      labelElem.setAttribute('id', labelId);
+      labelElem.textContent = label;
+      if (!required && type !== 'radio' && type !== 'checkbox') {
+        labelElem.classList.add('optional');
+      }
+      fieldDiv.append(labelElem);
+    } else {
+      // Apply id attribute to the last h3 we created
+      const sectionTitle = currentSection.querySelector('h3:last-of-type');
+      if (sectionTitle) {
+        sectionTitle.setAttribute('id', labelId);
+      }
     }
-    fieldDiv.append(labelElem);
 
     switch (type) {
       case 'text':
@@ -215,6 +223,7 @@ function buildForm(formData, defaultAction) {
           }
           fieldDiv.append(input);
           const labelEle = createElement('label');
+          labelEle.setAttribute('class', 'value-label');
           labelEle.textContent = selectionLabel;
           fieldDiv.append(labelEle);
         });

@@ -129,7 +129,7 @@
     width: 1.25em;
 }
 
-.field-container .form-field.type-radio label:not(:first-of-type) {
+.field-container .form-field.type-radio label.value-label {
     display: inline-block;
 }
 
