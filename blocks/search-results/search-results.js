@@ -2,6 +2,7 @@ import { createSearchForm, getSearchConfig, queryIndexPath } from '../../scripts
 import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
 import { toClassName } from '../../scripts/lib-franklin.js';
+import getTaxonomy from '../../scripts/taxonomy.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -185,19 +186,37 @@ export const fetchResults = (cfg, query, tag, pageNum) => {
   return results.slice(offset, offset + resultsPerPage);
 };
 
-const buildFacets = (filteredResults, block, cfg, q, selectedTag) => {
+const buildFacets = async (filteredResults, block, cfg, q, selectedTag) => {
   const filterContainer = block.querySelector(`.${classNames.searchResultsFilterContainer}`);
+
+  const taxonomy = await getTaxonomy();
+  const facetPath = cfg.tagFacet;
+  const contentTypeTags = new Set();
+  const recurse = (data) => {
+    if (data.path && data.path.startsWith(facetPath)) {
+      contentTypeTags.add(data.title);
+    }
+
+    Object.keys(data).forEach((key) => {
+      if (!['title', 'name', 'path'].includes(key)) {
+        recurse(data[key]);
+      }
+    });
+  };
+  recurse(taxonomy);
 
   const tagData = {};
   filteredResults.forEach((page) => {
     JSON.parse(page.tags).forEach((tag) => {
-      let tagCount = tagData[tag];
-      if (tagCount) {
-        tagCount += 1;
-      } else {
-        tagCount = 1;
+      if (contentTypeTags.has(tag)) {
+        let tagCount = tagData[tag];
+        if (tagCount) {
+          tagCount += 1;
+        } else {
+          tagCount = 1;
+        }
+        tagData[tag] = tagCount;
       }
-      tagData[tag] = tagCount;
     });
   });
 
@@ -291,7 +310,9 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
 
     if (!partial) {
       block.querySelector('.search-result-count').textContent = `${allResCount} Results Found`;
-      buildFacets(resArray, block, cfg, q, tag);
+      if (cfg.tagFacet) {
+        buildFacets(resArray, block, cfg, q, tag);
+      }
     }
 
     const totalPages = Math.ceil(allResCount / resultsPerPage);
