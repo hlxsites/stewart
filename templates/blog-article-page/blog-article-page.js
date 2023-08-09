@@ -9,7 +9,7 @@ async function addBlogPostInfo(main) {
     const author = getMetadata('author');
     if (author) {
       h1.insertAdjacentHTML('afterend', `
-      <p>${placeholders.by} ${author}</p>
+      <p>${placeholders.by || 'By'} ${author}</p>
     `);
     }
 
@@ -19,7 +19,7 @@ async function addBlogPostInfo(main) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const pubDateStr = pubDateDate.toLocaleString(undefined, options);
         h1.insertAdjacentHTML('afterend', `
-        <p>${placeholders.publishedOn}: ${pubDateStr}</p>
+        <p>${placeholders.publishedOn || 'Publish on'}: ${pubDateStr}</p>
         `);
       } catch {
         // no op, just to catch any weird date format stuff
