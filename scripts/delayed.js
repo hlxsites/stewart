@@ -15,14 +15,23 @@ function loadGoogleTagManager(placeholders) {
   }
 }
 
+async function loadMuchkin() {
+  await loadScript('https://munchkin.marketo.net/munchkin.js');
+  const placeholders = await fetchPlaceholders();
+  window.Munchkin.init(placeholders.munchkinId);
+}
+
 function OTLoaded() {
   if (window.OnetrustActiveGroups) {
     const activeGroups = window.OnetrustActiveGroups.split(',');
     // eslint-disable-next-line no-console
     console.log(`OneTrust Loaded. Active groups: ${activeGroups}`);
     // use active groups to determine what else is loaded
-    // down the line, if blocks need to rely on this, e.g marketo form block
+    // if blocks need to rely on this
     // we could send an event here that blocks could listen on to trigger their loading.
+    if (activeGroups.includes('C0004')) {
+      loadMuchkin();
+    }
   }
 }
 
@@ -68,11 +77,14 @@ async function runDelayed() {
   // Core Web Vitals RUM collection
   sampleRUM('cwv');
 
-  initDataLayer();
-  const placeholders = await fetchPlaceholders();
-  // add more delayed functionality here
-  await loadOneTrust(placeholders);
-  loadGoogleTagManager(placeholders);
+  // skip analytics stuff when in library
+  if (!document.body.classList.contains('sidekick-library')) {
+    initDataLayer();
+    const placeholders = await fetchPlaceholders();
+    // add more delayed functionality here
+    await loadOneTrust(placeholders);
+    loadGoogleTagManager(placeholders);
+  }
 }
 
 runDelayed();

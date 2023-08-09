@@ -9,24 +9,30 @@ const getSearchFormAction = async () => {
   return [...links].find((link) => link.innerHTML.toLowerCase().includes('search') || link.innerHTML.toLowerCase().includes('icon-far-search')).getAttribute('href');
 };
 
+export const queryIndexPath = '/query-index.json';
 const SearchConfigs = {
   default: {
     path: '/',
     tagFacet: false,
-    queryIndex: '/query-index.json',
     'page-size': 10,
   },
   insights: {
     path: '/en/insights/',
-    queryIndex: '/query-index.json',
+    sheet: 'blog',
     tagFacet: true,
     'page-size': 10,
   },
   news: {
     path: '/en/news/press-releases/',
     tagFacet: false,
-    queryIndex: '/query-index.json',
+    sheet: 'news',
     'page-size': 10,
+  },
+  'real-estate-dictionary': {
+    path: '/en/real-estate-dictionary/',
+    tagFacet: false,
+    sheet: 'real-estate-dictionary',
+    'page-size': 25,
   },
 };
 

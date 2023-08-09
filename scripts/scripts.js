@@ -4,7 +4,6 @@ import {
   decorateBlock,
   loadHeader,
   loadFooter,
-  decorateButtons,
   decorateIcons as libFranklinDecorateIcons,
   decorateSections,
   decorateBlocks,
@@ -16,6 +15,12 @@ import {
   getMetadata,
 } from './lib-franklin.js';
 
+// valid template for which we have css/js files
+const VALID_TEMPLATES = [
+  'primary-site-section-landing-page',
+  'primary-site-subsection-landing-page',
+  'detail-content-page',
+];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
 
@@ -84,7 +89,7 @@ export async function decorateIcons(element) {
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
-function buildHeroBlock(main) {
+export function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   if (!h1) {
     return;
@@ -112,7 +117,7 @@ function buildFormBlocks(main) {
   });
 }
 
-function buildEmbedBlocks(main) {
+export function buildEmbedBlocks(main) {
   // For every youtube link, convert to an embed block
   main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
     // Get picture if it exists and move it to the block
@@ -123,15 +128,34 @@ function buildEmbedBlocks(main) {
   });
 }
 
+function buildFragmentBlocks(main) {
+  const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
+  // links to /fragments/* become fragment blocks
+  main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
+    if (a.href) {
+      const url = new URL(a.href);
+
+      // for safety, we do a host match, and make sure the text content matches the path
+      const hostMatch = hosts.some((host) => url.hostname.includes(host));
+      if (hostMatch && a.textContent.includes(url.pathname)) {
+        const block = buildBlock('fragment', a.cloneNode(true));
+        a.replaceWith(block);
+        decorateBlock(block);
+      }
+    }
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
-function buildAutoBlocks(main) {
+export function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
     buildFormBlocks(main);
     buildEmbedBlocks(main);
+    buildFragmentBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -261,17 +285,102 @@ function decorateSectionsExt(main) {
 }
 
 /**
+ * Decorates paragraphs containing a single link as buttons.
+ * @param {Element} element container element
+ */
+export function decorateButtons(element) {
+  element.querySelectorAll('a').forEach((a) => {
+    a.title = a.title || a.textContent;
+    if (a.href !== a.textContent) {
+      if (!a.querySelector('img')) {
+        const up = a.parentElement;
+        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+          a.className = 'button primary'; // default
+          up.classList.add('button-container');
+        }
+
+        const twoup = a.parentElement.parentElement;
+        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
+          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
+          a.className = 'button tertiary';
+          twoup.classList.add('button-container');
+        }
+        if (up.childNodes.length === 1 && up.tagName === 'EM'
+          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
+          a.className = 'button secondary';
+          twoup.classList.add('button-container');
+        }
+      }
+    }
+  });
+}
+
+/**
+ * load template css and js.
+ * @param {string} template the template to load.
+ * @param {element} main the main element to pass to template decorate function
+ * @returns promise which resolves to the templates js module if there is one.
+ */
+async function loadTemplate(templateName) {
+  if (!VALID_TEMPLATES.some((t) => t === templateName)) {
+    return null;
+  }
+
+  try {
+    let mod;
+    const cssLoaded = new Promise((resolve) => {
+      try {
+        loadCSS(`${window.hlx.codeBasePath}/templates/${templateName}/${templateName}.css`);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(`failed to load styles for ${templateName}`, error);
+      }
+      resolve();
+    });
+    const decorationComplete = new Promise((resolve) => {
+      (async () => {
+        try {
+          mod = await import(`../templates/${templateName}/${templateName}.js`);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(`failed to load module for ${templateName}`, error);
+        }
+        resolve();
+      })();
+    });
+    await Promise.all([cssLoaded, decorationComplete]);
+    return mod;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(`failed to load block ${templateName}`, error);
+  }
+
+  return null;
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
-export function decorateMain(main) {
+export async function decorateMain(main) {
   // hopefully forward compatible button decoration
   wrapImgsInLinks(main);
   decorateLinks(main);
   decorateButtons(main);
   decorateIcons(main);
-  buildAutoBlocks(main);
+
+  const template = getMetadata('template');
+  let autoBlocksFunc = buildAutoBlocks;
+  if (template) {
+    // template js, if they exist, must call appropriate auto-blocks on their own
+    const templateMod = await loadTemplate(template);
+    if (templateMod && templateMod.default) {
+      autoBlocksFunc = templateMod.default;
+    }
+  }
+  await autoBlocksFunc(main);
+
   decorateSectionBackgroundImages(main);
   decorateSections(main);
   decorateSectionsExt(main);
@@ -287,7 +396,7 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
-    decorateMain(main);
+    await decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }

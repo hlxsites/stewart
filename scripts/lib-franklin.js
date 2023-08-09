@@ -109,7 +109,7 @@ export async function loadScript(src, attrs) {
       const script = document.createElement('script');
       script.src = src;
       if (attrs) {
-      // eslint-disable-next-line no-restricted-syntax, guard-for-in
+        // eslint-disable-next-line no-restricted-syntax, guard-for-in
         for (const attr in attrs) {
           script.setAttribute(attr, attrs[attr]);
         }
@@ -563,11 +563,7 @@ export function decorateButtons(element) {
     if (a.href !== a.textContent) {
       const up = a.parentElement;
       const twoup = a.parentElement.parentElement;
-      /**
-       * teaser-list CTAs were getting the primary button treatment.
-       * Adding this condition for now, this can be cleaned up as part of https://github.com/hlxsites/stewart/issues/57
-       */
-      if (!a.querySelector('img') && !a.closest('.teaser-list')) {
+      if (!a.querySelector('img')) {
         if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
           a.className = 'button primary'; // default
           up.classList.add('button-container');

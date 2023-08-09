@@ -1,4 +1,4 @@
-import { createSearchForm, getSearchConfig } from '../../scripts/search-utils.js';
+import { createSearchForm, getSearchConfig, queryIndexPath } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
 import { toClassName } from '../../scripts/lib-franklin.js';
@@ -149,7 +149,8 @@ const createResultItem = (entry) => {
 const createPagination = (paginationArray, currentPage) => paginationArray.map((page) => createPaginationButton(page, currentPage)).join('');
 
 export const fetchResults = (cfg, query, tag, pageNum) => {
-  const results = ffetch(cfg.queryIndex)
+  const results = ffetch(queryIndexPath)
+    .sheet(cfg.sheet || '')
     .filter((entry) => {
       if (entry.path.startsWith(cfg.path)) {
         let tagMatch = true;
