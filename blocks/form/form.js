@@ -25,6 +25,51 @@ function attr(object, name) {
   return val;
 }
 
+/**
+ * For a franklin form post, set up the form post handler
+ * to post via AJAX and display a success or failure message
+ * @param {*} form the form element
+ * @param {*} successMessage Success message
+ * @param {*} failureMessage Failure message
+ */
+function configureFranklinFormPost(form, successMessage, failureMessage) {
+  form.addEventListener('submit', async (event) => {
+    const data = {};
+    event.preventDefault();
+    (new FormData(form)).forEach((value, key) => { data[key] = value; });
+    let action = form.getAttribute('action');
+    if (isCmdShiftPressed) {
+      action = `https://admin.hlx.page/form/hlxsites/stewart/main${action}.json`;
+    }
+    let response;
+    try {
+      response = await fetch(action, {
+        method: 'POST',
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data }),
+      });
+    } finally {
+      let message;
+      if (response && response.ok) {
+        // Create success message at the top of the form and scroll to it.
+        message = createElement('p', { class: 'form-success' });
+        message.textContent = successMessage;
+      } else {
+        message = createElement('p', { class: 'form-failure' });
+        message.textContent = failureMessage;
+      }
+      // Convert any text content surrounded by asterisks to boldface
+      message.innerHTML = message.innerHTML.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
+      form.querySelectorAll('.form-success, .form-failure').forEach((ele) => ele.remove());
+      form.prepend(message);
+      message.parentElement.scrollIntoView();
+    }
+  });
+}
+
 function buildForm(formData, defaultAction) {
   const form = createElement('form');
   form.setAttribute('action', defaultAction);
@@ -224,43 +269,34 @@ function buildForm(formData, defaultAction) {
   form.append(createElement('input', { type: 'submit', value: 'Submit' }));
   if (usesDefaultAction) {
     // Default action uses AJAX to post the form
-    form.addEventListener('submit', async (event) => {
-      const data = {};
-      event.preventDefault();
-      (new FormData(form)).forEach((value, key) => { data[key] = value; });
-      let action = form.getAttribute('action');
-      if (isCmdShiftPressed) {
-        action = `https://admin.hlx.page/form/hlxsites/stewart/main${action}.json`;
-      }
-      let response;
-      try {
-        response = await fetch(action, {
-          method: 'POST',
-          cache: 'no-cache',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ data }),
-        });
-      } finally {
-        let message;
-        if (response && response.ok) {
-          // Create success message at the top of the form and scroll to it.
-          message = createElement('p', { class: 'form-success' });
-          message.textContent = successMessage;
-        } else {
-          message = createElement('p', { class: 'form-failure' });
-          message.textContent = failureMessage;
-        }
-        // Convert any text content surrounded by asterisks to boldface
-        message.innerHTML = message.innerHTML.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
-        form.querySelectorAll('.form-success, .form-failure').forEach((ele) => ele.remove());
-        form.prepend(message);
-        message.parentElement.scrollIntoView();
-      }
-    });
+    configureFranklinFormPost(form, successMessage, failureMessage);
   }
   return form;
+}
+
+/**
+ * Autofill the form with test data
+ * @param {FormElement} form Form to autofill
+ */
+function autofillForm(form) {
+  const inputs = form.querySelectorAll('input, textarea, select');
+  inputs.forEach((input) => {
+    const type = input.getAttribute('type');
+    const name = input.getAttribute('name');
+    if (type === 'radio' || type === 'checkbox') {
+      if (Math.random() > 0.5) input.checked = true;
+    } else if (type === 'date') {
+      input.value = '2020-01-01';
+    } else if (type === 'tel') {
+      input.value = '555-555-5555';
+    } else if (type === 'email') {
+      input.value = 'test@test.test';
+    } else if (input.tagName === 'SELECT') {
+      input.selectedIndex = 1 + (Math.floor(Math.random() * input.options.length - 1));
+    } else if (name) {
+      input.value = name;
+    }
+  });
 }
 
 /**
@@ -288,25 +324,7 @@ export default function decorate(block) {
           document.addEventListener('keyup', handler);
           // Cmd+Shift+DoubleClick autofills everything with test data
           form.addEventListener('dblclick', () => {
-            if (!isCmdShiftPressed) return;
-            const inputs = form.querySelectorAll('input, textarea, select');
-            inputs.forEach((input) => {
-              const type = input.getAttribute('type');
-              const name = input.getAttribute('name');
-              if (type === 'radio' || type === 'checkbox') {
-                if (Math.random() > 0.5) input.checked = true;
-              } else if (type === 'date') {
-                input.value = '2020-01-01';
-              } else if (type === 'tel') {
-                input.value = '555-555-5555';
-              } else if (type === 'email') {
-                input.value = 'test@test.test';
-              } else if (input.tagName === 'SELECT') {
-                input.selectedIndex = 1 + (Math.floor(Math.random() * input.options.length - 1));
-              } else if (name) {
-                input.value = name;
-              }
-            });
+            if (isCmdShiftPressed) autofillForm(form);
           });
         }
       }
