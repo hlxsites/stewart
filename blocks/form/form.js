@@ -83,7 +83,7 @@ function buildForm(formData, defaultAction) {
   let failureMessage = 'We\'re sorry, there was an error processing your submission. Please try again later.';
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
-    const label = attr(field, 'label') || attr(field, 'name');
+    const label = attr(field, 'label');
     const name = attr(field, 'name') || attr(field, 'label');
     let labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}--label`;
     let labelSuffix = 1;
@@ -105,11 +105,11 @@ function buildForm(formData, defaultAction) {
       if (name.toLowerCase() === 'url' || name.toLowerCase() === 'action') {
         form.setAttribute('action', options || defaultValue);
         usesDefaultAction = false;
-      } else if (field.Name.toLowerCase() === 'method') {
+      } else if (name.toLowerCase() === 'method') {
         form.setAttribute('method', options || defaultValue);
-      } else if (field.Name.toLowerCase() === 'success') {
+      } else if (name.toLowerCase() === 'success') {
         successMessage = options || defaultValue;
-      } else if (field.Name.toLowerCase() === 'failure') {
+      } else if (name.toLowerCase() === 'failure') {
         failureMessage = options || defaultValue;
       }
       return;
@@ -243,6 +243,16 @@ function buildForm(formData, defaultAction) {
         input.setAttribute('type', 'tel');
         input.setAttribute('aria-labelledby', labelId);
         input.setAttribute('placeholder', placeholder || '555-555-5555');
+        if (required) { input.setAttribute('required', true); }
+        if (defaultValue) { input.textContent = defaultValue; }
+        fieldDiv.append(input);
+        break;
+      case 'email':
+        input = createElement('input');
+        input.setAttribute('name', name);
+        input.setAttribute('type', 'email');
+        input.setAttribute('aria-labelledby', labelId);
+        input.setAttribute('placeholder', placeholder);
         if (required) { input.setAttribute('required', true); }
         if (defaultValue) { input.textContent = defaultValue; }
         fieldDiv.append(input);
