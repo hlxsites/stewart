@@ -40,21 +40,17 @@ export default async function decorate(block) {
     "row" class is used to set the column width. So, not adding "row" class for the first row.
     */
     if (rowCount > 1 && rdx === 0) {
-      row.className = `row-${rdx + 1}`;
+      row.classList.add(`row-${rdx + 1}`);
     } else {
-      row.className = `row row-${rdx + 1}`;
+      row.classList.add('row', `row-${rdx + 1}`);
     }
     [...row.children].forEach((col, cdx) => {
-      col.className = `column column-${cdx + 1}`;
+      col.classList.add('column', `column-${cdx + 1}`);
 
       // setup image columns
       const pic = col.querySelector('picture');
       if (pic) {
-        const picWrapper = pic.closest('div');
-        if (picWrapper && picWrapper.children.length === 1) {
-          // picture is only content in column
-          picWrapper.classList.add('columns-img-col');
-        }
+        col.classList.add('columns-img-col');
       }
     });
   });

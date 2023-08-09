@@ -1,0 +1,92 @@
+main .teaser-list {
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+}
+
+main .teaser-list .teaser-list-item {
+    border: .0625rem solid var(--clr-gray-light);
+    box-shadow: .625rem .625rem .9375rem 0 rgb(0 0 0 / 10%);
+    background-color: var(--clr-white);
+    margin: 0 1rem 2rem 1.5rem;
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-image {
+    width: 100%;
+    height: 0;
+    padding-top: 52%;
+    position: relative;
+    overflow-y: hidden;
+    background-color: var(--clr-gray-light);
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-image img {
+    position: absolute;
+    top: 0;
+    height: auto;
+    width: 100%;
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-content {
+    padding: 1.5rem;
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-title {
+    font-weight: 700;
+    font-size: var(--heading-font-size-s);
+    line-height: 2rem;
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-subhead {
+    font-size: var(--body-font-size-xxs);
+    color: var(--clr-gray-dark);
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-link {
+    font-weight: 700;
+    white-space: nowrap;
+    font-size: var(--body-font-size-l);
+}
+
+main .teaser-list .teaser-list-item .teaser-list-item-link::after {
+    border-top: .375rem solid transparent;
+    border-bottom: .375rem solid transparent;
+    border-left: .375rem solid var(--clr-purple);
+    content: "";
+    display: inline-block;
+    height: 0;
+    margin-left: 1.125rem;
+    width: 0;
+    vertical-align: middle;
+}
+
+@media (min-width: 900px) {
+    main .teaser-list .teaser-list-item .teaser-list-item-link::after {
+        border-top:.5rem solid transparent;
+        border-bottom: .5rem solid transparent;
+        border-left: .5rem solid var(--clr-purple);
+        margin-left: 1.5rem;
+    }
+}
+
+@media (min-width: 900px) {
+    main .teaser-list {
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: stretch;
+        max-width: none;
+    }
+
+    main .teaser-list .teaser-list-item {
+        max-width: 19.25rem;
+        width: 16.25rem;
+        flex-grow: 1;
+    }
+
+    main .teaser-list .teaser-list-item .teaser-list-item-content {
+        padding: 2rem;
+    }
+}

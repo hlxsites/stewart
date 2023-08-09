@@ -71,7 +71,7 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    return (this.endBlock().element('table').element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
+    return (this.endBlock().element('table', { 'data-block': name }).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -94,24 +94,70 @@ class BlockBuilder {
 
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
-const pressReleaseDateFormat1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?[0-9]{1,2}, [12][0-9]{3}/i;
-const pressReleaseDateFormat2 = /[0-9]{1,2} (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?[12][0-9]{3}/i;
+const pressReleaseDateFormat1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?([0-9]{1,2}), ([12][0-9]{3})/i;
+const pressReleaseDateFormat2 = /([0-9]{1,2}) (jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?([12][0-9]{3})/i;
 const getPublishDate = (document) => {
+  let month;
+  let day;
+  let year;
+  let date;
+
+  const calProjection = document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+  if (calProjection) {
+    date = new Date(Date.parse(calProjection.textContent));
+  }
+
   const publishDate = document.querySelector('.contentcontainer > .cmp-container')?.textContent;
-  if (publishDate && publishDate.match(pressReleaseDateFormat1)) { return publishDate.match(pressReleaseDateFormat1)[0]; }
-  if (publishDate && publishDate.match(pressReleaseDateFormat2)) { return publishDate.match(pressReleaseDateFormat2)[0]; }
-  return document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+  if (publishDate && publishDate.match(pressReleaseDateFormat1)) {
+    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat1)[0]));
+  }
+  if (publishDate && publishDate.match(pressReleaseDateFormat2)) {
+    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat2)[0]));
+  }
+
+  if (date) {
+    month = date.getUTCMonth() + 1;
+    year = date.getUTCFullYear();
+    day = date.getUTCDate();
+    if (day < 10) day = `0${day}`;
+    if (month < 10) month = `0${month}`;
+
+    return `${month}/${day}/${year}`;
+  }
+
+  return '';
 };
 
-const extractMetadata = (document) => {
+const extractMetadata = (document, url) => {
   const metadata = {};
-  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template'];
+  const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
   metadataProperties.forEach((prop) => {
     const val = getMetadata(document, prop);
     if (val) {
-      metadata[prop.replaceAll('og:', '')] = val;
+      if (prop === 'keywords') {
+        metadata.tags = val;
+      } else if (prop === 'template') {
+        const templateMap = {
+          'stewart-homepage': 'Homepage',
+          // todo add more values here
+        };
+        metadata.Template = templateMap[val] || val;
+      } else {
+        metadata[prop.replaceAll('og:', '')] = val;
+      }
     }
   });
+
+  const navTitle = [...document.querySelectorAll('nav a')].find((a) => {
+    const docUrl = new URL(url);
+    const linkUrl = new URL(a.href, 'https://www.stewart.com');
+
+    return docUrl.pathname === linkUrl.pathname;
+  })?.textContent;
+  if (navTitle) {
+    metadata['Navigation Title'] = navTitle;
+  }
+
   if (metadata.image) {
     const img = document.createElement('img');
     img.src = metadata.image;
@@ -135,6 +181,9 @@ const buildEmbed = (builder, section) => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
         builder.element('a', { href: src }).text(src).up();
+      } else if (embed.querySelector('.mktoForm')) {
+        const formId = embed.querySelector('.mktoForm').id.split('_')[1];
+        builder.block('Marketo Form', 2).append('Form Id').column().append(formId);
       } else if (embed.querySelector('form')) {
         builder.element('tt').withText(`${embed.querySelector('form').id}`);
       } else {
@@ -203,33 +252,37 @@ const buildColumnsBlock = (builder, section) => {
             builder.append(col);
           } else {
             if (!inTable) {
-              let name = 'Columns';
+              const blockName = 'Columns';
+              const variants = new Set();
               if (cols[0].classList.contains('col-md-8')) {
-                name += ' (Split 66-33)';
+                variants.add('Split 66-33');
               } else if (cols[0].classList.contains('col-md-9')) {
-                name += ' (Split 75-25)';
+                variants.add('Split 75-25');
               } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                name += ' (Split 33-33-33)';
+                variants.add('Split 33-33-33');
               } else if (child.querySelector('.carousel')) {
-                name += ' (Carousel)';
+                variants.add('Carousel');
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                name += ' Card gray';
+                variants.add('Card', 'gray');
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  name += ' Card dark';
+                  variants.add('Card', 'dark');
                 } else {
-                  name += ' Card';
+                  variants.add('Card');
                 }
               }
 
               /* When a new variation added, update blocks/columns.js to support that - END */
-
+              let name = blockName;
+              if (variants.size > 0) {
+                name += ` (${[...variants].join(', ')})`;
+              }
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;
@@ -287,15 +340,40 @@ const buildTeaserLists = (builder, section) => {
 };
 
 const buildAccordions = (builder, section) => {
+  // first merge all subsequent accordions to one
+  const firstAcc = section.querySelector('.accordion');
+  let nextAccordion = firstAcc?.nextElementSibling;
+  while (nextAccordion && nextAccordion.classList.contains('accordion')) {
+    const items = nextAccordion.querySelectorAll('.cmp-accordion__item');
+    firstAcc.append(...items);
+    const nextNext = nextAccordion.nextElementSibling;
+    nextAccordion.remove();
+    nextAccordion = nextNext;
+  }
+
   section.querySelectorAll('.accordion')?.forEach((accordion) => {
-    builder.replace(accordion, () => {
-      builder.block('Accordion', 2, false);
-      accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
-        const header = accordionItem.querySelector('.cmp-accordion__header');
-        const panelContent = accordionItem.querySelector('.cmp-accordion__panel');
-        builder.row().append(header).column().append(panelContent);
-      });
+    const accDiv = builder.doc.createElement('div');
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.querySelectorAll('.cmp-accordion__item').forEach((accordionItem) => {
+      const title = accordionItem.querySelector('.cmp-accordion__title');
+      const content = accordionItem.querySelector('.cmp-accordion__panel');
+
+      accDiv.insertAdjacentHTML('beforeend', `<h2>${title.textContent}</h2`);
+      accDiv.insertAdjacentHTML('beforeend', content.innerHTML);
     });
+    accDiv.insertAdjacentHTML('beforeend', `
+    <table>
+    <tr>
+      <th colspan="2">Section Metadata</th>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>Accordion</td>
+    </tr>
+  </table>
+    `);
+    accDiv.insertAdjacentHTML('beforeend', '<hr/>');
+    accordion.replaceWith(accDiv);
   });
 };
 
@@ -314,19 +392,25 @@ const buildGenericLists = (builder, section) => {
 };
 
 const buildButtons = (builder, section) => {
-  section.querySelectorAll('.btn').forEach((button) => {
-    const parent = button.parentElement;
+  section.querySelectorAll('.linkcalltoaction').forEach((ctaDiv) => {
+    const button = ctaDiv.querySelector('a.btn');
+    if (button) {
+      const par = builder.doc.createElement('p');
+      let inner = par;
+      if (ctaDiv.classList.contains('ss-buttonstyle-secondary')) {
+        const em = builder.doc.createElement('em');
+        inner.append(em);
+        inner = em;
+      }
 
-    if (parent.classList.contains('ss-buttonstyle-secondary')) {
-      const em = builder.doc.createElement('em');
-      em.textContent = button.textContent;
-      button.textContent = '';
-      button.append(em);
-    } if (parent.classList.contains('ss-buttonstyle-tertiary')) {
-      const strong = builder.doc.createElement('strong');
-      strong.textContent = button.textContent;
-      button.textContent = '';
-      button.append(strong);
+      if (ctaDiv.classList.contains('ss-buttonstyle-tertiary')) {
+        const strong = builder.doc.createElement('strong');
+        inner.append(strong);
+        inner = strong;
+      }
+
+      inner.append(button.cloneNode(true));
+      ctaDiv.replaceWith(par);
     }
   });
 };
@@ -382,6 +466,7 @@ const translateClassNames = (className) => {
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
     case 'contentbreak': return 'Content break';
+    case 'ss-sectiontype-banner': return 'Banner';
     // These all get ignored
     case 'ss-overlay-left':
     case 'ss-margin-0':
@@ -390,7 +475,6 @@ const translateClassNames = (className) => {
     case 'pagehero':
     case 'pagesection':
     case 'genericpagesection':
-    case 'ss-sectiontype-banner':
     case 'aem-GridColumn':
     case 'aem-GridColumn--default--12':
     case 'backgroundablepagesection':
@@ -404,6 +488,11 @@ const buildGenericSection = (builder, section) => {
   let classes = section.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
+
+  if (section.querySelector('.offset-lg-7, .offset-md-7')) {
+    classes.push('Offset');
+  }
+
   classes.sort();
   let allSectionClasses = {};
   if (sessionStorage.getItem('allSectionClasses') !== null) {
@@ -563,15 +652,8 @@ const preocessHeadingIcons = (document) => {
 };
 
 const gatherBlockNames = (document) => {
-  const blocksArr = [...document.querySelectorAll('table')]
-    .map((table) => {
-      const header = table.querySelector('tr > th');
-      if (header) {
-        return header.textContent;
-      }
-
-      return '';
-    })
+  const blocksArr = [...document.querySelectorAll('table[data-block]')]
+    .map((table) => table.getAttribute('data-block'))
     .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
   const blocks = new Set(blocksArr);
   return [...blocks].join(', ');
@@ -583,6 +665,28 @@ const gatherAssetLinks = (document) => {
     assetLinks.add(a.href);
   });
   return [...assetLinks].join(', ');
+};
+
+const processFragments = (document) => {
+  const fragments = [];
+  // find marketo forms inside of columns, this should be made more generic probably to handle all possible fragments inside of columns?
+  document.querySelectorAll('[data-block="Columns"] [data-block="Marketo Form"]').forEach((mktoForm) => {
+    const formId = mktoForm.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
+    const path = `/en/fragments/marketo-forms/${formId}`;
+    const div = document.createElement('div');
+    div.append(mktoForm.cloneNode(true));
+    fragments.push({
+      element: div,
+      path,
+    });
+
+    const link = document.createElement('a');
+    link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
+    link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
+    mktoForm.replaceWith(link);
+  });
+
+  return fragments;
 };
 
 export default {
@@ -600,7 +704,7 @@ export default {
     document, url, html, params,
   }) => {
     // define the main element: the one that will be transformed to Markdown
-    const builder = new BlockBuilder(document, extractMetadata(document));
+    const builder = new BlockBuilder(document, extractMetadata(document, url));
 
     const parser = new DOMParser();
     const originalDoc = parser.parseFromString(html, 'text/html');
@@ -623,24 +727,31 @@ export default {
     // add icon markup to headings with icons
     preocessHeadingIcons(document);
 
+    const fragments = processFragments(document);
+
     // Note the classes used for each section
     console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
+    const docPath = generateDocumentPath({
+      document,
+      url,
+      html,
+      params,
+    });
     const report = {
-      blocks: gatherBlockNames(document),
-      assetLinks: gatherAssetLinks(document),
+      blocks: gatherBlockNames(document) || 'n/a',
+      assetLinks: gatherAssetLinks(document) || 'n/a',
+      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      prodUrl: `https://www.stewart.com${docPath}`,
     };
 
-    return [{
+    fragments.push({
       element: document.body,
-      path: generateDocumentPath({
-        document,
-        url,
-        html,
-        params,
-      }),
+      path: docPath,
       report,
-    }];
+    });
+    return fragments;
   },
 };

@@ -91,6 +91,7 @@ main .hero .align-end a {
   .section.narrow.hero-container {
     max-width: 100%;
     margin-bottom: 2rem;
+    margin-inline: 0;
   }
 }
 

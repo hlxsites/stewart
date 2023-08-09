@@ -1,5 +1,21 @@
-main .search-results-data {
-  margin-top: 3rem;
+main .search-results-container {
+  margin-block-start: 3rem;
+}
+
+main .search-results .search-results-container {
+  display: grid;
+}
+
+@media (min-width: 900px) {
+  main .search-results .search-results-container {
+    grid-template-columns: auto auto;
+    gap: 2rem;
+  }
+
+  main .search-results .search-results-info-container {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
 }
 
 main .search-results .search-results-data-list {
@@ -9,8 +25,7 @@ main .search-results .search-results-data-list {
 }
 
 main .search-results .search-results-data-list li {
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
+  margin-block-end: 2rem;
   border-bottom: 1px solid var(--clr-gray-light);
 }
 
@@ -19,11 +34,24 @@ main .search-results .search-results-data-list li:last-child {
 }
 
 main .search-results .search-results-data-list li > h4 {
-  margin-bottom: 1rem;
+  margin-block-end: 1rem;
 }
 
 main .search-results .search-results-data-list li > h4 > a {
   color: var(--clr-primary);
+}
+
+main .search-results .search-results-data-list li > span {
+  display: block;
+  color: var(--clr-gray-dark);
+  font-size: var(--body-font-size-xxs);
+  margin-block-end: .5rem;
+}
+
+@media (min-width: 900px) {
+  main .search-results .search-results-data-list li > span {
+    font-size: var(--body-font-size-l);
+  }
 }
 
 main .search-results .search-results-nav {
@@ -51,7 +79,7 @@ main .search-results .search-results-pagination .search-results-pagination-item 
   font-family: var(--body-font-family);
   font-weight: normal;
   min-width: initial;
-  margin-bottom: 0;
+  margin-block-end: 0;
 }
 
 main .search-results .search-results-pagination .search-results-pagination-item > button.arrow {
@@ -71,5 +99,103 @@ main .search-results .search-results-pagination .search-results-pagination-item 
 
   main .search-results .search-results-pagination .search-results-pagination-item {
     margin: 0 0.5rem;
+  }
+}
+
+/* tag facets */
+main .search-results .search-results-filter-container {
+  display: none;
+  border: 3px solid  var(--clr-primary);
+  padding: 0.5rem 1rem;
+  margin-block-end: 1rem;
+}
+
+main .search-results.tag-facet .search-results-filter-container {
+  display: unset;
+}
+
+main .search-results.tag-facet[data-result-count="0"] .search-results-filter-container {
+  display: none;
+}
+
+
+main .search-results .search-results-filterby {
+  color: var(--clr-primary);
+  font-weight: 700;
+  font-size: var(--body-font-size-m);
+  cursor: pointer;
+  margin-block-end: 0;
+}
+
+main .search-results .search-results-facet-container {
+  display: none;
+}
+
+main .search-results .search-results-facet-container :is(h5, label) {
+  font-size: var(--body-font-size-xxs);
+  font-weight: 400;
+  letter-spacing: .0075rem;
+}
+
+main .search-results .search-results-facet-container[aria-expanded="true"] {
+  display: block;
+  padding-block: 1rem;
+}
+
+main .search-results .search-results-facet-container ul {
+  list-style: none;
+  padding-inline: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+main .search-results .search-results-facet-container ul > li {
+  margin-block-end: .25rem;
+}
+
+main .search-results .search-results-facet-container ul > li input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  margin-inline-end: 0.9rem;
+  filter: invert(0) sepia(99%) saturate(5000%) hue-rotate(176deg) brightness(93%) contrast(126%);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+main .search-results .search-results-facet-container ul > li label {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  main .search-results .search-results-filter-container {
+    border: none;
+    padding: 0;
+  }
+
+  main .search-results .search-results-filterby {
+    color: unset;
+    font-weight: 700;
+    font-size: unset;
+    cursor: unset;
+    margin-block-end: 1em;
+  }
+
+  main .search-results .search-results-facet-container {
+    border: 1px solid var(--clr-gray-light);
+    padding: 1rem;
+  }
+
+  main .search-results .search-results-facet-container h5 {
+    font-size: var(--heading-font-size-s);
+  }
+
+  main .search-results .search-results-facet-container label {
+    font-size: var(--heading-font-size-xs);
   }
 }
