@@ -403,7 +403,13 @@ const buildTeaserLists = (builder, section) => {
       // For each teaser, build a block with the image and text
       list.querySelectorAll('.page-teaser').forEach((teaser) => {
         const link = teaser.querySelector('.page-teaser_content-title a');
-        builder.row().append(link);
+        if (link.href.startsWith('/')) {
+          builder.row().append(link);
+        } else {
+          const img = teaser.querySelector('.page-teaser_image') || '';
+          const content = teaser.querySelector('.page-teaser_content');
+          builder.row().append(img).column().append(content);
+        }
       });
     });
   });
