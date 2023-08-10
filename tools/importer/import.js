@@ -104,6 +104,8 @@ class BlockBuilder {
   #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
 }
 
+const capitalizeWord = (word) => `${word[0].toUpperCase()}${word.slice(1)}`;
+
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
 const pressReleaseDateFormat1 = /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[A-Za-z]*\.?\s?([0-9]{1,2}), ([12][0-9]{3})/i;
@@ -176,7 +178,7 @@ const extractMetadata = (document, url) => {
         }
       } else {
         let propName = prop.replaceAll('og:', '');
-        propName = `${propName[0].toUpperCase()}${propName.slice(1)}`;
+        propName = capitalizeWord(propName);
         metadata[propName] = val;
       }
     }
@@ -192,10 +194,10 @@ const extractMetadata = (document, url) => {
     metadata['Navigation Title'] = navTitle;
   }
 
-  if (metadata.image) {
+  if (metadata.Image) {
     const img = document.createElement('img');
-    img.src = metadata.image;
-    metadata.image = img;
+    img.src = metadata.Image;
+    metadata.Image = img;
   }
   const publishDate = getPublishDate(document);
   if (publishDate) { metadata['Publication Date'] = publishDate; }
@@ -483,6 +485,16 @@ const buildBreadcrumbs = (builder, section) => {
   });
 };
 
+const buildCalculators = (builder, section) => {
+  section.querySelectorAll('.cmp-calculator').forEach((calc) => {
+    let calcName = calc.querySelector('[data-calculator]').getAttribute('data-calculator');
+    if (calcName === 'mortgate') calcName = 'mortgage';
+    builder.replace(calc, () => {
+      builder.block(`Calculator (${capitalizeWord(calcName)})`, 1, false);
+    });
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
   buildBreadcrumbs(builder, section);
@@ -495,6 +507,7 @@ const buildSectionContent = (builder, section) => {
   buildAccordions(builder, section);
   buildButtons(builder, section);
   buildBlockQuotes(builder, section);
+  buildCalculators(builder, section);
   builder.append(section);
 };
 
@@ -531,7 +544,7 @@ const translateClassNames = (className) => {
     case 'backgroundablepagesection':
       return undefined;
     // Otherwise pass-thru (this includes colors)
-    default: return `${className.replace('ss-backgroundcolor-', '')[0].toUpperCase()}${className.replace('ss-backgroundcolor-', '').slice(1)}`;
+    default: return capitalizeWord(className.replace('ss-backgroundcolor-', ''));
   }
 };
 
