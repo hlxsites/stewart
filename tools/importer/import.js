@@ -437,8 +437,17 @@ const buildBlockQuotes = (builder, section) => {
   });
 };
 
+const buildBreadcrumbs = (builder, section) => {
+  section.querySelectorAll('.breadcrumbnavigation').forEach((bc) => {
+    builder.replace(bc, () => {
+      builder.block('Breadcrumb', 1, false);
+    });
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
+  buildBreadcrumbs(builder, section);
   buildEmbed(builder, section);
   buildGenericLists(builder, section);
   buildTeaserLists(builder, section);
@@ -671,20 +680,24 @@ const gatherAssetLinks = (document) => {
   return [...assetLinks].join(', ');
 };
 
-let fragmentCount = 1;
-const processFragments = (document) => {
+const processFragments = (document, docPath) => {
   const fragments = [];
+  const pathSegments = docPath.split('/');
   // find blocks inside of columns
+  let fragmentCount = 1;
   document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
     const blockName = internalBlock.getAttribute('data-block');
     const div = document.createElement('div');
-    let path = `/en/fragments/${blockName}-${fragmentCount}`;
-    fragmentCount += 1;
+    // name fragments based on site section and page name
+    let path = `/en/fragments/${blockName}/${pathSegments[2]}-${pathSegments.pop()}-${fragmentCount}`;
     if (blockName === 'Marketo Form') {
       const formId = internalBlock.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
       path = `/en/fragments/marketo-forms/${formId}`;
+    } else {
+      fragmentCount += 1;
     }
 
+    div.setAttribute('data-fragment-path', path);
     div.append(internalBlock.cloneNode(true));
     fragments.push({
       element: div,
@@ -725,6 +738,19 @@ export default {
     // Strip out header and footers that are not needed
     document.querySelector('page-header, page-footer')?.remove();
 
+    // deal with breadcrumbs
+    const bc = document.querySelector('.breadcrumbnavigation');
+    if (bc) {
+      let moved = false;
+      // move bc to top of the first section that isn't the hero
+      document.querySelectorAll('.pagesection').forEach((section) => {
+        if (!moved && !section.classList.contains('pagehero')) {
+          section.prepend(bc);
+          moved = true;
+        }
+      });
+    }
+
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
@@ -737,21 +763,23 @@ export default {
     // add icon markup to headings with icons
     preocessHeadingIcons(document);
 
-    const fragments = processFragments(document);
-
-    // Note the classes used for each section
-    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
-    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
-
     const docPath = generateDocumentPath({
       document,
       url,
       html,
       params,
     });
+
+    const fragments = processFragments(document, docPath);
+
+    // Note the classes used for each section
+    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
+    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
+
     const report = {
       blocks: gatherBlockNames(document) || 'n/a',
       assetLinks: gatherAssetLinks(document) || 'n/a',
+      fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
