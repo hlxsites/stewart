@@ -180,7 +180,11 @@ const buildEmbed = (builder, section) => {
     builder.replace(embed, () => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
-        builder.element('a', { href: src }).text(src).up();
+        if (src.includes('youtube.com')) {
+          builder.element('a', { href: src }).text(src).up();
+        } else {
+          builder.block('Embed', 1).element('a', { href: src }).text(src).up();
+        }
       } else if (embed.querySelector('.mktoForm')) {
         const formId = embed.querySelector('.mktoForm').id.split('_')[1];
         builder.block('Marketo Form', 2).append('Form Id').column().append(formId);
@@ -667,23 +671,29 @@ const gatherAssetLinks = (document) => {
   return [...assetLinks].join(', ');
 };
 
+let fragmentCount = 1;
 const processFragments = (document) => {
   const fragments = [];
-  // find marketo forms inside of columns, this should be made more generic probably to handle all possible fragments inside of columns?
-  document.querySelectorAll('[data-block="Columns"] [data-block="Marketo Form"]').forEach((mktoForm) => {
-    const formId = mktoForm.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
-    const path = `/en/fragments/marketo-forms/${formId}`;
+  // find blocks inside of columns
+  document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
+    const blockName = internalBlock.getAttribute('data-block');
     const div = document.createElement('div');
-    div.append(mktoForm.cloneNode(true));
+    let path = `/en/fragments/${blockName}-${fragmentCount}`;
+    fragmentCount += 1;
+    if (blockName === 'Marketo Form') {
+      const formId = internalBlock.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
+      path = `/en/fragments/marketo-forms/${formId}`;
+    }
+
+    div.append(internalBlock.cloneNode(true));
     fragments.push({
       element: div,
       path,
     });
-
     const link = document.createElement('a');
     link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
     link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
-    mktoForm.replaceWith(link);
+    internalBlock.replaceWith(link);
   });
 
   return fragments;
