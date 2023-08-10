@@ -17,9 +17,8 @@ import {
 
 // valid template for which we have css/js files
 const VALID_TEMPLATES = [
-  'primary-site-section-landing-page',
-  'primary-site-subsection-landing-page',
-  'detail-content-page',
+  'section-landing-page',
+  'section-page',
   'blog-article-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];

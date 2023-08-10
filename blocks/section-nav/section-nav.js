@@ -31,7 +31,7 @@ function bindMouseOverEvents(navDrop, navList) {
 async function findRootLandingPage() {
   const results = await ffetch('/query-index.json')
     .sheet('nav')
-    .filter((p) => p.template === 'primary-site-section-landing-page')
+    .filter((p) => p.template === 'section-landing-page')
     .all();
 
   let root;
