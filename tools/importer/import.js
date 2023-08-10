@@ -323,14 +323,16 @@ const buildColumnsBlock = (builder, section) => {
                 variants.add('Carousel');
               }
 
-              if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
-                variants.add('Split 66-33');
-              } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
-                variants.add('Split 33-66');
-              } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
-                variants.add('Split 75-25');
-              } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
-                variants.add('Split 25-75');
+              if (cols.length === 2) {
+                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
+                  variants.add('Split 66-33');
+                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
+                  variants.add('Split 33-66');
+                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
+                  variants.add('Split 75-25');
+                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
+                  variants.add('Split 25-75');
+                }
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
