@@ -20,22 +20,12 @@ function cleanAndRound(num) {
   return roundToHundredths(cleanNumber(num));
 }
 
-/*
-* Start of Customization
-*
-* Need to format monetary amounts.  The prior implementation relied on a heavy and
-* out of date jquery plugin.
-* Putting it here so as to not clog the global namespace
-*/
 function formatAsMoney(amount, locale, currency) {
   return (amount).toLocaleString(locale || 'en-US', {
     style: 'currency',
     currency: currency || 'USD',
   });
 }
-/*
-* End of Customization
-*/
 
 function Calculate() {
   thisform.setAttribute('data-calculated', 'true');

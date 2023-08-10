@@ -1,21 +1,11 @@
 let thisform;
-/*
-* Start of Customization
-*
-* Need to format monetary amounts.  The prior implementation relied on a heavy and
-* out of date jquery plugin.
-* Putting it here so as to not clog the global namespace
-*/
+
 function formatAsMoney(amount, locale, currency) {
   return (amount).toLocaleString(locale || 'en-US', {
     style: 'currency',
     currency: currency || 'USD',
   });
 }
-
-/*
-* End of Customization
-*/
 
 function roundToHundredths(num) { // annoying float precision forces the +0.000001
   return Math.round(parseFloat(num) * 100 + 0.000001) / 100;
@@ -131,8 +121,6 @@ function printSchedule(p, t, r, s) {
     yearly.real += monthly.real;
     yearly.principle = monthly.principle;
 
-    // DISPLAY
-
     numRows = table.rows.length;
 
     if (isGroupByYear) {
@@ -141,19 +129,11 @@ function printSchedule(p, t, r, s) {
         for (i = 0; i < columns.length; i += 1) {
           tableData = tableRow.insertCell(i);
 
-          /*
-           * Start of Customization
-           *
-           * Adding code to allow for formatting as money
-           */
           if (i === 0) {
             tableData.innerHTML = yearly[columns[i]];
           } else {
             tableData.innerHTML = formatAsMoney(yearly[columns[i]] / 100);
           }
-          /*
-           * End of Customization
-           */
         }
       }
     } else {
@@ -163,15 +143,7 @@ function printSchedule(p, t, r, s) {
         if (i === 0) {
           tableData.innerHTML = monthly[columns[i]];
         } else {
-          /*
-           * Start of Customization
-           *
-           * Adding formatAsMoney
-           */
           tableData.innerHTML = (formatAsMoney(monthly[columns[i]] / 100));
-          /*
-           * End of Customization
-           */
           tableData.className = 'amortDollarCell';
         }
       }
@@ -181,11 +153,6 @@ function printSchedule(p, t, r, s) {
   }
 
   // display totals
-  /*
-   * Start of change
-   *
-   * Removing the call to currencyInput and replacing with formatAsMoney
-   */
   thisform.querySelector('.monthlyPayment').innerHTML = formatAsMoney(payment / 100);
   thisform.querySelector('.totalYearlyPayment').innerHTML = formatAsMoney((payment * 12) / 100);
   thisform.querySelector('.totalLifetimePayments').innerHTML = formatAsMoney((principle + totalInterest) / 100);
@@ -202,16 +169,7 @@ function Calculate() {
   const isLoanAmount = (principle > 0);
   const isDateOfFirstPayment = (start !== '' && start !== undefined);
 
-  /*
-   * Start of Customization
-   *
-   * Adding an attr that indicates that the calculation has run so we can hide the totals until
-   * such a time
-   */
   thisform.setAttribute('data-calculated', 'true');
-  /*
-   * End of customization
-   */
 
   while (numRows > 0) {
     table.deleteRow(numRows - 1);
