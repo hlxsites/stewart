@@ -157,6 +157,7 @@ const translateTemplateName = (templateName) => {
     case 'stewart-homepage':
     case 'general-webpage':
     case 'web-calculators-page':
+    case 'content-search':
       return '';
     // end ignored
     default:
@@ -185,12 +186,15 @@ const extractMetadata = (document, url) => {
     }
   });
 
-  const navTitle = [...document.querySelectorAll('nav a')].find((a) => {
+  let navTitle = [...document.querySelectorAll('nav a')].find((a) => {
     const docUrl = new URL(url);
     const linkUrl = new URL(a.href, 'https://www.stewart.com');
 
     return docUrl.pathname === linkUrl.pathname;
   })?.textContent;
+  if (!navTitle) {
+    navTitle = document.querySelector('h1')?.textContent;
+  }
   if (navTitle) {
     metadata['Navigation Title'] = navTitle;
   }
@@ -254,7 +258,14 @@ const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) =
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
 
-// const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+const buildSearchResults = (builder, section) => {
+  section.querySelectorAll('.cmp-contentsearchresults').forEach((sr) => {
+    builder.replace(sr, () => {
+      builder.block('Search Results', 1, false);
+    });
+  });
+};
+
 const buildTables = (builder, section) => {
   section.querySelectorAll('table').forEach((table) => {
     let maxCols = 1;
@@ -379,9 +390,8 @@ const buildTeaserLists = (builder, section) => {
       builder.block('Teaser List', 2, false);
       // For each teaser, build a block with the image and text
       list.querySelectorAll('.page-teaser').forEach((teaser) => {
-        const img = teaser.querySelector('.page-teaser_image') || '';
-        const content = teaser.querySelector('.page-teaser_content');
-        builder.row().append(img).column().append(content);
+        const link = teaser.querySelector('.page-teaser_content-title a');
+        builder.row().append(link);
       });
     });
   });
@@ -482,7 +492,7 @@ const buildBlockQuotes = (builder, section) => {
 };
 
 const buildBreadcrumbs = (builder, section) => {
-  section.querySelectorAll('.breadcrumbnavigation').forEach((bc) => {
+  section.querySelectorAll('.breadcrumbnavigation > nav').forEach((bc) => {
     builder.replace(bc, () => {
       builder.block('Breadcrumb', 1, false);
     });
@@ -490,7 +500,7 @@ const buildBreadcrumbs = (builder, section) => {
 };
 
 const buildCalculators = (builder, section) => {
-  section.querySelectorAll('.cmp-calculator').forEach((calc) => {
+  section.querySelectorAll('.cmp-calculator, .cmp-shared-calc').forEach((calc) => {
     let calcName = calc.querySelector('[data-calculator]').getAttribute('data-calculator');
     if (calcName === 'mortgate') calcName = 'mortgage';
     builder.replace(calc, () => {
@@ -512,6 +522,7 @@ const buildSectionContent = (builder, section) => {
   buildButtons(builder, section);
   buildBlockQuotes(builder, section);
   buildCalculators(builder, section);
+  buildSearchResults(builder, section);
   builder.append(section);
 };
 
