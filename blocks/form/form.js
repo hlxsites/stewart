@@ -83,6 +83,7 @@ function buildForm(formData, defaultAction) {
   const placeholders = fetchPlaceholders();
   let successMessage = placeholders?.formSuccessMessage || '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.';
   let failureMessage = placeholders?.formFailureMessage || '*An error has occurred!* Please contact webmaster@stewart.com and let us know the name and URL of the form you just tried to complete. Something happened and it didn\'t accept your information. We apologize!';
+  let submitLabel = placeholders?.formSubmitLabel || 'Submit';
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
     const label = attr(field, 'label');
@@ -113,6 +114,8 @@ function buildForm(formData, defaultAction) {
         successMessage = options || defaultValue;
       } else if (name.toLowerCase() === 'failure') {
         failureMessage = options || defaultValue;
+      } else if (name.toLowerCase() === 'submit') {
+        submitLabel = label || options || defaultValue;
       }
       return;
     }
@@ -292,7 +295,7 @@ function buildForm(formData, defaultAction) {
     }
   });
 
-  form.append(createElement('input', { type: 'submit', value: 'Submit' }));
+  form.append(createElement('input', { type: 'submit', value: submitLabel }));
   if (usesDefaultAction) {
     // Default action uses AJAX to post the form
     configureFranklinFormPost(form, successMessage, failureMessage);
