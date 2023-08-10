@@ -1,7 +1,3 @@
-.columns-container.content-break {
-  padding: 2.5rem 1.5rem;
-}
-
 .columns > .row {
   display: flex;
   flex-direction: column;
@@ -104,10 +100,6 @@
 
   .columns.split-25-75 .row .column-2 {
     flex-grow: 3;
-  }
-
-  .columns-container.content-break {
-    padding: 7.5rem;
   }
 
   .columns.card .row .column {

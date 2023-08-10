@@ -116,17 +116,18 @@ const getPublishDate = (document) => {
   let year;
   let date;
 
-  const calProjection = document.querySelector('.referenceprojection .calendarattributeprojection .projection-value');
+  const calProjection = document.querySelector('.referenceprojection .calendarattributeprojection [property="datePublished"]');
   if (calProjection) {
-    date = new Date(Date.parse(calProjection.textContent));
-  }
-
-  const publishDate = document.querySelector('.contentcontainer > .cmp-container')?.textContent;
-  if (publishDate && publishDate.match(pressReleaseDateFormat1)) {
-    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat1)[0]));
-  }
-  if (publishDate && publishDate.match(pressReleaseDateFormat2)) {
-    date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat2)[0]));
+    date = new Date(Date.parse(calProjection.querySelector('.projection-value').textContent));
+    calProjection.remove();
+  } else {
+    const publishDate = document.querySelector('.contentcontainer > .cmp-container')?.textContent;
+    if (publishDate && publishDate.match(pressReleaseDateFormat1)) {
+      date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat1)[0]));
+    }
+    if (publishDate && publishDate.match(pressReleaseDateFormat2)) {
+      date = new Date(Date.parse(publishDate.match(pressReleaseDateFormat2)[0]));
+    }
   }
 
   if (date) {
@@ -202,7 +203,10 @@ const extractMetadata = (document, url) => {
   const publishDate = getPublishDate(document);
   if (publishDate) { metadata['Publication Date'] = publishDate; }
   const author = document.querySelector(".cmp-singlesimpleattributeprojection[property='author']");
-  if (author) { metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, ''); }
+  if (author) {
+    metadata.Author = author.textContent.replaceAll(/^\s*By\s*/ig, '');
+    author.remove();
+  }
   return metadata;
 };
 
