@@ -19,7 +19,7 @@ const SearchConfigs = {
   insights: {
     path: '/en/insights/',
     sheet: 'blog',
-    tagFacet: true,
+    tagFacet: 'content-types/insights',
     'page-size': 10,
   },
   news: {
