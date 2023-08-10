@@ -94,7 +94,15 @@
     flex-grow: 2;
   }
 
+  .columns.split-33-66 .row .column-2 {
+    flex-grow: 2;
+  }
+
   .columns.split-75-25 .row .column-1 {
+    flex-grow: 3;
+  }
+
+  .columns.split-25-75 .row .column-2 {
     flex-grow: 3;
   }
 

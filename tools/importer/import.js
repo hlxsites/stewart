@@ -71,7 +71,19 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    return (this.endBlock().element('table', { 'data-block': name }).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
+    const tableAttrs = {
+    };
+    const variantIndex = name.indexOf('(');
+    if (variantIndex > -1) {
+      // block name has variants, so
+      // eslint-disable-next-line prefer-destructuring
+      tableAttrs['data-block'] = name.slice(0, variantIndex - 1);
+      // eslint-disable-next-line prefer-destructuring
+      tableAttrs['data-block-variants'] = name.slice(variantIndex + 1, -1);
+    } else {
+      tableAttrs['data-block'] = name;
+    }
+    return (this.endBlock().element('table', tableAttrs).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -258,25 +270,29 @@ const buildColumnsBlock = (builder, section) => {
             if (!inTable) {
               const blockName = 'Columns';
               const variants = new Set();
-              if (cols[0].classList.contains('col-md-8')) {
-                variants.add('Split 66-33');
-              } else if (cols[0].classList.contains('col-md-9')) {
-                variants.add('Split 75-25');
-              } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                variants.add('Split 33-33-33');
-              } else if (child.querySelector('.carousel')) {
+              if (child.querySelector('.carousel')) {
                 variants.add('Carousel');
+              }
+
+              if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
+                variants.add('Split 66-33');
+              } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
+                variants.add('Split 33-66');
+              } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
+                variants.add('Split 75-25');
+              } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
+                variants.add('Split 25-75');
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                variants.add('Card', 'gray');
+                variants.add('Card', 'Gray');
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  variants.add('Card', 'dark');
+                  variants.add('Card', 'Dark');
                 } else {
                   variants.add('Card');
                 }
@@ -387,7 +403,7 @@ const buildGenericLists = (builder, section) => {
     builder.replace(list, () => {
       let name = 'List';
       if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (1-col)';
+        name += ' (1 Col)';
       }
       builder.block(name, 1, false);
       list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
@@ -666,7 +682,11 @@ const preocessHeadingIcons = (document) => {
 
 const gatherBlockNames = (document) => {
   const blocksArr = [...document.querySelectorAll('table[data-block]')]
-    .map((table) => table.getAttribute('data-block'))
+    .map((table) => {
+      const blockName = table.getAttribute('data-block');
+      const variantNames = table.getAttribute('data-block-variants');
+      return variantNames ? `${blockName} (${variantNames})` : blockName;
+    })
     .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
   const blocks = new Set(blocksArr);
   return [...blocks].join(', ');
