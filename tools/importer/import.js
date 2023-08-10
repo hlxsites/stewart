@@ -218,6 +218,16 @@ const getBackgroundImage = (section) => section.querySelector('.has-background')
 
 const buildExperienceFragment = (builder, section) => builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 
+const buildPersonDetailCards = (builder, section) => {
+  section.querySelectorAll('.cmp-container#person-detail-card').forEach((card) => {
+    const content = card.querySelector('.contentcontainer');
+    const image = card.querySelector('.cmp-imageattributeprojection img');
+    builder.replace(card, () => {
+      builder.block('Person Detail Card', 2, true).append(image).column().append(content);
+    });
+  });
+};
+
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
@@ -523,6 +533,7 @@ const buildSectionContent = (builder, section) => {
   buildBlockQuotes(builder, section);
   buildCalculators(builder, section);
   buildSearchResults(builder, section);
+  buildPersonDetailCards(builder, section);
   builder.append(section);
 };
 
@@ -682,6 +693,8 @@ const restoreIcons = (document, originalDocument) => {
   });
 };
 
+const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/\.html$/, '').replace(/\/$/, '').toLowerCase());
+
 /**
    * Return a path that describes the document being transformed (file name, nesting...).
    * The path is then used to create the corresponding Word document.
@@ -693,7 +706,7 @@ const restoreIcons = (document, originalDocument) => {
    */
 const generateDocumentPath = ({
   document, url, html, params,
-}) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, ''));
+}) => sanitizePath(new URL(url).pathname);
 
 const updateLinks = (document) => {
   document.querySelectorAll('a').forEach((a) => {
@@ -707,7 +720,7 @@ const updateLinks = (document) => {
       if (aURL.hostname === 'www.stewart.com') {
         // sanitze local links
         if (!aURL.pathname.startsWith('/content/dam/')) {
-          aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+          aURL.pathname = sanitizePath(aURL.pathname);
         }
       }
       a.href = aURL.toString();
@@ -753,13 +766,31 @@ const gatherAssetLinks = (document) => {
 const processFragments = (document, docPath) => {
   const fragments = [];
   const pathSegments = docPath.split('/');
+
+  // person detail cards, regardless of location, become fragments
+  document.querySelectorAll('[data-block="Person Detail Card"]').forEach((card) => {
+    const div = document.createElement('div');
+    const name = card.querySelector('[property="displayName"]').textContent;
+    const cardPath = sanitizePath(`/en/fragments/people/${name.replace('.', '')}`);
+    div.setAttribute('data-fragment-path', cardPath);
+    div.append(card.cloneNode(true));
+    fragments.push({
+      element: div,
+      path: cardPath,
+    });
+    const link = document.createElement('a');
+    link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+    link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+    card.replaceWith(link);
+  });
+
   // find blocks inside of columns
   let fragmentCount = 1;
   document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
     const blockName = internalBlock.getAttribute('data-block');
     const div = document.createElement('div');
     // name fragments based on site section and page name
-    let path = `/en/fragments/${blockName}/${pathSegments[2]}-${pathSegments.pop()}-${fragmentCount}`;
+    let path = `/en/fragments/${blockName.toLowerCase().replace(' ', '-')}/${pathSegments[2]}-${pathSegments.pop()}-${fragmentCount}`;
     if (blockName === 'Marketo Form') {
       const formId = internalBlock.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
       path = `/en/fragments/marketo-forms/${formId}`;
