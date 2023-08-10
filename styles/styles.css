@@ -304,6 +304,7 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 0;
 }
 
 @media (min-width: 900px) {
