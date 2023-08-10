@@ -32,18 +32,8 @@ export default async function decorate(block) {
     block.classList.add('opacity');
   }
 
-  const rowCount = [...block.children].length;
-
   [...block.children].forEach((row, rdx) => {
-    /*
-    The columns of first row should occupy full width when more than one row exists.
-    "row" class is used to set the column width. So, not adding "row" class for the first row.
-    */
-    if (rowCount > 1 && rdx === 0) {
-      row.classList.add(`row-${rdx + 1}`);
-    } else {
-      row.classList.add('row', `row-${rdx + 1}`);
-    }
+    row.classList.add('row', `row-${rdx + 1}`);
     [...row.children].forEach((col, cdx) => {
       col.classList.add('column', `column-${cdx + 1}`);
 
