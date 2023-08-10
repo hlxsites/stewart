@@ -24,7 +24,7 @@
 }
 
 .form-section:not(.transparent) {
-    background-color: var(--clr-light);
+    background-color: var(--clr-gray);
     border: 1px solid var(--clr-gray-dark);
     border-radius: 5px;
     box-shadow: 0 5px 4px -2px rgb(0 0 0 / 15%);
