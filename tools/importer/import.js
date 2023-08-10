@@ -276,6 +276,24 @@ const buildSearchResults = (builder, section) => {
   });
 };
 
+const buildOfficeInfos = (builder, section) => {
+  section.querySelectorAll('.cmp-officeinformation').forEach((office) => {
+    builder.replace(office, () => {
+      // todo how do we get office id?
+      const address = office.querySelector('address');
+      builder.block('Office Info', 1, true).append(address);
+    });
+  });
+};
+
+const buildForms = (builder, section) => {
+  section.querySelectorAll('.formcontainer').forEach((form) => {
+    builder.replace(form, () => {
+      builder.block('Form', 1, false);
+    });
+  });
+};
+
 const buildTables = (builder, section) => {
   section.querySelectorAll('table').forEach((table) => {
     let maxCols = 1;
@@ -542,6 +560,8 @@ const buildSectionContent = (builder, section) => {
   buildCalculators(builder, section);
   buildSearchResults(builder, section);
   buildPersonDetailCards(builder, section);
+  buildOfficeInfos(builder, section);
+  buildForms(builder, section);
   builder.append(section);
 };
 
@@ -642,6 +662,11 @@ const buildHeroSection = (builder, hero) => {
   }
   let style = classes.join(', ');
 
+  // if there is an alert, place it above the image
+  if (hero.previousElementSibling?.classList?.contains('simplealert')) {
+    builder.block('Alert', 1, true).append(hero.previousElementSibling).jumpTo(undefined);
+  }
+
   const img = getBackgroundImage(hero);
   if (img) {
     builder.element('img', { src: img, class: 'hero-img' }).up();
@@ -653,6 +678,7 @@ const buildHeroSection = (builder, hero) => {
   }
   allSectionClasses[style || 'none'] = (allSectionClasses[style || 'none'] || 0) + 1;
   sessionStorage.setItem('allHeroClasses', JSON.stringify(allSectionClasses));
+
   // Rely on importer to strip out extra divs, etc.
   builder.append(hero);
 };
@@ -859,6 +885,12 @@ export default {
         }
       });
     }
+
+    // for office projection, make those sections so they get imported
+    document.querySelectorAll('.officeinformationprojection').forEach((office) => {
+      office.classList.add('pagesection');
+      office.classList.remove('officeinformationprojection');
+    });
 
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
