@@ -509,7 +509,7 @@ const translateClassNames = (className) => {
     case 'backgroundablepagesection':
       return undefined;
     // Otherwise pass-thru (this includes colors)
-    default: return className.replace('ss-backgroundcolor-', '');
+    default: return `${className.replace('ss-backgroundcolor-', '')[0].toUpperCase()}${className.replace('ss-backgroundcolor-', '').slice(1)}`;
   }
 };
 
