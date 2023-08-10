@@ -140,6 +140,27 @@ const getPublishDate = (document) => {
   return '';
 };
 
+const translateTemplateName = (templateName) => {
+  switch (templateName) {
+    case 'blog-article-page': return 'Blog Article Page';
+    case 'press-release-page': return 'Press Release Page';
+    case 'primary-site-section-landing-page': return 'Section Landing Page';
+    case 'landing-page-template': return 'Landing Page';
+    case 'primary-site-subsection-landing-page':
+    case 'detail-content-page':
+      return 'Section Page';
+    // These all get ignored
+    case 'content-page':
+    case 'stewart-homepage':
+    case 'general-webpage':
+    case 'web-calculators-page':
+      return '';
+    // end ignored
+    default:
+      return templateName;
+  }
+};
+
 const extractMetadata = (document, url) => {
   const metadata = {};
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
@@ -147,15 +168,16 @@ const extractMetadata = (document, url) => {
     const val = getMetadata(document, prop);
     if (val) {
       if (prop === 'keywords') {
-        metadata.tags = val;
+        metadata.Tags = val;
       } else if (prop === 'template') {
-        const templateMap = {
-          'stewart-homepage': 'Homepage',
-          // todo add more values here
-        };
-        metadata.Template = templateMap[val] || val;
+        const templateName = translateTemplateName(val);
+        if (templateName) {
+          metadata.Template = templateName;
+        }
       } else {
-        metadata[prop.replaceAll('og:', '')] = val;
+        let propName = prop.replaceAll('og:', '');
+        propName = `${propName[0].toUpperCase()}${propName.slice(1)}`;
+        metadata[propName] = val;
       }
     }
   });
