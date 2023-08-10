@@ -33,7 +33,7 @@ function attr(object, name) {
  * @param {*} successMessage Success message
  * @param {*} failureMessage Failure message
  */
-function configureFranklinFormPost(form, successMessage, failureMessage) {
+function configureDefaultFormPost(form, successMessage, failureMessage) {
   form.addEventListener('submit', async (event) => {
     const data = {};
     event.preventDefault();
@@ -298,7 +298,7 @@ function buildForm(formData, defaultAction) {
   form.append(createElement('input', { type: 'submit', value: submitLabel }));
   if (usesDefaultAction) {
     // Default action uses AJAX to post the form
-    configureFranklinFormPost(form, successMessage, failureMessage);
+    configureDefaultFormPost(form, successMessage, failureMessage);
   }
   return form;
 }
