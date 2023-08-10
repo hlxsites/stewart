@@ -20,6 +20,7 @@ const VALID_TEMPLATES = [
   'primary-site-section-landing-page',
   'primary-site-subsection-landing-page',
   'detail-content-page',
+  'blog-article-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
@@ -130,7 +131,7 @@ export function buildEmbedBlocks(main) {
   });
 }
 
-function buildFragmentBlocks(main) {
+export function buildFragmentBlocks(main) {
   const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
   // links to /fragments/* become fragment blocks
   main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
@@ -153,15 +154,10 @@ function buildFragmentBlocks(main) {
  * @param {Element} main The container element
  */
 export function buildAutoBlocks(main) {
-  try {
-    buildHeroBlock(main);
-    buildFormBlocks(main);
-    buildEmbedBlocks(main);
-    buildFragmentBlocks(main);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Auto Blocking failed', error);
-  }
+  buildHeroBlock(main);
+  buildFormBlocks(main);
+  buildEmbedBlocks(main);
+  buildFragmentBlocks(main);
 }
 
 export function decorateLinks(element) {
@@ -372,16 +368,21 @@ export async function decorateMain(main) {
   decorateButtons(main);
   decorateIcons(main);
 
-  const template = getMetadata('template');
-  let autoBlocksFunc = buildAutoBlocks;
-  if (template) {
-    // template js, if they exist, must call appropriate auto-blocks on their own
-    const templateMod = await loadTemplate(template);
-    if (templateMod && templateMod.default) {
-      autoBlocksFunc = templateMod.default;
+  try {
+    const template = getMetadata('template');
+    let autoBlocksFunc = buildAutoBlocks;
+    if (template) {
+      // template js, if they exist, must call appropriate auto-blocks on their own
+      const templateMod = await loadTemplate(template);
+      if (templateMod && templateMod.default) {
+        autoBlocksFunc = templateMod.default;
+      }
     }
+    await autoBlocksFunc(main);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Auto Blocking failed', error);
   }
-  await autoBlocksFunc(main);
 
   decorateSectionBackgroundImages(main);
   decorateSections(main);
