@@ -805,18 +805,22 @@ const processFragments = (document, docPath) => {
   // person detail cards, regardless of location, become fragments
   document.querySelectorAll('[data-block="Person Detail Card"]').forEach((card) => {
     const div = document.createElement('div');
-    const name = card.querySelector('[property="displayName"]').textContent;
-    const cardPath = sanitizePath(`/en/fragments/people/${name.replace('.', '')}`);
-    div.setAttribute('data-fragment-path', cardPath);
-    div.append(card.cloneNode(true));
-    fragments.push({
-      element: div,
-      path: cardPath,
-    });
-    const link = document.createElement('a');
-    link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
-    link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
-    card.replaceWith(link);
+    const name = card.querySelector('[property="displayName"]')?.textContent;
+    if (name) {
+      const cardPath = sanitizePath(`/en/fragments/people/${name.replaceAll('.', '')}`);
+      div.setAttribute('data-fragment-path', cardPath);
+      div.append(card.cloneNode(true));
+      fragments.push({
+        element: div,
+        path: cardPath,
+      });
+      const link = document.createElement('a');
+      link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+      link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+      card.replaceWith(link);
+    } else {
+      card.remove();
+    }
   });
 
   // find blocks inside of columns
