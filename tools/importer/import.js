@@ -147,6 +147,7 @@ const translateTemplateName = (templateName) => {
   switch (templateName) {
     case 'blog-article-page': return 'Blog Article Page';
     case 'press-release-page': return 'Press Release Page';
+    case 'market-landing-page': return 'Market Landing Page';
     case 'primary-site-section-landing-page': return 'Section Landing Page';
     case 'landing-page-template': return 'Landing Page';
     case 'primary-site-subsection-landing-page':
