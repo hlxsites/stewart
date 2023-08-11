@@ -389,7 +389,7 @@ export async function decorateMain(main) {
     let autoBlocksFunc = buildAutoBlocks;
     if (template) {
       // template js, if they exist, must call appropriate auto-blocks on their own
-      const templateMod = await loadTemplate(template);
+      const templateMod = await loadTemplate(toClassName(template));
       if (templateMod && templateMod.default) {
         autoBlocksFunc = templateMod.default;
       }
