@@ -562,7 +562,8 @@ main .section>div {
   color: var(--clr-white);
 }
 
-.section.black a {
+.section.black a,
+.section.dark a {
   color: var(--clr-teal);
 }
 
