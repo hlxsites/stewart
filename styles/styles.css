@@ -579,20 +579,18 @@ main .section>div {
 
 @media(min-width: 600px) {
   .section.wide {
-    padding: 8% 3%;
+    padding-inline: 3%;
   }
   
   .section.narrow {
-    margin-inline-start: 8%;
-    margin-inline-end: 8%;
+    margin-inline: 8%;
     width: auto;
     max-width: 64rem;
   }
 
   .section.narrow.has-bg-image {
     max-width: 100%;
-    margin-inline-start: unset;
-    margin-inline-end: unset;
+    margin-inline: unset;
   }
 }
 
