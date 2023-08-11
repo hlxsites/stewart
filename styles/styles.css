@@ -75,7 +75,7 @@
 
   /* nav height */
   --nav-height: 58px;
-  --max-content-width: 1440px;
+  --max-content-width: 90rem;
 }
 
 @media (min-width: 900px) {
@@ -579,13 +579,15 @@ main .section>div {
 
 @media(min-width: 600px) {
   .section.wide {
+    --max-content-width: 100rem; 
     padding-inline: 3%;
   }
   
   .section.narrow {
+    --max-content-width: 64rem;
+
     margin-inline: 8%;
     width: auto;
-    max-width: 64rem;
   }
 
   .section.narrow.has-bg-image {
