@@ -39,9 +39,26 @@ const assignContentClasses = (teaser) => {
 };
 
 export default async function decorate(block) {
-  [...block.children].forEach((teaser) => {
+  const teaserPromises = [...block.children].map(async (teaser) => {
     teaser.classList.add(classNames.teaser);
+
+    const pic = teaser.querySelector('picture');
+    const link = teaser.querySelector('a');
+    if (link && !pic) {
+      // todo build teaser from page content
+      // undecided if this should be done via query index or by fetching page directly.
+      // fetching page directly is probably faster
+      // const teaserPageResp = await fetch(link.href);
+      // if (teaserPageResp.ok) {
+      //   const content = await teaserPageResp.text();
+      //   const parser = new DOMParser();
+      //   const contentDoc = parser.parseFromString(content, 'text/html');
+      // }
+    }
+
     assignContainerClasses(teaser);
     assignContentClasses(teaser);
   });
+
+  await Promise.all(teaserPromises);
 }

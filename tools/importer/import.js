@@ -71,7 +71,19 @@ class BlockBuilder {
   }
 
   block(name, colspan = 2, createRow = true) {
-    return (this.endBlock().element('table', { 'data-block': name }).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
+    const tableAttrs = {
+    };
+    const variantIndex = name.indexOf('(');
+    if (variantIndex > -1) {
+      // block name has variants, so
+      // eslint-disable-next-line prefer-destructuring
+      tableAttrs['data-block'] = name.slice(0, variantIndex - 1);
+      // eslint-disable-next-line prefer-destructuring
+      tableAttrs['data-block-variants'] = name.slice(variantIndex + 1, -1);
+    } else {
+      tableAttrs['data-block'] = name;
+    }
+    return (this.endBlock().element('table', tableAttrs).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
   }
 
   row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
@@ -91,6 +103,8 @@ class BlockBuilder {
 
   #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
 }
+
+const capitalizeWord = (word) => `${word[0].toUpperCase()}${word.slice(1)}`;
 
 const getMetadata = (document, prop) => document.querySelector(`head meta[property='${prop}'], head meta[name='${prop}']`)?.content;
 
@@ -129,6 +143,29 @@ const getPublishDate = (document) => {
   return '';
 };
 
+const translateTemplateName = (templateName) => {
+  switch (templateName) {
+    case 'blog-article-page': return 'Blog Article Page';
+    case 'press-release-page': return 'Press Release Page';
+    case 'market-landing-page': return 'Market Landing Page';
+    case 'primary-site-section-landing-page': return 'Section Landing Page';
+    case 'landing-page-template': return 'Landing Page';
+    case 'primary-site-subsection-landing-page':
+    case 'detail-content-page':
+      return 'Section Page';
+    // These all get ignored
+    case 'content-page':
+    case 'stewart-homepage':
+    case 'general-webpage':
+    case 'web-calculators-page':
+    case 'content-search':
+      return '';
+    // end ignored
+    default:
+      return templateName;
+  }
+};
+
 const extractMetadata = (document, url) => {
   const metadata = {};
   const metadataProperties = ['og:title', 'description', 'keywords', 'og:image', 'template', 'robots'];
@@ -136,33 +173,37 @@ const extractMetadata = (document, url) => {
     const val = getMetadata(document, prop);
     if (val) {
       if (prop === 'keywords') {
-        metadata.tags = val;
+        metadata.Tags = val;
       } else if (prop === 'template') {
-        const templateMap = {
-          'stewart-homepage': 'Homepage',
-          // todo add more values here
-        };
-        metadata.Template = templateMap[val] || val;
+        const templateName = translateTemplateName(val);
+        if (templateName) {
+          metadata.Template = templateName;
+        }
       } else {
-        metadata[prop.replaceAll('og:', '')] = val;
+        let propName = prop.replaceAll('og:', '');
+        propName = capitalizeWord(propName);
+        metadata[propName] = val;
       }
     }
   });
 
-  const navTitle = [...document.querySelectorAll('nav a')].find((a) => {
+  let navTitle = [...document.querySelectorAll('nav a')].find((a) => {
     const docUrl = new URL(url);
     const linkUrl = new URL(a.href, 'https://www.stewart.com');
 
     return docUrl.pathname === linkUrl.pathname;
   })?.textContent;
+  if (!navTitle) {
+    navTitle = document.querySelector('h1')?.textContent;
+  }
   if (navTitle) {
     metadata['Navigation Title'] = navTitle;
   }
 
-  if (metadata.image) {
+  if (metadata.Image) {
     const img = document.createElement('img');
-    img.src = metadata.image;
-    metadata.image = img;
+    img.src = metadata.Image;
+    metadata.Image = img;
   }
   const publishDate = getPublishDate(document);
   if (publishDate) { metadata['Publication Date'] = publishDate; }
@@ -178,13 +219,27 @@ const getBackgroundImage = (section) => section.querySelector('.has-background')
 
 const buildExperienceFragment = (builder, section) => builder.block('embed').text('Fragment').column().text(section.children[0].getAttribute('id'));
 
+const buildPersonDetailCards = (builder, section) => {
+  section.querySelectorAll('.cmp-container#person-detail-card').forEach((card) => {
+    const content = card.querySelector('.contentcontainer');
+    const image = card.querySelector('.cmp-imageattributeprojection img');
+    builder.replace(card, () => {
+      builder.block('Person Detail Card', 2, true).append(image).column().append(content);
+    });
+  });
+};
+
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
     builder.replace(embed, () => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
-        builder.element('a', { href: src }).text(src).up();
+        if (src.includes('youtube.com')) {
+          builder.element('a', { href: src }).text(src).up();
+        } else {
+          builder.block('Embed', 1).element('a', { href: src }).text(src).up();
+        }
       } else if (embed.querySelector('.mktoForm')) {
         const formId = embed.querySelector('.mktoForm').id.split('_')[1];
         builder.block('Marketo Form', 2).append('Form Id').column().append(formId);
@@ -214,7 +269,32 @@ const countColumns = (rows) => Math.max.apply(null, Array.from(rows).map((row) =
 
 const isHeading = (col) => col.querySelector('.heading') && col.querySelector('.heading').nextElementSibling === null;
 
-// const buildTables = (builder, section) => section.querySelectorAll('table').forEach((table) => builder.replace(table, () => builder.block('Table', 1, true).append(table.cloneNode(true))));
+const buildSearchResults = (builder, section) => {
+  section.querySelectorAll('.cmp-contentsearchresults').forEach((sr) => {
+    builder.replace(sr, () => {
+      builder.block('Search Results', 1, false);
+    });
+  });
+};
+
+const buildOfficeInfos = (builder, section) => {
+  section.querySelectorAll('.cmp-officeinformation').forEach((office) => {
+    builder.replace(office, () => {
+      // todo how do we get office id?
+      const address = office.querySelector('address');
+      builder.block('Office Info', 1, true).append(address);
+    });
+  });
+};
+
+const buildForms = (builder, section) => {
+  section.querySelectorAll('.formcontainer').forEach((form) => {
+    builder.replace(form, () => {
+      builder.block('Form', 1, false);
+    });
+  });
+};
+
 const buildTables = (builder, section) => {
   section.querySelectorAll('table').forEach((table) => {
     let maxCols = 1;
@@ -258,25 +338,31 @@ const buildColumnsBlock = (builder, section) => {
             if (!inTable) {
               const blockName = 'Columns';
               const variants = new Set();
-              if (cols[0].classList.contains('col-md-8')) {
-                variants.add('Split 66-33');
-              } else if (cols[0].classList.contains('col-md-9')) {
-                variants.add('Split 75-25');
-              } else if (cols[0].classList.contains('col-md-4') && cols.length === 3) {
-                variants.add('Split 33-33-33');
-              } else if (child.querySelector('.carousel')) {
+              if (child.querySelector('.carousel')) {
                 variants.add('Carousel');
+              }
+
+              if (cols.length === 2) {
+                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
+                  variants.add('Split 66-33');
+                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
+                  variants.add('Split 33-66');
+                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
+                  variants.add('Split 75-25');
+                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
+                  variants.add('Split 25-75');
+                }
               }
 
               /* When a new variation added, update blocks/columns.js to support that - START */
 
               if (col.querySelector('.ss-containerpresentationtype-box')) {
-                variants.add('Card', 'gray');
+                variants.add('Card', 'Gray');
               }
 
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
-                  variants.add('Card', 'dark');
+                  variants.add('Card', 'Dark');
                 } else {
                   variants.add('Card');
                 }
@@ -335,9 +421,14 @@ const buildTeaserLists = (builder, section) => {
       builder.block('Teaser List', 2, false);
       // For each teaser, build a block with the image and text
       list.querySelectorAll('.page-teaser').forEach((teaser) => {
-        const img = teaser.querySelector('.page-teaser_image') || '';
-        const content = teaser.querySelector('.page-teaser_content');
-        builder.row().append(img).column().append(content);
+        const link = teaser.querySelector('.page-teaser_content-title a');
+        if (link.href.startsWith('/')) {
+          builder.row().append(link);
+        } else {
+          const img = teaser.querySelector('.page-teaser_image') || '';
+          const content = teaser.querySelector('.page-teaser_content');
+          builder.row().append(img).column().append(content);
+        }
       });
     });
   });
@@ -387,7 +478,7 @@ const buildGenericLists = (builder, section) => {
     builder.replace(list, () => {
       let name = 'List';
       if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (1-col)';
+        name += ' (1 Col)';
       }
       builder.block(name, 1, false);
       list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
@@ -437,8 +528,27 @@ const buildBlockQuotes = (builder, section) => {
   });
 };
 
+const buildBreadcrumbs = (builder, section) => {
+  section.querySelectorAll('.breadcrumbnavigation > nav').forEach((bc) => {
+    builder.replace(bc, () => {
+      builder.block('Breadcrumb', 1, false);
+    });
+  });
+};
+
+const buildCalculators = (builder, section) => {
+  section.querySelectorAll('.cmp-calculator, .cmp-shared-calc').forEach((calc) => {
+    let calcName = calc.querySelector('[data-calculator]').getAttribute('data-calculator');
+    if (calcName === 'mortgate') calcName = 'mortgage';
+    builder.replace(calc, () => {
+      builder.block(`Calculator (${capitalizeWord(calcName)})`, 1, false);
+    });
+  });
+};
+
 const buildSectionContent = (builder, section) => {
   buildTables(builder, section);
+  buildBreadcrumbs(builder, section);
   buildEmbed(builder, section);
   buildGenericLists(builder, section);
   buildTeaserLists(builder, section);
@@ -448,6 +558,11 @@ const buildSectionContent = (builder, section) => {
   buildAccordions(builder, section);
   buildButtons(builder, section);
   buildBlockQuotes(builder, section);
+  buildCalculators(builder, section);
+  buildSearchResults(builder, section);
+  buildPersonDetailCards(builder, section);
+  buildOfficeInfos(builder, section);
+  buildForms(builder, section);
   builder.append(section);
 };
 
@@ -469,9 +584,9 @@ const translateClassNames = (className) => {
     case 'ss-overlayopacity-10': return 'Opacity 10';
     case 'ss-overlay-gradient-disabled': return 'No gradient';
     case 'ss-overlay-right': return 'Right';
-    case 'contentbreak': return 'Content break';
-    case 'ss-sectiontype-banner': return 'Banner';
+    case 'ss-sectiontype-banner': return 'Left Border';
     // These all get ignored
+    case 'contentbreak':
     case 'ss-overlay-left':
     case 'ss-margin-0':
     case 'ss-margin-bottom-small':
@@ -484,7 +599,7 @@ const translateClassNames = (className) => {
     case 'backgroundablepagesection':
       return undefined;
     // Otherwise pass-thru (this includes colors)
-    default: return className.replace('ss-backgroundcolor-', '');
+    default: return capitalizeWord(className.replace('ss-backgroundcolor-', ''));
   }
 };
 
@@ -548,6 +663,11 @@ const buildHeroSection = (builder, hero) => {
   }
   let style = classes.join(', ');
 
+  // if there is an alert, place it above the image
+  if (hero.previousElementSibling?.classList?.contains('simplealert')) {
+    builder.block('Alert', 1, true).append(hero.previousElementSibling).jumpTo(undefined);
+  }
+
   const img = getBackgroundImage(hero);
   if (img) {
     builder.element('img', { src: img, class: 'hero-img' }).up();
@@ -559,6 +679,7 @@ const buildHeroSection = (builder, hero) => {
   }
   allSectionClasses[style || 'none'] = (allSectionClasses[style || 'none'] || 0) + 1;
   sessionStorage.setItem('allHeroClasses', JSON.stringify(allSectionClasses));
+
   // Rely on importer to strip out extra divs, etc.
   builder.append(hero);
 };
@@ -607,6 +728,8 @@ const restoreIcons = (document, originalDocument) => {
   });
 };
 
+const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/\.html$/, '').replace(/\/$/, '').toLowerCase());
+
 /**
    * Return a path that describes the document being transformed (file name, nesting...).
    * The path is then used to create the corresponding Word document.
@@ -618,7 +741,7 @@ const restoreIcons = (document, originalDocument) => {
    */
 const generateDocumentPath = ({
   document, url, html, params,
-}) => WebImporter.FileUtils.sanitizePath(new URL(url).pathname.replace(/\.html$/, '').replace(/\/$/, ''));
+}) => sanitizePath(new URL(url).pathname);
 
 const updateLinks = (document) => {
   document.querySelectorAll('a').forEach((a) => {
@@ -632,7 +755,7 @@ const updateLinks = (document) => {
       if (aURL.hostname === 'www.stewart.com') {
         // sanitze local links
         if (!aURL.pathname.startsWith('/content/dam/')) {
-          aURL.pathname = aURL.pathname.replace('.html', '').replace(/\/$/, '').replace(' ', '-').toLowerCase();
+          aURL.pathname = sanitizePath(aURL.pathname);
         }
       }
       a.href = aURL.toString();
@@ -657,7 +780,11 @@ const preocessHeadingIcons = (document) => {
 
 const gatherBlockNames = (document) => {
   const blocksArr = [...document.querySelectorAll('table[data-block]')]
-    .map((table) => table.getAttribute('data-block'))
+    .map((table) => {
+      const blockName = table.getAttribute('data-block');
+      const variantNames = table.getAttribute('data-block-variants');
+      return variantNames ? `${blockName} (${variantNames})` : blockName;
+    })
     .filter((blockName) => !['', 'section metadata', 'metadata'].includes(blockName.toLowerCase()));
   const blocks = new Set(blocksArr);
   return [...blocks].join(', ');
@@ -671,23 +798,51 @@ const gatherAssetLinks = (document) => {
   return [...assetLinks].join(', ');
 };
 
-const processFragments = (document) => {
+const processFragments = (document, docPath) => {
   const fragments = [];
-  // find marketo forms inside of columns, this should be made more generic probably to handle all possible fragments inside of columns?
-  document.querySelectorAll('[data-block="Columns"] [data-block="Marketo Form"]').forEach((mktoForm) => {
-    const formId = mktoForm.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
-    const path = `/en/fragments/marketo-forms/${formId}`;
+  const pathSegments = docPath.split('/');
+
+  // person detail cards, regardless of location, become fragments
+  document.querySelectorAll('[data-block="Person Detail Card"]').forEach((card) => {
     const div = document.createElement('div');
-    div.append(mktoForm.cloneNode(true));
+    const name = card.querySelector('[property="displayName"]').textContent;
+    const cardPath = sanitizePath(`/en/fragments/people/${name.replace('.', '')}`);
+    div.setAttribute('data-fragment-path', cardPath);
+    div.append(card.cloneNode(true));
+    fragments.push({
+      element: div,
+      path: cardPath,
+    });
+    const link = document.createElement('a');
+    link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+    link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+    card.replaceWith(link);
+  });
+
+  // find blocks inside of columns
+  let fragmentCount = 1;
+  document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
+    const blockName = internalBlock.getAttribute('data-block');
+    const div = document.createElement('div');
+    // name fragments based on site section and page name
+    let path = `/en/fragments/${blockName.toLowerCase().replace(' ', '-')}/${pathSegments[2]}-${pathSegments.pop()}-${fragmentCount}`;
+    if (blockName === 'Marketo Form') {
+      const formId = internalBlock.querySelector('tr:nth-child(2) > td:nth-child(2)').textContent;
+      path = `/en/fragments/marketo-forms/${formId}`;
+    } else {
+      fragmentCount += 1;
+    }
+
+    div.setAttribute('data-fragment-path', path);
+    div.append(internalBlock.cloneNode(true));
     fragments.push({
       element: div,
       path,
     });
-
     const link = document.createElement('a');
     link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
     link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
-    mktoForm.replaceWith(link);
+    internalBlock.replaceWith(link);
   });
 
   return fragments;
@@ -719,6 +874,25 @@ export default {
     // Strip out header and footers that are not needed
     document.querySelector('page-header, page-footer')?.remove();
 
+    // deal with breadcrumbs
+    const bc = document.querySelector('.breadcrumbnavigation');
+    if (bc) {
+      let moved = false;
+      // move bc to top of the first section that isn't the hero
+      document.querySelectorAll('.pagesection').forEach((section) => {
+        if (!moved && !section.classList.contains('pagehero')) {
+          section.prepend(bc);
+          moved = true;
+        }
+      });
+    }
+
+    // for office projection, make those sections so they get imported
+    document.querySelectorAll('.officeinformationprojection').forEach((office) => {
+      office.classList.add('pagesection');
+      office.classList.remove('officeinformationprojection');
+    });
+
     // Create sections of the page
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
@@ -731,21 +905,23 @@ export default {
     // add icon markup to headings with icons
     preocessHeadingIcons(document);
 
-    const fragments = processFragments(document);
-
-    // Note the classes used for each section
-    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
-    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
-
     const docPath = generateDocumentPath({
       document,
       url,
       html,
       params,
     });
+
+    const fragments = processFragments(document, docPath);
+
+    // Note the classes used for each section
+    console.log('Hero style combinations:', sessionStorage.getItem('allHeroClasses'));
+    console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
+
     const report = {
       blocks: gatherBlockNames(document) || 'n/a',
       assetLinks: gatherAssetLinks(document) || 'n/a',
+      fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
