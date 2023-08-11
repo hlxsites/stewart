@@ -1,6 +1,7 @@
 .columns > .row {
   display: flex;
   flex-direction: column;
+  gap: 2rem;
 }
 
 .columns img {
@@ -17,6 +18,10 @@
 
 .columns > div > .columns-img-col img {
   display: block;
+}
+
+.columns .column.button-container .button {
+  width: 100%;
 }
 
 .columns.card .row .column {
@@ -113,6 +118,10 @@
   }
 
   /* align buttons right */
+  .columns .column.button-container .button {
+    width: unset;
+  }
+
   .columns .column.button-container {
     text-align: right;
   }

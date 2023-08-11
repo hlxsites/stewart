@@ -272,7 +272,12 @@ const renderResults = async (block, filteredResults, searchTerm) => {
     resultsUl.append(li);
   }
 
-  block.querySelector('.search-results-term').textContent = `"${searchTerm}"`;
+  if (searchTerm) {
+    block.querySelector('.search-results-term').textContent = `"${searchTerm}"`;
+    block.querySelector('.search-results-term').parentElement.style.display = null;
+  } else {
+    block.querySelector('.search-results-term').parentElement.style.display = 'none';
+  }
 };
 
 function renderSearchResultsScaffolding() {
