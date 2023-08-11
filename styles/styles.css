@@ -542,7 +542,8 @@ main .section>div {
   --_bg-overlay-opacity-no-gradient: .355;
 }
 
-.section.dark {
+.section.dark,
+.section.dark a {
   color: var(--clr-white);
 }
 
@@ -562,8 +563,7 @@ main .section>div {
   color: var(--clr-white);
 }
 
-.section.black a,
-.section.dark a {
+.section.black a {
   color: var(--clr-teal);
 }
 
