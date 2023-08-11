@@ -178,10 +178,24 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
-  const pictures = container.querySelectorAll('p picture');
+  const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
+    // need to deal with 2 use cases here
+    // 1) <picture><br/><a>
+    // 2) <p><picture></p><p><a></p>
+    if (pic.nextElementSibling && pic.nextElementSibling.tagName === 'BR'
+      && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
+      const link = pic.nextElementSibling.nextElementSibling;
+      if (link.textContent.includes(link.getAttribute('href'))) {
+        pic.nextElementSibling.remove();
+        link.innerHTML = pic.outerHTML;
+        pic.replaceWith(link);
+        return;
+      }
+    }
+
     const parent = pic.parentNode;
-    if (!parent.nextElementSibling) {
+    if (parent.tagName !== 'P' || !parent.nextElementSibling || parent.nextElementSibling.tagName !== 'P') {
       // eslint-disable-next-line no-console
       console.warn('no next element');
       return;
