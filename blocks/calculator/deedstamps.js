@@ -42,7 +42,7 @@ function Calculate() {
   thisform.querySelector('.intangibleTax').innerHTML = formatAsMoney(cleanAndRound(thisform.querySelector('[name="loanAmount"]').value) * 0.002);
   thisform.querySelector('.transferTax').innerHTML = formatAsMoney((salesPrice / 100) * transferTaxRate);
 
-  thisform.querySelector('#calculatorFormResults').classList.remove('hidden');
+  thisform.querySelector('#deedstampsFormResults').classList.remove('hidden');
 }
 
 export default function deedStampsCalc(evt) {
@@ -52,8 +52,8 @@ export default function deedStampsCalc(evt) {
   let valid = true;
   let isFirstIndex = false;
   thisform.querySelectorAll('input[type="text"]').forEach((input) => {
-    if (document.getElementById(`#${input.getAttribute('id')}-errormessage`)) {
-      document.getElementById(`#${input.getAttribute('id')}-errormessage`).remove();
+    if (document.querySelector(`#${input.getAttribute('id')}-errormessage`)) {
+      document.querySelector(`#${input.getAttribute('id')}-errormessage`).remove();
     }
     input.classList.remove('invalid');
     input.removeAttribute('aria-describedby');
@@ -84,14 +84,14 @@ export function inputUpdate(evt) {
   thisform = evt.currentTarget.closest('form');
   thisform.setAttribute('data-calculated', 'false');
   thisform.querySelector('.calculator-form-results').removeAttribute('aria-live');
-  thisform.querySelector('#calculatorFormResults').classList.add('hidden');
+  thisform.querySelector('#deedstampsFormResults').classList.add('hidden');
 }
 
 export function currencyUpdate(evt) {
   const elem = evt.currentTarget;
   elem.value = elem.value ? formatAsMoney(cleanNumber(elem.value)) : '';
-  if (document.querySelector(`${elem.getAttribute('id')}-errormessage`)) {
-    document.querySelector(`${elem.getAttribute('id')}-errormessage`).remove();
+  if (document.querySelector(`#${elem.getAttribute('id')}-errormessage`)) {
+    document.querySelector(`#${elem.getAttribute('id')}-errormessage`).remove();
   }
   elem.classList.remove('invalid');
   elem.removeAttribute('aria-describedby');

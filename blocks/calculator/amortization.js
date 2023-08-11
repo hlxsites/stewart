@@ -178,9 +178,9 @@ function Calculate() {
 
   if (isLoanAmount && isDateOfFirstPayment) {
     printSchedule(principle, term, rate, start);
-    thisform.querySelector('#calculatorFormResults').classList.remove('hidden');
+    thisform.querySelector('#amortizationFormResults').classList.remove('hidden');
   } else {
-    thisform.querySelector('#calculatorFormResults').classList.add('hidden');
+    thisform.querySelector('#amortizationFormResults').classList.add('hidden');
   }
 }
 

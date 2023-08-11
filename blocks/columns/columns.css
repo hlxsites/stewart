@@ -63,7 +63,7 @@
   .columns .row {
     align-items: center;
     flex-direction: unset;
-    gap: 32px;
+    gap: 24px;
   }
 
   .columns.card .row {
@@ -87,19 +87,19 @@
   }
 
   .columns.split-66-33 .row .column-1 {
-    flex-grow: 2;
+    flex-basis: 66.666%;
   }
 
-  .columns.split-33-66 .row .column-2 {
-    flex-grow: 2;
+  .columns.split-66-33 .row .column-2 {
+    flex-basis: 33.333%;
   }
 
   .columns.split-75-25 .row .column-1 {
-    flex-grow: 3;
+    flex-basis: 75%;
   }
 
-  .columns.split-25-75 .row .column-2 {
-    flex-grow: 3;
+  .columns.split-75-25 .row .column-2 {
+    flex-basis: 25%;
   }
 
   .columns.card .row .column {
@@ -111,9 +111,18 @@
   .columns.card .row .column:last-child {
     margin-bottom: 1rem;
   }
+
+  /* align buttons right */
+  .columns .column.button-container {
+    text-align: right;
+  }
 }
 
 @media (min-width: 900px) {
+  .columns .row {
+    gap: 32px;;
+  }
+
   .columns.card.gray .row {
     align-items: center;
     flex-direction: unset;
@@ -136,14 +145,5 @@
 
   .columns.card.gray .row .column:last-child {
     padding: 3.5rem;
-  }
-}
-
-
-
-@media (min-width: 600px) {
-  /* align buttons right */
-  .columns .column.button-container {
-    text-align: right;
   }
 }
