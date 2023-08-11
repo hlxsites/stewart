@@ -307,11 +307,21 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
   const resultsForPage = fetchResults(cfg, q, tag, pageNum);
   await renderResults(block, resultsForPage, q);
 
+  if (q && pageNum === 1 && !tag) {
+    // only sample rum on initial search, not paging or tagging
+    sampleRUM('search', { source: '.search-form .search-input', target: q });
+  }
+
   const allResults = fetchResults(cfg, q, tag, -1);
   allResults.all().then((resArray) => {
     const allResCount = resArray.length;
     block.setAttribute('data-result-count', allResCount);
     const resultsPerPage = Number(cfg['page-size']);
+
+    if (q && pageNum === 1 && !tag && allResCount === 0) {
+      // only sample rum on initial search, not paging or tagging
+      sampleRUM('searchnull', { source: '.search-form .search-input', target: q });
+    }
 
     if (!partial) {
       block.querySelector('.search-result-count').textContent = `${allResCount} Results Found`;
@@ -347,8 +357,6 @@ export default async function decorate(block) {
     renderSearchResults(block, cfg, searchTerm, '', '1');
     addQueryParamToURL('page', '1');
     addQueryParamToURL('q', searchTerm);
-
-    sampleRUM('search', { source: '.search-form .search-input', target: searchTerm });
   });
 
   block.append(renderSearchResultsScaffolding());
