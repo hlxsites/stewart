@@ -68,13 +68,12 @@ export default async function decorate(block) {
         }
 
         teaser.replaceChildren(imageDiv, contentDiv);
+        assignContainerClasses(teaser);
+        assignContentClasses(teaser);
       } else {
         teaser.remove();
       }
     }
-
-    assignContainerClasses(teaser);
-    assignContentClasses(teaser);
   });
 
   await Promise.all(teaserPromises);
