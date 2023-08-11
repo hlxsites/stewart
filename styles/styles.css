@@ -612,20 +612,20 @@ main .section>div {
   }
 }
 
-.section.left-border .default-content-wrapper,
+.section.left-border:not(.columns-container) .default-content-wrapper,
 .section.left-border .columns > .row > .column-1 {
   padding-inline-start: 1.5rem;
 }
 
-.section.left-border .default-content-wrapper,
+.section.left-border:not(.columns-container) .default-content-wrapper,
+.section.has-bg.left-border.grey:not(.columns-container) .default-content-wrapper,
 .section.left-border .columns > .row > .column-1,
-.section.has-bg.left-border.grey .default-content-wrapper,
 .section.has-bg.left-border.grey .columns > .row > .column-1 {
   border-inline-start: 0.25rem solid var(--clr-teal);
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
-.section.has-bg.left-border .default-content-wrapper,
+.section.has-bg.left-border:not(.columns-container) .default-content-wrapper,
 .section.has-bg.left-border .columns > .row > .column-1 {
   border-inline-start: 0.25rem solid var(--clr-white);
 }

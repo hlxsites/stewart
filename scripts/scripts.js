@@ -377,7 +377,7 @@ async function loadTemplate(templateName) {
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function decorateMain(main) {
+export async function decorateMain(main, isFragment = false) {
   // hopefully forward compatible button decoration
   wrapImgsInLinks(main);
   decorateLinks(main);
@@ -387,14 +387,14 @@ export async function decorateMain(main) {
   try {
     const template = getMetadata('template');
     let autoBlocksFunc = buildAutoBlocks;
-    if (template) {
+    if (template && !isFragment) {
       // template js, if they exist, must call appropriate auto-blocks on their own
       const templateMod = await loadTemplate(toClassName(template));
       if (templateMod && templateMod.default) {
         autoBlocksFunc = templateMod.default;
       }
     }
-    await autoBlocksFunc(main);
+    await autoBlocksFunc(main, isFragment);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
