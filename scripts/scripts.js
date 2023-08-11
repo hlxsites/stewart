@@ -207,6 +207,35 @@ export async function fetchNavigationHTML() {
 }
 
 /**
+ * fetches page and returns a json representation of all it's metadata
+ * @param {string} path path to the page to fetch
+ */
+export async function fetchMetadataJson(path) {
+  const data = {};
+  const resp = await fetch(path);
+  if (resp.ok) {
+    const html = await resp.text();
+    const parser = new DOMParser();
+    const contentDoc = parser.parseFromString(html, 'text/html');
+    contentDoc.querySelectorAll('head > meta').forEach((metaTag) => {
+      const name = metaTag.getAttribute('name') || metaTag.getAttribute('property');
+      const value = metaTag.getAttribute('content');
+      if (data[name]) {
+        let val = data[name];
+        if (!Array.isArray(val)) {
+          val = [val];
+        }
+        val.push(value);
+        data[name] = val;
+      } else {
+        data[name] = value;
+      }
+    });
+  }
+
+  return data;
+}
+/**
  * decorates section background images out of section metadata
  * @param {element} main the container element
  */

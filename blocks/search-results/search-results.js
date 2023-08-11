@@ -1,7 +1,7 @@
 import { createSearchForm, getSearchConfig, queryIndexPath } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
-import { toClassName } from '../../scripts/lib-franklin.js';
+import { toClassName, sampleRUM } from '../../scripts/lib-franklin.js';
 import getTaxonomy from '../../scripts/taxonomy.js';
 
 // media query match that indicates mobile/tablet width
@@ -342,6 +342,8 @@ export default async function decorate(block) {
     renderSearchResults(block, cfg, searchTerm, '', '1');
     addQueryParamToURL('page', '1');
     addQueryParamToURL('q', searchTerm);
+
+    sampleRUM('search', { source: '.search-form .search-input', target: searchTerm });
   });
 
   block.append(renderSearchResultsScaffolding());

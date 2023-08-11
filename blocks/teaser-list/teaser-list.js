@@ -1,3 +1,6 @@
+import { createOptimizedPicture, fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import { createElement, fetchMetadataJson } from '../../scripts/scripts.js';
+
 const blockName = 'teaser-list';
 
 const classNames = {
@@ -38,22 +41,36 @@ const assignContentClasses = (teaser) => {
   }
 };
 
+/**
+ * decorate the teaser list
+ * @param {Element} block the block element
+ */
 export default async function decorate(block) {
+  const placeholders = await fetchPlaceholders();
   const teaserPromises = [...block.children].map(async (teaser) => {
     teaser.classList.add(classNames.teaser);
 
     const pic = teaser.querySelector('picture');
     const link = teaser.querySelector('a');
     if (link && !pic) {
-      // todo build teaser from page content
-      // undecided if this should be done via query index or by fetching page directly.
-      // fetching page directly is probably faster
-      // const teaserPageResp = await fetch(link.href);
-      // if (teaserPageResp.ok) {
-      //   const content = await teaserPageResp.text();
-      //   const parser = new DOMParser();
-      //   const contentDoc = parser.parseFromString(content, 'text/html');
-      // }
+      const teaserPageMeta = await fetchMetadataJson(new URL(link.href).pathname);
+      if (teaserPageMeta['og:image']) {
+        const imageDiv = createElement('div', {}, [
+          createOptimizedPicture(teaserPageMeta['og:image']),
+        ]);
+        const contentDiv = createElement('div', {}, [
+          createElement('h3', {}, createElement('a', { href: link.href }, teaserPageMeta['navigation-title'] || teaserPageMeta['og:title'])),
+          createElement('p', {}, teaserPageMeta.description),
+          createElement('p', {}, createElement('a', { href: link.href }, placeholders.readMore || 'Read More')),
+        ]);
+        if (teaserPageMeta['publication-date']) {
+          contentDiv.prepend(createElement('p', {}, teaserPageMeta['publication-date']));
+        }
+
+        teaser.replaceChildren(imageDiv, contentDiv);
+      } else {
+        teaser.remove();
+      }
     }
 
     assignContainerClasses(teaser);

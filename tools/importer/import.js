@@ -145,6 +145,7 @@ const getPublishDate = (document) => {
 
 const translateTemplateName = (templateName) => {
   switch (templateName) {
+    case 'stewart-homepage': return 'Home Page';
     case 'blog-article-page': return 'Blog Article Page';
     case 'press-release-page': return 'Press Release Page';
     case 'market-landing-page': return 'Market Landing Page';
@@ -155,7 +156,6 @@ const translateTemplateName = (templateName) => {
       return 'Section Page';
     // These all get ignored
     case 'content-page':
-    case 'stewart-homepage':
     case 'general-webpage':
     case 'web-calculators-page':
     case 'content-search':
@@ -745,20 +745,25 @@ const generateDocumentPath = ({
 
 const updateLinks = (document) => {
   document.querySelectorAll('a').forEach((a) => {
-    let { href } = a;
-    if (href) {
-      if (href.startsWith('/')) {
-        href = `https://www.stewart.com${href}`;
-      }
-      const aURL = new URL(href);
-
-      if (aURL.hostname === 'www.stewart.com') {
-        // sanitze local links
-        if (!aURL.pathname.startsWith('/content/dam/')) {
-          aURL.pathname = sanitizePath(aURL.pathname);
+    try {
+      let { href } = a;
+      if (href) {
+        if (href.startsWith('/')) {
+          href = `https://www.stewart.com${href}`;
         }
+        const aURL = new URL(href);
+
+        if (aURL.hostname === 'www.stewart.com') {
+          // sanitze local links
+          if (!aURL.pathname.startsWith('/content/dam/')) {
+            aURL.pathname = sanitizePath(aURL.pathname);
+          }
+        }
+        a.href = aURL.toString();
       }
-      a.href = aURL.toString();
+    } catch (e) {
+      // no op
+      console.error(e);
     }
   });
 };
@@ -813,6 +818,14 @@ const processFragments = (document, docPath) => {
       fragments.push({
         element: div,
         path: cardPath,
+        report: {
+          blocks: 'Person Detail Card',
+          assetLinks: 'n/a',
+          fragmentPaths: 'isFragment',
+          previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
+          liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
+          prodUrl: `https://www.stewart.com${cardPath}`,
+        },
       });
       const link = document.createElement('a');
       link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
@@ -842,6 +855,14 @@ const processFragments = (document, docPath) => {
     fragments.push({
       element: div,
       path,
+      report: {
+        blocks: blockName,
+        assetLinks: 'n/a',
+        fragmentPaths: 'isFragment',
+        previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
+        liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
+        prodUrl: `https://www.stewart.com${path}`,
+      },
     });
     const link = document.createElement('a');
     link.href = `https://main--stewart--hlxsites.hlx.page${path}`;

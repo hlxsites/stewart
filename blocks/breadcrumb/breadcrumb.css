@@ -1,0 +1,25 @@
+.breadcrumb {
+  min-height: var(--body-font-size-s);
+  margin-block-end: 1rem;
+}
+
+.breadcrumb > nav {
+  color: var(--link-color);
+  font-size: var(--body-font-size-xxxs);
+  line-height: 1;
+}
+
+@media (min-width: 600px) {
+  .breadcrumb > nav {
+    font-size: var(--body-font-size-s);
+  }
+}
+
+.breadcrumb > nav a,
+.breadcrumb > nav span {
+  color: var(--clr-gray-dark);
+}
+
+.breadcrumb .breadcrumb-separator {
+  margin-inline: 1ch;
+}
