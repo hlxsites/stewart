@@ -71,6 +71,20 @@ function configureDefaultFormPost(form, successMessage, failureMessage) {
   });
 }
 
+function configureEmailFormPost(form, subject) {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    // Build the email body using carriage return and new line as delimiters
+    const body = [...(new FormData(form)).entries()].map((entry) => `${entry[0]}: ${entry[1]}`).join('\r\n');
+    const action = form.getAttribute('action');
+    // URL encode the body
+    const encodedBody = encodeURIComponent(body);
+    // Open the mailto link with subject and body in new window
+    const url = `${action}?subject=${subject}&body=${encodedBody}`;
+    window.open(url, '_blank');
+  });
+}
+
 function buildForm(formData, defaultAction) {
   const form = createElement('form');
   form.setAttribute('action', defaultAction);
@@ -83,6 +97,7 @@ function buildForm(formData, defaultAction) {
   const placeholders = fetchPlaceholders();
   let successMessage = placeholders?.formSuccessMessage || '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.';
   let failureMessage = placeholders?.formFailureMessage || '*An error has occurred!* Please contact webmaster@stewart.com and let us know the name and URL of the form you just tried to complete. Something happened and it didn\'t accept your information. We apologize!';
+  let subject = placeholders?.formSubject || 'Form Submission';
   let submitLabel = placeholders?.formSubmitLabel || 'Submit';
   const encounteredFieldLabels = new Set();
   formFieldData.forEach((field) => {
@@ -116,6 +131,8 @@ function buildForm(formData, defaultAction) {
         failureMessage = options || defaultValue;
       } else if (name.toLowerCase() === 'submit') {
         submitLabel = label || options || defaultValue;
+      } else if (name.toLowerCase() === 'subject') {
+        subject = options || defaultValue;
       }
       return;
     }
@@ -299,6 +316,9 @@ function buildForm(formData, defaultAction) {
   if (usesDefaultAction) {
     // Default action uses AJAX to post the form
     configureDefaultFormPost(form, successMessage, failureMessage);
+  } else if (form.getAttribute('action').startsWith('mailto:')) {
+    // Mailto action opens the user's email client
+    configureEmailFormPost(form, subject);
   }
   return form;
 }
