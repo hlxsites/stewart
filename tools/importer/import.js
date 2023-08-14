@@ -817,6 +817,7 @@ const processFragments = (document, docPath) => {
           blocks: 'Person Detail Card',
           assetLinks: 'n/a',
           fragmentPaths: 'isFragment',
+          hasNestedSections: 'false',
           previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
           liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
           prodUrl: `https://www.stewart.com${cardPath}`,
@@ -854,6 +855,7 @@ const processFragments = (document, docPath) => {
         blocks: blockName,
         assetLinks: 'n/a',
         fragmentPaths: 'isFragment',
+        hasNestedSections: 'false',
         previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
         liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
         prodUrl: `https://www.stewart.com${path}`,
@@ -914,6 +916,7 @@ export default {
     });
 
     // Create sections of the page
+    const hasNestedSections = document.querySelector('.pagesection .pagesection') ? 'true' : 'false';
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
     // Build document and store into main element
@@ -942,6 +945,7 @@ export default {
       blocks: gatherBlockNames(document) || 'n/a',
       assetLinks: gatherAssetLinks(document) || 'n/a',
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
+      hasNestedSections,
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
