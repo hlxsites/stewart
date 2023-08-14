@@ -296,7 +296,7 @@ const buildForms = (builder, section) => {
 };
 
 const buildTables = (builder, section) => {
-  section.querySelectorAll('table').forEach((table) => {
+  section.querySelectorAll('table:not([data-block])').forEach((table) => {
     let maxCols = 1;
     table.querySelectorAll('tr').forEach((tr) => {
       const cols = tr.querySelectorAll('td');
@@ -635,9 +635,6 @@ const buildBackgroundableSection = (builder, section) => {
   }
 };
 
-// Same thing for now
-const buildContentBreakSection = buildGenericSection;
-
 const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
   const meta = {};
@@ -694,8 +691,6 @@ const buildSection = (builder, section) => {
     buildHeroSection(builder, section);
   } else if (section.classList.contains('backgroundablepagesection')) {
     buildBackgroundableSection(builder, section);
-  } else if (section.classList.contains('contentbreak')) {
-    buildContentBreakSection(builder, section);
   } else if (section.classList.contains('experiencefragment')) {
     buildExperienceFragment(builder, section);
   } else {
