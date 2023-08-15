@@ -43,7 +43,7 @@
 }
 
 .list-container ul .list-item .text-wrapper strong {
-  font-size: 1rem;
+  font-size: var(--body-font-size-m);
   line-height: 1.25rem;
   letter-spacing: 0.01rem;
   margin-bottom: 0.5rem;
@@ -95,7 +95,7 @@
 .list-container ul .list-item .text-wrapper h4,
 .list-container ul .list-item .text-wrapper p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--body-font-size-xs);
   line-height: 1.125rem;
   letter-spacing: 0.0138rem;
 }
@@ -141,7 +141,7 @@
   }
 
   .list-container ul .list-item .text-wrapper strong {
-    font-size: 1.625rem;
+    font-size: var(--body-font-size-xxl);
     line-height: 2.375rem;
     letter-spacing: 0.0163rem;
     margin-bottom: 0;
@@ -173,7 +173,7 @@
 
   .list-container ul .list-item .text-wrapper h4,
   .list-container ul .list-item .text-wrapper p {
-    font-size: 1.375rem;
+    font-size: var(--body-font-size-xl);
     line-height: 2rem;
   }
 }
