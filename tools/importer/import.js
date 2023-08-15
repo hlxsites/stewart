@@ -363,6 +363,8 @@ const buildColumnsBlock = (builder, section) => {
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
                   variants.add('Card', 'Dark');
+                } else if (col.querySelector('.ss-cardtype-peoplecard')) {
+                  variants.add('People Card');
                 } else {
                   variants.add('Card');
                 }

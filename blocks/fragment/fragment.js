@@ -44,7 +44,8 @@ export default async function decorate(block) {
     if (fragmentSection) {
       block.closest('.section').classList.add(...fragmentSection.classList);
       if (block.closest('.fragment-wrapper')) {
-        block.closest('.fragment-wrapper').replaceWith(...fragmentSection.childNodes);
+        block.closest('.fragment-wrapper').classList.remove('button-container');
+        block.closest('.fragment-wrapper').replaceChildren(...fragmentSection.childNodes);
       } else {
         block.replaceChildren(...fragmentSection.childNodes);
       }

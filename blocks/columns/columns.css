@@ -1,7 +1,7 @@
 .columns > .row {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .columns img {
@@ -68,10 +68,10 @@
   .columns .row {
     align-items: center;
     flex-direction: unset;
-    gap: 24px;
   }
 
-  .columns.card .row {
+  .columns.card .row,
+  .columns.people-card .row {
     align-items: stretch;
   }
 

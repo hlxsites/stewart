@@ -22,7 +22,7 @@ export default async function decorate(block) {
     }
 
     if (contentWrapper.querySelector('h5')) {
-      contentWrapperNew.append(createElement('h4', { class: 'title' }, contentWrapper.querySelector('h5').innerText));
+      contentWrapperNew.append(createElement('h4', { class: 'title' }, contentWrapper.querySelector('h5').innerHTML));
     }
 
     [...contentWrapper.querySelectorAll('p')].forEach((p) => {
