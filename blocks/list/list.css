@@ -60,19 +60,11 @@
 
 .list-container .default-content-wrapper h2 {
   text-align: center;
-  margin-bottom: 2rem;
 }
 
 .list-container.card-wrapper .default-content-wrapper h2 {
   text-align: left;
   margin-bottom: 0.5rem;
-}
-
-.list-container .default-content-wrapper h3 {
-  margin-bottom: 2rem;
-  font-size: var(--body-font-size-l);
-  line-height: 1.375rem;
-  letter-spacing: 0.0113rem;
 }
 
 .list-container .default-content-wrapper p {
@@ -163,14 +155,6 @@
   }
 
   /* Style the default content whihc is ouside of List block - START */
-
-  .list-container .default-content-wrapper h2 {
-    margin-bottom: 4rem;
-  }
-  
-  .list-container .default-content-wrapper h3 {
-    margin-bottom: 4rem;
-  }
 
   .list-container .default-content-wrapper p {
     margin-bottom: 3.5rem;

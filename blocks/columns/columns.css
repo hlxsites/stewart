@@ -107,6 +107,22 @@
     flex-basis: 25%;
   }
 
+  .columns.split-33-66 .row .column-1 {
+    flex-basis: 33.333%;
+  }
+
+  .columns.split-33-66 .row .column-2 {
+    flex-basis: 66.666%;
+  }
+
+  .columns.split-25-75 .row .column-1 {
+    flex-basis: 25%;
+  }
+
+  .columns.split-25-75 .row .column-2 {
+    flex-basis: 75%;
+  }
+
   .columns.card .row .column {
     box-shadow: 0 0.25rem 0.25rem 0 rgba(0 0 0 / 25%);
     border: .0625rem solid var(--clr-gray-dark);
