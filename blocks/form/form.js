@@ -2,8 +2,21 @@ import { createElement } from '../../scripts/scripts.js';
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 
 let isCmdShiftPressed = false;
+let commonOptions;
 
-function getOptions(formData, options) {
+async function getCommonOptions(listName) {
+  if (!commonOptions) {
+    const response = await fetch('/forms/common.json');
+    commonOptions = await response.json();
+  }
+  return [...commonOptions[listName].data];
+}
+
+async function getOptions(formData, options) {
+  // If options is state or yes-no get the common options
+  if (options === 'state' || options === 'yes-no') {
+    return getCommonOptions(options);
+  }
   if (formData[options] && formData[options].data) {
     return [...formData[options].data];
   }
@@ -85,13 +98,12 @@ function configureEmailFormPost(form, subject) {
   });
 }
 
-function buildForm(formData, defaultAction) {
+async function buildForm(formData, defaultAction) {
   const form = createElement('form');
   form.setAttribute('action', defaultAction);
   form.setAttribute('method', 'POST');
   const formFieldData = formData?.form?.data || formData.data;
   let currentSection = form;
-  let input;
   let previousIs2Col = false;
   let usesDefaultAction = true;
   const placeholders = fetchPlaceholders();
@@ -100,7 +112,8 @@ function buildForm(formData, defaultAction) {
   let subject = placeholders?.formSubject || 'Form Submission';
   let submitLabel = placeholders?.formSubmitLabel || 'Submit';
   const encounteredFieldLabels = new Set();
-  formFieldData.forEach((field) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const field of formFieldData) {
     const label = attr(field, 'label');
     const name = attr(field, 'name') || attr(field, 'label');
     let labelId = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}--label`;
@@ -112,7 +125,8 @@ function buildForm(formData, defaultAction) {
     encounteredFieldLabels.add(labelId);
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
-    const optionsList = getOptions(formData, options);
+    // eslint-disable-next-line no-await-in-loop
+    const optionsList = await getOptions(formData, options);
     const required = (attr(field, 'required') || 'n').toLowerCase() !== 'n';
     const cols = attr(field, 'cols') || 1;
     const help = attr(field, 'help');
@@ -135,10 +149,7 @@ function buildForm(formData, defaultAction) {
       } else if (name.toLowerCase() === 'subject') {
         subject = options || defaultValue;
       }
-      return;
-    }
-
-    if (type === 'section') {
+    } else if (type === 'section') {
       const newSection = createElement('div');
       newSection.classList = ['field-container'];
       if (cols) {
@@ -170,152 +181,151 @@ function buildForm(formData, defaultAction) {
         newSection.append(sectionTitle);
       }
       currentSection = newSection;
-      return;
-    }
-
-    const fieldDiv = createElement('div');
-    fieldDiv.classList = ['form-field'];
-    fieldDiv.classList.add(`type-${type}`);
-    if (cols) {
-      fieldDiv.classList.add(`col-${cols}`);
-    }
-    currentSection.append(fieldDiv);
-
-    if (label) {
-      const labelElem = createElement('label');
-      labelElem.setAttribute('for', name);
-      labelElem.setAttribute('id', labelId);
-      labelElem.textContent = label;
-      if (!required && type !== 'radio' && type !== 'checkbox' && type !== 'label') {
-        labelElem.classList.add('optional');
-      }
-      fieldDiv.append(labelElem);
     } else {
-      // Apply id attribute to the last h3 we created
-      const sectionTitle = currentSection.querySelector('h3:last-of-type');
-      if (sectionTitle) {
-        sectionTitle.setAttribute('id', labelId);
+      const fieldDiv = createElement('div');
+      fieldDiv.classList = ['form-field'];
+      fieldDiv.classList.add(`type-${type}`);
+      if (cols) {
+        fieldDiv.classList.add(`col-${cols}`);
       }
-    }
+      currentSection.append(fieldDiv);
 
-    switch (type) {
-      case 'text':
-        input = createElement('input');
-        input.setAttribute('name', name);
-        input.setAttribute('aria-labelledby', labelId);
-        if (placeholder) { input.setAttribute('placeholder', placeholder); }
-        if (defaultValue) { input.textContent = defaultValue; }
-        if (required) { input.setAttribute('required', true); }
-        fieldDiv.append(input);
-        break;
-      case 'textarea':
-        input = createElement('textarea');
-        input.setAttribute('name', name);
-        input.setAttribute('aria-labelledby', labelId);
-        if (placeholder) { input.setAttribute('placeholder', placeholder); }
-        if (defaultValue) { input.textContent = defaultValue; }
-        if (required) { input.setAttribute('required', true); }
-        fieldDiv.append(input);
-        break;
-      case 'select':
-        input = createElement('select');
-        input.setAttribute('name', name);
-        input.setAttribute('aria-labelledby', labelId);
-        if (required) { input.setAttribute('required', true); }
-        optionsList.forEach((option) => {
-          const selectionLabel = attr(option, 'label') || attr(option, 'display');
-          const value = attr(option, 'value');
-          const optionEle = createElement('option');
-          optionEle.setAttribute('value', value);
-          optionEle.textContent = selectionLabel;
-          if (defaultValue === value) {
-            optionEle.setAttribute('checked', true);
-          }
-          input.append(optionEle);
-        });
-        fieldDiv.append(input);
-        break;
-      case 'radio':
-        if (optionsList.length === 1 && !label) {
-          fieldDiv.classList.add('long-radio');
+      if (label) {
+        const labelElem = createElement('label');
+        labelElem.setAttribute('for', name);
+        labelElem.setAttribute('id', labelId);
+        labelElem.textContent = label;
+        if (!required && type !== 'radio' && type !== 'checkbox' && type !== 'label') {
+          labelElem.classList.add('optional');
         }
-        optionsList.forEach((option) => {
-          const selectionLabel = attr(option, 'label') || attr(option, 'display');
-          const value = attr(option, 'value');
+        fieldDiv.append(labelElem);
+      } else {
+        // Apply id attribute to the last h3 we created
+        const sectionTitle = currentSection.querySelector('h3:last-of-type');
+        if (sectionTitle) {
+          sectionTitle.setAttribute('id', labelId);
+        }
+      }
+      let input;
+      switch (type) {
+        case 'text':
           input = createElement('input');
           input.setAttribute('name', name);
           input.setAttribute('aria-labelledby', labelId);
-          input.setAttribute('type', 'radio');
-          input.setAttribute('value', value);
-          if (defaultValue === value) {
-            input.setAttribute('checked', true);
-          }
+          if (placeholder) { input.setAttribute('placeholder', placeholder); }
+          if (defaultValue) { input.textContent = defaultValue; }
+          if (required) { input.setAttribute('required', true); }
           fieldDiv.append(input);
-          const labelEle = createElement('label');
-          labelEle.setAttribute('class', 'value-label');
-          labelEle.textContent = selectionLabel;
-          fieldDiv.append(labelEle);
-        });
+          break;
+        case 'textarea':
+          input = createElement('textarea');
+          input.setAttribute('name', name);
+          input.setAttribute('aria-labelledby', labelId);
+          if (placeholder) { input.setAttribute('placeholder', placeholder); }
+          if (defaultValue) { input.textContent = defaultValue; }
+          if (required) { input.setAttribute('required', true); }
+          fieldDiv.append(input);
+          break;
+        case 'select':
+          input = createElement('select');
+          input.setAttribute('name', name);
+          input.setAttribute('aria-labelledby', labelId);
+          if (required) { input.setAttribute('required', true); }
+          optionsList.forEach((option) => {
+            const selectionLabel = attr(option, 'label') || attr(option, 'display');
+            const value = attr(option, 'value');
+            const optionEle = createElement('option');
+            optionEle.setAttribute('value', value);
+            optionEle.textContent = selectionLabel;
+            if (defaultValue === value) {
+              optionEle.setAttribute('checked', true);
+            }
+            input.append(optionEle);
+          });
+          fieldDiv.append(input);
+          break;
+        case 'radio':
+          if (optionsList.length === 1 && !label) {
+            fieldDiv.classList.add('long-radio');
+          }
+          optionsList.forEach((option) => {
+            const selectionLabel = attr(option, 'label') || attr(option, 'display');
+            const value = attr(option, 'value');
+            input = createElement('input');
+            input.setAttribute('name', name);
+            input.setAttribute('aria-labelledby', labelId);
+            input.setAttribute('type', 'radio');
+            input.setAttribute('value', value);
+            if (defaultValue === value) {
+              input.setAttribute('checked', true);
+            }
+            fieldDiv.append(input);
+            const labelEle = createElement('label');
+            labelEle.setAttribute('class', 'value-label');
+            labelEle.textContent = selectionLabel;
+            fieldDiv.append(labelEle);
+          });
 
-        break;
-      case 'checkbox':
-        input = createElement('input');
-        input.setAttribute('name', name);
-        input.setAttribute('type', 'checkbox');
-        input.setAttribute('aria-labelledby', labelId);
-        if (required) { input.setAttribute('required', true); }
-        fieldDiv.append(input);
-        break;
-      case 'date':
-        input = createElement('input');
-        input.setAttribute('name', name);
-        input.setAttribute('type', 'date');
-        input.setAttribute('aria-labelledby', labelId);
-        input.setAttribute('placeholder', placeholder || 'mm/dd/yyyy');
-        if (required) { input.setAttribute('required', true); }
-        if (defaultValue) { input.textContent = defaultValue; }
-        fieldDiv.append(input);
-        break;
-      case 'tel':
-      case 'telephone':
-      case 'phone':
-        input = createElement('input');
-        input.setAttribute('name', name);
-        input.setAttribute('type', 'tel');
-        input.setAttribute('aria-labelledby', labelId);
-        input.setAttribute('placeholder', placeholder || '555-555-5555');
-        if (required) { input.setAttribute('required', true); }
-        if (defaultValue) { input.textContent = defaultValue; }
-        fieldDiv.append(input);
-        break;
-      case 'email':
-        input = createElement('input');
-        input.setAttribute('name', name);
-        input.setAttribute('type', 'email');
-        input.setAttribute('aria-labelledby', labelId);
-        input.setAttribute('placeholder', placeholder);
-        if (required) { input.setAttribute('required', true); }
-        if (defaultValue) { input.textContent = defaultValue; }
-        fieldDiv.append(input);
-        break;
-      default:
-        break;
-    }
-    if (help) {
-      if (helpUrl) {
-        const helpLink = createElement('a');
-        helpLink.classList = ['help'];
-        helpLink.setAttribute('href', helpUrl);
-        helpLink.textContent = help;
-        fieldDiv.append(helpLink);
-      } else {
-        const helpEle = createElement('p');
-        helpEle.classList = ['help'];
-        helpEle.textContent = help;
-        fieldDiv.append(helpEle);
+          break;
+        case 'checkbox':
+          input = createElement('input');
+          input.setAttribute('name', name);
+          input.setAttribute('type', 'checkbox');
+          input.setAttribute('aria-labelledby', labelId);
+          if (required) { input.setAttribute('required', true); }
+          fieldDiv.append(input);
+          break;
+        case 'date':
+          input = createElement('input');
+          input.setAttribute('name', name);
+          input.setAttribute('type', 'date');
+          input.setAttribute('aria-labelledby', labelId);
+          input.setAttribute('placeholder', placeholder || 'mm/dd/yyyy');
+          if (required) { input.setAttribute('required', true); }
+          if (defaultValue) { input.textContent = defaultValue; }
+          fieldDiv.append(input);
+          break;
+        case 'tel':
+        case 'telephone':
+        case 'phone':
+          input = createElement('input');
+          input.setAttribute('name', name);
+          input.setAttribute('type', 'tel');
+          input.setAttribute('aria-labelledby', labelId);
+          input.setAttribute('placeholder', placeholder || '555-555-5555');
+          if (required) { input.setAttribute('required', true); }
+          if (defaultValue) { input.textContent = defaultValue; }
+          fieldDiv.append(input);
+          break;
+        case 'email':
+          input = createElement('input');
+          input.setAttribute('name', name);
+          input.setAttribute('type', 'email');
+          input.setAttribute('aria-labelledby', labelId);
+          input.setAttribute('placeholder', placeholder);
+          if (required) { input.setAttribute('required', true); }
+          if (defaultValue) { input.textContent = defaultValue; }
+          fieldDiv.append(input);
+          break;
+        default:
+          break;
+      }
+      if (help) {
+        if (helpUrl) {
+          const helpLink = createElement('a');
+          helpLink.classList = ['help'];
+          helpLink.setAttribute('href', helpUrl);
+          helpLink.textContent = help;
+          fieldDiv.append(helpLink);
+        } else {
+          const helpEle = createElement('p');
+          helpEle.classList = ['help'];
+          helpEle.textContent = help;
+          fieldDiv.append(helpEle);
+        }
       }
     }
-  });
+  }
 
   form.append(createElement('input', { type: 'submit', value: submitLabel }));
   if (usesDefaultAction) {
@@ -357,7 +367,7 @@ function autofillForm(form) {
  * loads and generated the form
  * @param {Element} formEmbed The marker for the form embed
  */
-export default function decorate(block) {
+export default async function decorate(block) {
   const observer = new IntersectionObserver(async (entries) => {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
@@ -366,7 +376,7 @@ export default function decorate(block) {
         // The form id is everything after the colon in the text
         const formData = await fetch(`/forms/${formId}.json`);
         const formJson = await formData.json();
-        const form = buildForm(formJson, `/forms/${formId}`);
+        const form = await buildForm(formJson, `/forms/${formId}`);
         block.replaceWith(form);
 
         // If domain is localhost or contains hlxsites.hlx then track keboard events

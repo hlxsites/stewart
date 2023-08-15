@@ -1,14 +1,13 @@
 .form-wrapper form input[type="submit"] {
     width: 10em;
-    background-color: #007dbd;
-    border-color: #007dbd;
+    background-color: var(--clr-primary);
+    border-color: var(--clr-primary);
     color: var(--clr-white);
     margin-left: 0.5em;
 }
 
 .form-wrapper form input[type="submit"]:hover {
-    background-color: #006dad;
-    border-color: #006dad;
+    filter:brightness(0.9);
 }
 
 .form-wrapper form input[type="submit"]:active {
@@ -39,7 +38,6 @@
 }
 
 .section-col-2-wrapper .section-col-2 {
-    /* border: 2px solid red; */
     display: inline-flex;
     flex-grow: 1;
     width: 100%;
@@ -190,7 +188,7 @@
 /** Completion messages **/
 
 p.form-success {
-    color: #0f5132;
+    color:  var(--clr-green);
     background-color: #d1e7dd;
     border: 1px solid #badbcc;
     padding: 1.5em;
@@ -201,7 +199,7 @@ p.form-success {
 }
 
 p.form-failure {
-    color: #842029;
+    color: var(--clr-brand-red);
     background-color: #f8d7da;
     border: 1px solid #f5c2c7;
     padding: 1.5em;
