@@ -4,7 +4,7 @@ import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 let isCmdShiftPressed = false;
 
 function getOptions(formData, options) {
-  if (formData[options] || formData[options].data) {
+  if (formData[options] && formData[options].data) {
     return [...formData[options].data];
   }
   return [...options].split(',').map((option) => {
@@ -357,7 +357,7 @@ export default function decorate(block) {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
         observer.disconnect();
-        const formId = block.textContent.trim();
+        const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
         // The form id is everything after the colon in the text
         const formData = await fetch(`/forms/${formId}.json`);
         const formJson = await formData.json();
