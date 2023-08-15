@@ -115,7 +115,7 @@ function processFormOption(name, form, options, defaultValue, formOptions, label
   }
 }
 
-function processFormSection(lastSection, form, label, cols, options) {
+function buildFormSection(lastSection, form, label, cols, options) {
   let previousIs2Col = lastSection?.previousIs2Col || false;
   const newSection = createElement('div');
   newSection.classList = ['field-container'];
@@ -195,7 +195,7 @@ async function buildForm(formData, defaultAction) {
         processFormOption(name, form, options, defaultValue, formOptions, label);
         break;
       case 'section':
-        currentSection = processFormSection(currentSection, form, label, cols, options);
+        currentSection = buildFormSection(currentSection, form, label, cols, options);
         break;
       default:
         fieldDiv = createElement('div');
