@@ -115,13 +115,48 @@ function processFormOption(name, form, options, defaultValue, formOptions, label
   }
 }
 
+function processFormSection(lastSection, form, label, cols, options) {
+  let previousIs2Col = lastSection?.previousIs2Col || false;
+  const newSection = createElement('div');
+  newSection.classList = ['field-container'];
+  if (cols) {
+    newSection.classList.add(`col-${cols}`);
+  }
+  if (options.includes('transparent')) {
+    newSection.classList.add('transparent');
+  }
+  if (options.includes('2-col')) {
+    newSection.classList.add('section-col-2');
+    if (previousIs2Col) {
+      previousIs2Col = false;
+      lastSection.parentElement.append(newSection);
+    } else {
+      previousIs2Col = true;
+      const sectionWrapper = createElement('div');
+      sectionWrapper.classList = ['form-section'];
+      sectionWrapper.classList.add('section-col-2-wrapper');
+      sectionWrapper.append(newSection);
+      form.append(sectionWrapper);
+    }
+  } else {
+    newSection.classList.add('form-section');
+    form.append(newSection);
+  }
+  if (label) {
+    const sectionTitle = createElement('h3');
+    sectionTitle.textContent = label;
+    newSection.append(sectionTitle);
+  }
+  newSection.previousIs2Col = previousIs2Col;
+  return newSection;
+}
+
 async function buildForm(formData, defaultAction) {
   const form = createElement('form');
   form.setAttribute('action', defaultAction);
   form.setAttribute('method', 'POST');
   const formFieldData = formData?.form?.data || formData.data;
   let currentSection = form;
-  let previousIs2Col = false;
   const placeholders = fetchPlaceholders();
   const formOptions = {
     successMessage: placeholders?.formSuccessMessage || '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.',
@@ -153,7 +188,6 @@ async function buildForm(formData, defaultAction) {
     const defaultValue = attr(field, 'default');
     const placeholder = attr(field, 'placeholder');
     let input;
-    let newSection;
     let fieldDiv;
 
     switch (type) {
@@ -161,37 +195,7 @@ async function buildForm(formData, defaultAction) {
         processFormOption(name, form, options, defaultValue, formOptions, label);
         break;
       case 'section':
-        newSection = createElement('div');
-        newSection.classList = ['field-container'];
-        if (cols) {
-          newSection.classList.add(`col-${cols}`);
-        }
-        if (options.includes('transparent')) {
-          newSection.classList.add('transparent');
-        }
-        if (options.includes('2-col')) {
-          newSection.classList.add('section-col-2');
-          if (previousIs2Col) {
-            previousIs2Col = false;
-            currentSection.parentElement.append(newSection);
-          } else {
-            previousIs2Col = true;
-            const sectionWrapper = createElement('div');
-            sectionWrapper.classList = ['form-section'];
-            sectionWrapper.classList.add('section-col-2-wrapper');
-            sectionWrapper.append(newSection);
-            form.append(sectionWrapper);
-          }
-        } else {
-          newSection.classList.add('form-section');
-          form.append(newSection);
-        }
-        if (label) {
-          const sectionTitle = createElement('h3');
-          sectionTitle.textContent = label;
-          newSection.append(sectionTitle);
-        }
-        currentSection = newSection;
+        currentSection = processFormSection(currentSection, form, label, cols, options);
         break;
       default:
         fieldDiv = createElement('div');
