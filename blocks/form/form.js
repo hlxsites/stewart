@@ -7,7 +7,7 @@ function getOptions(formData, options) {
   if (formData[options] && formData[options].data) {
     return [...formData[options].data];
   }
-  return [...options].split(',').map((option) => {
+  return [...options.split(',')].map((option) => {
     if (option.includes(':')) {
       const [display, value] = option.split(':');
       return { display, value };
@@ -112,6 +112,7 @@ function buildForm(formData, defaultAction) {
     encounteredFieldLabels.add(labelId);
     const type = (attr(field, 'type') || '').toLowerCase();
     const options = attr(field, 'options');
+    const optionsList = getOptions(formData, options);
     const required = (attr(field, 'required') || 'n').toLowerCase() !== 'n';
     const cols = attr(field, 'cols') || 1;
     const help = attr(field, 'help');
@@ -221,7 +222,7 @@ function buildForm(formData, defaultAction) {
         input.setAttribute('name', name);
         input.setAttribute('aria-labelledby', labelId);
         if (required) { input.setAttribute('required', true); }
-        getOptions(formData, options).forEach((option) => {
+        optionsList.forEach((option) => {
           const selectionLabel = attr(option, 'label') || attr(option, 'display');
           const value = attr(option, 'value');
           const optionEle = createElement('option');
@@ -235,7 +236,10 @@ function buildForm(formData, defaultAction) {
         fieldDiv.append(input);
         break;
       case 'radio':
-        getOptions(formData, options).forEach((option) => {
+        if (optionsList.length === 1 && !label) {
+          fieldDiv.classList.add('long-radio');
+        }
+        optionsList.forEach((option) => {
           const selectionLabel = attr(option, 'label') || attr(option, 'display');
           const value = attr(option, 'value');
           input = createElement('input');
@@ -252,6 +256,7 @@ function buildForm(formData, defaultAction) {
           labelEle.textContent = selectionLabel;
           fieldDiv.append(labelEle);
         });
+
         break;
       case 'checkbox':
         input = createElement('input');

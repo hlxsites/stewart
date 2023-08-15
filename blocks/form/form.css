@@ -147,6 +147,19 @@
     width: 1.25em;
 }
 
+.field-container .help {
+    font-size: var(--body-font-size-xs);
+    display: block;
+}
+
+.field-container .form-field.type-radio.long-radio .help {
+    display: inline-block;
+    font-size: var(--body-font-size-xxs);
+    font-style: italic;
+    padding-left:1em;
+    margin: 0;
+}
+
 .field-container .form-field.type-radio label.value-label {
     display: inline-block;
 }
@@ -172,11 +185,6 @@
     border-radius: 0.25rem;
     box-sizing: border-box;
     border: 1px solid var(--text-color);    
-}
-
-.field-container .help {
-    font-size: var(--body-font-size-xs);
-    display: block;
 }
 
 /** Completion messages **/
