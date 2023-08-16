@@ -581,6 +581,7 @@ main .section>div {
 @media(min-width: 600px) {
   .section.wide {
     --max-content-width: 100rem; 
+    
     padding-inline: 3%;
   }
   
