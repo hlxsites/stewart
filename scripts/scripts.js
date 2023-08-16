@@ -312,13 +312,13 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
+    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
-      const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
         section.classList.add('no-margin');
       }
-    } else {
+    } else if (thisHasBg) {
       section.classList.add('no-margin');
     }
   }
