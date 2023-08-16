@@ -343,13 +343,13 @@ const buildColumnsBlock = (builder, section) => {
               }
 
               if (cols.length === 2) {
-                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
+                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8') || cols[0].classList.contains('col-xl-8')) {
                   variants.add('Split 66-33');
-                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
+                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4') || cols[0].classList.contains('col-xl-4')) {
                   variants.add('Split 33-66');
-                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
+                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9') || cols[0].classList.contains('col-xl-9')) {
                   variants.add('Split 75-25');
-                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
+                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3') || cols[0].classList.contains('col-xl-3')) {
                   variants.add('Split 25-75');
                 }
               }
@@ -380,7 +380,8 @@ const buildColumnsBlock = (builder, section) => {
               inTable = true;
             }
 
-            if (cols.length > 2 && col.classList.contains('col-md-6') && (index % 2) === 0) {
+            if (cols.length > 2 && (index % 2) === 0
+              && (col.classList.contains('col-md-6') || col.classList.contains('col-lg-6') || col.classList.contains('col-xl-6'))) {
               // Move the additional columns into a new row if more than 2 columns(50%) exist in a row
               newRow = true;
             }
@@ -942,6 +943,8 @@ export default {
       params,
     });
 
+    const blocks = gatherBlockNames(document) || 'n/a';
+    const assetLinks = gatherAssetLinks(document) || 'n/a';
     const fragments = processFragments(document, docPath);
 
     // Note the classes used for each section
@@ -949,8 +952,8 @@ export default {
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
     const report = {
-      blocks: gatherBlockNames(document) || 'n/a',
-      assetLinks: gatherAssetLinks(document) || 'n/a',
+      blocks,
+      assetLinks,
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       hasNestedSections,
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
