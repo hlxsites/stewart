@@ -578,10 +578,12 @@ main .section>div {
 }
 
 @media(min-width: 600px) {
+  /* wide section */
   .section.wide {
     padding: 8% 3%;
   }
 
+  /* narrow section */
   .section.narrow {
     margin-inline-start: 8%;
     margin-inline-end: 8%;
@@ -589,6 +591,7 @@ main .section>div {
     max-width: 64rem;
   }
 
+  /* bg image section */
   .section.narrow.has-bg-image {
     max-width: 100%;
     margin-inline-start: unset;
