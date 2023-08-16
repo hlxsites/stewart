@@ -66,7 +66,6 @@
 
 @media (min-width: 600px) {
   .columns .row {
-    align-items: center;
     flex-direction: unset;
     gap: 24px;
   }
