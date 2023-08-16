@@ -54,6 +54,7 @@
   --body-font-family: 'Montserrat', 'Montserrat-fallback', sans-serif;
   --heading-font-family: var(--body-font-family);
   --fixed-font-family: sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New', monospace;
+  --icon-font-family: 'Font Awesome\ 5 Pro';
 
   /* body sizes */
   --body-font-size-xxl: 1.625rem; /* 26px */

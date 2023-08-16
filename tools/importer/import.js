@@ -322,12 +322,12 @@ const buildColumnsBlock = (builder, section) => {
     let inTable = false;
     // for each child of parent element, append if it is not a column
     for (const child of [...parentElement.children]) {
-      if (child.classList.contains('columnrow')) {
+      if (child.classList.contains('columnrow') || child.querySelector('.columnrow')) { // Few columns present inside container component
         // First make sure we don't try to render nested columns
         child.querySelectorAll('.cmp-columnrow__item .cmp-columnrow__item').forEach((nested) => nested.classList.remove('cmp-columnrow__item'));
         const cols = child.querySelectorAll('.cmp-columnrow__item');
         let newRow = true;
-        for (const col of [...cols]) {
+        for (const [index, col] of [...cols].entries()) {
           if (isHeading(col) || ((col.classList.contains('col-12') || col.querySelector('.col-12')) && newRow) || (cols.length === 1 && !inTable)) {
             if (inTable) {
               builder.jumpTo(undefined);
@@ -363,6 +363,8 @@ const buildColumnsBlock = (builder, section) => {
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
                   variants.add('Card', 'Dark');
+                } else if (col.querySelector('.ss-cardtype-peoplecard')) {
+                  variants.add('People Card');
                 } else {
                   variants.add('Card');
                 }
@@ -376,6 +378,11 @@ const buildColumnsBlock = (builder, section) => {
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;
+            }
+
+            if (cols.length > 2 && col.classList.contains('col-md-6') && (index % 2) === 0) {
+              // Move the additional columns into a new row if more than 2 columns(50%) exist in a row
+              newRow = true;
             }
 
             if (newRow) {
