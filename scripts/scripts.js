@@ -137,6 +137,17 @@ export function buildFragmentBlocks(main) {
   });
 }
 
+function buildFormBlocks(main) {
+  main.querySelectorAll('code').forEach((code) => {
+    if (code.textContent.toLowerCase().startsWith('form:')) {
+      const formId = code.textContent.split(':')[1].trim();
+      const block = buildBlock('form', { elems: [formId] });
+      code.replaceWith(block);
+      decorateBlock(block);
+    }
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -145,6 +156,7 @@ export function buildAutoBlocks(main) {
   buildHeroBlock(main);
   buildEmbedBlocks(main);
   buildFragmentBlocks(main);
+  buildFormBlocks(main);
 }
 
 export function decorateLinks(element) {
