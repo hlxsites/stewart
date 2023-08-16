@@ -1,3 +1,6 @@
+import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+
+const placeholders = fetchPlaceholders();
 let thisform;
 
 function formatAsMoney(amount, locale, currency) {
@@ -103,7 +106,7 @@ function printSchedule(p, t, r, s) {
 
     // set date output
     monthly.date = `${months[monthly.month]} ${monthly.year}`;
-    yearly.date = `Year ${monthly.year}`;
+    yearly.date = `${placeholders?.year || 'Year'} ${monthly.year}`;
 
     // calc interest
     monthly.interest = Math.round((monthly.principle * monthlyRate) / 1000000);
@@ -131,8 +134,12 @@ function printSchedule(p, t, r, s) {
 
           if (i === 0) {
             tableData.innerHTML = yearly[columns[i]];
-          } else {
-            tableData.innerHTML = formatAsMoney(yearly[columns[i]] / 100);
+          } else if (i === 1) {
+            tableData.innerHTML = `<span>${placeholders?.principalPaid || 'Principal Paid'}</span><span>${formatAsMoney(yearly[columns[i]] / 100)}</span>`;
+          } else if (i === 2) {
+            tableData.innerHTML = `<span>${placeholders?.interestPaid || 'Interest Paid'}</span><span>${formatAsMoney(yearly[columns[i]] / 100)}</span>`;
+          } else if (i === 3) {
+            tableData.innerHTML = `<span>${placeholders?.remainingBalance || 'Remaining Balance'}</span><span>${formatAsMoney(yearly[columns[i]] / 100)}</span>`;
           }
         }
       }
@@ -142,9 +149,12 @@ function printSchedule(p, t, r, s) {
         tableData = tableRow.insertCell(i);
         if (i === 0) {
           tableData.innerHTML = monthly[columns[i]];
-        } else {
-          tableData.innerHTML = (formatAsMoney(monthly[columns[i]] / 100));
-          tableData.className = 'amortDollarCell';
+        } else if (i === 1) {
+          tableData.innerHTML = `<span>${placeholders?.principalPaid || 'Principal Paid'}</span><span>${formatAsMoney(monthly[columns[i]] / 100)}</span>`;
+        } else if (i === 2) {
+          tableData.innerHTML = `<span>${placeholders?.interestPaid || 'Interest Paid'}</span><span>${formatAsMoney(monthly[columns[i]] / 100)}</span>`;
+        } else if (i === 3) {
+          tableData.innerHTML = `<span>${placeholders?.remainingBalance || 'Remaining Balance'}</span><span>${formatAsMoney(monthly[columns[i]] / 100)}</span>`;
         }
       }
     }

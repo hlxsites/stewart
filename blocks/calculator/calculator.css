@@ -165,7 +165,7 @@
   font-weight: 400;
   line-height: 1.125rem;
   letter-spacing: 0.0075rem;
-  text-align: right;
+  text-align: start;
   padding: 0.75rem;
   display: block;
   border-inline-start: 1px solid var(--clr-gray-light);
@@ -178,7 +178,6 @@
   background: linear-gradient(180deg, var(--clr-teal), var(--clr-black));
   font-weight: 700;
   font-size: var(--body-font-size-s);
-  text-align: start;
   border: 0;
 }
 
@@ -186,26 +185,13 @@
   background-color: var(--clr-gray);
 }
 
-.calculator .results-calculated .amortization table tbody tr td::before {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  width: 45%;
-  padding-inline-end: 0.75rem;
-  white-space: nowrap;
-  text-align: start;
+.calculator .results-calculated .amortization table tbody tr td span {
+  display: inline-block;
+  width: 50%;
 }
 
-.calculator .results-calculated .amortization table tbody tr td:nth-child(2)::before {
-  content: "Principal Paid";
-}
-
-.calculator .results-calculated .amortization table tbody tr td:nth-child(3)::before {
-  content: "Interest Paid";
-}
-
-.calculator .results-calculated .amortization table tbody tr td:nth-child(4)::before {
-  content: "Remaining Balance";
+.calculator .results-calculated .amortization table tbody tr td span:last-child {
+  text-align: end;
 }
 
 .calculator .results-calculated .amortization table tbody tr td:last-child {
@@ -367,9 +353,16 @@
     display: table-cell;
     background: none;
     font-weight: 300;
-    text-align: start;
     padding: 0.75rem 1.4375rem;
     border: 0;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td span:first-child {
+    display: none;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td span:last-child {
+    text-align: start;
   }
 
   .calculator .results-calculated .amortization table tbody tr td:first-child {
@@ -385,17 +378,5 @@
 
   .calculator .results-calculated .amortization table tbody tr td:last-child {
     border: 0;
-  }
-
-  .calculator .results-calculated .amortization table tbody tr td:nth-child(2)::before {
-    content: "";
-  }
-  
-  .calculator .results-calculated .amortization table tbody tr td:nth-child(3)::before {
-    content: "";
-  }
-  
-  .calculator .results-calculated .amortization table tbody tr td:nth-child(4)::before {
-    content: "";
   }
 }
