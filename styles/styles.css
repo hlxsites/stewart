@@ -473,7 +473,7 @@ main .section>div {
   height: 100%;
 }
 
-.section.has-opacity {
+.section.has-bg-image.has-opacity {
   --_bg-overlay-color: 71 76 85;
   --_bg-overlay-opacity-1: 0;
   --_bg-overlay-opacity-2: 0;
@@ -487,12 +487,12 @@ main .section>div {
   background: rgba(0 0 0 / var(--_bg-overlay-opacity-no-gradient));
 }
 
-.section.has-opacity.right {
+.section.has-bg-image.has-opacity.right {
   --_bg-opacty-angle: 90deg;
 }
 
 @media (min-width: 900px) {
-  .section.has-opacity:not(.no-gradient) {
+  .section.has-bg-image.has-opacity:not(.no-gradient) {
     background: linear-gradient(var(--_bg-opacty-angle), 
     rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-1)) var(--_bg-overlay-opacity-stop-1), 
     rgba(var(--_bg-overlay-color) / var(--_bg-overlay-opacity-2)) var(--_bg-overlay-opacity-stop-2), 
@@ -581,7 +581,7 @@ main .section>div {
 @media(min-width: 600px) {
   .section.wide {
     --max-content-width: 100rem;
-    
+
     padding-inline: 3%;
   }
   

@@ -296,7 +296,7 @@ const buildForms = (builder, section) => {
 };
 
 const buildTables = (builder, section) => {
-  section.querySelectorAll('table').forEach((table) => {
+  section.querySelectorAll('table:not([data-block])').forEach((table) => {
     let maxCols = 1;
     table.querySelectorAll('tr').forEach((tr) => {
       const cols = tr.querySelectorAll('td');
@@ -642,9 +642,6 @@ const buildBackgroundableSection = (builder, section) => {
   }
 };
 
-// Same thing for now
-const buildContentBreakSection = buildGenericSection;
-
 const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
   const meta = {};
@@ -701,8 +698,6 @@ const buildSection = (builder, section) => {
     buildHeroSection(builder, section);
   } else if (section.classList.contains('backgroundablepagesection')) {
     buildBackgroundableSection(builder, section);
-  } else if (section.classList.contains('contentbreak')) {
-    buildContentBreakSection(builder, section);
   } else if (section.classList.contains('experiencefragment')) {
     buildExperienceFragment(builder, section);
   } else {
@@ -829,6 +824,7 @@ const processFragments = (document, docPath) => {
           blocks: 'Person Detail Card',
           assetLinks: 'n/a',
           fragmentPaths: 'isFragment',
+          hasNestedSections: 'false',
           previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
           liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
           prodUrl: `https://www.stewart.com${cardPath}`,
@@ -866,6 +862,7 @@ const processFragments = (document, docPath) => {
         blocks: blockName,
         assetLinks: 'n/a',
         fragmentPaths: 'isFragment',
+        hasNestedSections: 'false',
         previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
         liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
         prodUrl: `https://www.stewart.com${path}`,
@@ -926,6 +923,7 @@ export default {
     });
 
     // Create sections of the page
+    const hasNestedSections = document.querySelector('.pagesection .pagesection') ? 'true' : 'false';
     document.querySelectorAll('.pagesection').forEach((section) => buildSection(builder, section));
 
     // Build document and store into main element
@@ -954,6 +952,7 @@ export default {
       blocks: gatherBlockNames(document) || 'n/a',
       assetLinks: gatherAssetLinks(document) || 'n/a',
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
+      hasNestedSections,
       previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
       liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
