@@ -43,9 +43,16 @@ export default async function decorate(block) {
     const fragmentSection = fragment.querySelector(':scope .section');
     if (fragmentSection) {
       block.closest('.section').classList.add(...fragmentSection.classList);
-      if (block.closest('.fragment-wrapper')) {
-        block.closest('.fragment-wrapper').classList.remove('button-container');
-        block.closest('.fragment-wrapper').replaceChildren(...fragmentSection.childNodes);
+      const fragmentWrapper = block.closest('.fragment-wrapper');
+      if (fragmentWrapper) {
+        fragmentWrapper.classList.remove('button-container');
+        const containingBlock = block.parentElement.closest('.block');
+        if (!containingBlock) {
+          fragmentWrapper.replaceWith(...fragmentSection.childNodes);
+        } else {
+          // to avoid disrupting block dom structure
+          fragmentWrapper.replaceChildren(...fragmentSection.childNodes);
+        }
       } else {
         block.replaceChildren(...fragmentSection.childNodes);
       }

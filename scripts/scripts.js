@@ -137,6 +137,17 @@ export function buildFragmentBlocks(main) {
   });
 }
 
+function buildFormBlocks(main) {
+  main.querySelectorAll('code').forEach((code) => {
+    if (code.textContent.toLowerCase().startsWith('form:')) {
+      const formId = code.textContent.split(':')[1].trim();
+      const block = buildBlock('form', { elems: [formId] });
+      code.replaceWith(block);
+      decorateBlock(block);
+    }
+  });
+}
+
 /**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
@@ -145,6 +156,7 @@ export function buildAutoBlocks(main) {
   buildHeroBlock(main);
   buildEmbedBlocks(main);
   buildFragmentBlocks(main);
+  buildFormBlocks(main);
 }
 
 export function decorateLinks(element) {
@@ -300,13 +312,13 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
+    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
-      const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
         section.classList.add('no-margin');
       }
-    } else {
+    } else if (thisHasBg) {
       section.classList.add('no-margin');
     }
   }

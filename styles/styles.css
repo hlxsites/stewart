@@ -39,6 +39,7 @@
   --clr-gray-dark: #757575;
   --clr-teal: #006781;
   --clr-teal-light: #248464;
+  --clr-green: #0f5132;
   --clr-purple: #53469c;
   --clr-cyan: #96e0ff;
   
@@ -579,27 +580,22 @@ main .section>div {
 }
 
 @media(min-width: 600px) {
-  .section.wide {
+  .section.wide:not(.has-bg-image) {
     --max-content-width: 100rem;
-
+    
     padding-inline: 3%;
   }
   
-  .section.narrow {
+  .section.narrow:not(.has-bg-image) {
     --max-content-width: 64rem;
 
     margin-inline: 8%;
     width: auto;
   }
-
-  .section.narrow.has-bg-image {
-    max-width: 100%;
-    margin-inline: unset;
-  }
 }
 
 @media(min-width: 900px) {
-  .section.narrow {
+  .section.narrow:not(.has-bg-image) {
     margin-inline: auto;
     width: auto
   }
