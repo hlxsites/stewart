@@ -8,27 +8,27 @@ main .hero-container {
   padding-inline: 0;
 }
 
-main .hero-container.opacity-10 {
+main .hero-container.opacity-10 .hero {
   background-color: rgb(0 0 0 / 10%);
 }
 
-main .hero-container.opacity-15 {
+main .hero-container.opacity-15 .hero {
   background-color: rgb(0 0 0 / 15%);
 }
 
-main .hero-container.opacity-20 {
+main .hero-container.opacity-20 .hero {
   background-color: rgb(0 0 0 / 20%);
 }
 
-main .hero-container.opacity-30 {
+main .hero-container.opacity-30 .hero {
   background-color: rgb(0 0 0 / 30%);
 }
 
-main .hero-container.opacity-40 {
+main .hero-container.opacity-40 .hero {
   background-color: rgb(0 0 0 / 40%);
 }
 
-main .hero-container.opacity-50 {
+main .hero-container.opacity-50 .hero {
   background-color: rgb(0 0 0 / 50%);
 }
   
@@ -54,7 +54,7 @@ main .hero h1::after {
   margin: 0.5rem 0 0;
 }
 
-main .hero picture {
+main .hero picture.hero-bg {
   position: absolute;
   z-index: -1;
   top: 0;
@@ -65,7 +65,7 @@ main .hero picture {
   box-sizing: border-box;
 }
 
-main .hero img {
+main .hero picture.hero-bg img {
   object-fit: cover;
   width: 100%;
   height: 100%;
@@ -77,13 +77,13 @@ main .hero h2 {
   font-weight: 400;
 }
 
-main .hero .align-end {
+main .hero .button-container {
   text-align: end;
   margin-top: 28px;
   margin-bottom: 2.5rem;
 }
 
-main .hero .align-end a {
+main .hero .button-container a {
   margin-block-end: 0;
 }
 

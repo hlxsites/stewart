@@ -102,10 +102,9 @@ export function buildHeroBlock(main) {
   }
 
   const elems = [...section.children];
-  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata') && !el.classList.contains('alert'));
   const block = buildBlock('hero', { elems: filtered });
   section.append(block);
-  main.prepend(section);
 }
 
 export function buildEmbedBlocks(main) {
