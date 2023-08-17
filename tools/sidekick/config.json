@@ -25,7 +25,7 @@
       "id": "form-helper",
       "title": "Form Helper",
       "environments": [
-        "edit"
+        "dev"
       ],
       "url": "/tools/sidekick/form-helper/form-helper.html"
     }
