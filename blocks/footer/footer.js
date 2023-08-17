@@ -1,5 +1,10 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { createElement, decorateIcons, wrapImgsInLinks } from '../../scripts/scripts.js';
+import {
+  createElement,
+  decorateIcons,
+  wrapImgsInLinks,
+  decorateLinks,
+} from '../../scripts/scripts.js';
 
 function createIconsList(ele) {
   const list = document.createElement('ul');
@@ -73,6 +78,7 @@ export default async function decorate(block) {
       }
     });
     footer.replaceChildren(firstColumn, secondColumn);
+    decorateLinks(footer);
     block.append(footer);
   }
 }
