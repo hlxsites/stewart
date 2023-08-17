@@ -1,8 +1,14 @@
-import { createSearchForm, getSearchConfig, queryIndexPath } from '../../scripts/search-utils.js';
+import {
+  createSearchForm,
+  getSearchConfig,
+  queryIndexPath,
+  generatePaginationData,
+  createPaginationButton,
+} from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
-import { createElement } from '../../scripts/scripts.js';
+import { createElement, addQueryParamToURL, getQueryParamFromURL } from '../../scripts/scripts.js';
 import { toClassName, sampleRUM, fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import getTaxonomy from '../../scripts/taxonomy.js';
+import { getTaxonomy } from '../../scripts/taxonomy.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -25,113 +31,14 @@ const placeholders = await fetchPlaceholders();
 const {
   filterBy,
   contentTypes,
-  nextPage,
-  previousPage,
   searchResultsPagination,
   resultsFound,
 } = placeholders;
-
-const generatePaginationData = (currentPage, totalPages) => {
-  if (!currentPage || !totalPages) {
-    return null;
-  }
-
-  const prev = currentPage === 1 ? null : currentPage - 1;
-  const next = currentPage === totalPages ? null : currentPage + 1;
-  const items = [1];
-
-  if (currentPage === 1 && totalPages === 1) {
-    return items;
-  }
-
-  if (currentPage > 3) {
-    items.push('…');
-  }
-
-  const pageOffset = 1;
-  const offsetLeft = currentPage - pageOffset;
-  const offsetRight = currentPage + pageOffset;
-
-  for (let i = offsetLeft > 2 ? offsetLeft : 2; i <= Math.min(totalPages, offsetRight); i += 1) {
-    items.push(i);
-  }
-
-  if (offsetRight + 1 < totalPages) {
-    items.push('…');
-  }
-
-  if (offsetRight < totalPages) {
-    items.push(totalPages);
-  }
-
-  if (next) {
-    items.push('>');
-  }
-
-  if (prev) {
-    items.unshift('<');
-  }
-
-  return items;
-};
-
-const addQueryParamToURL = (key, value) => {
-  const url = new URL(window.location.href);
-  url.searchParams.set(key, value);
-  window.history.pushState({}, '', url.toString());
-};
-
-const getQueryParamFromURL = (key) => {
-  const url = new URL(window.location.href);
-  return url.searchParams.get(key) || '';
-};
 
 const setupSearchForm = async (block) => {
   block.append(await createSearchForm({ type: 'default' }));
   const searchInput = block.querySelector('.search-form input[type="search"]');
   searchInput.value = getQueryParamFromURL('q') || '';
-};
-
-const createPaginationButton = (page, currentPage) => {
-  const pageLookup = {
-    '>': {
-      value: currentPage + 1,
-      text: '<span class="fa-icon far fa-chevron-right"></span>',
-      cssClass: 'arrow',
-      ariaLabel: nextPage || 'Next page',
-    },
-    '<': {
-      cssClass: 'arrow',
-      value: currentPage - 1,
-      text: '<span class="fa-icon far fa-chevron-left"></span>',
-      ariaLabel: previousPage || 'Previous page',
-    },
-    default: {
-      cssClass: '',
-      value: page,
-      text: page,
-      ariaLabel: `${placeholders.page || 'Page'} ${page}`,
-    },
-  };
-
-  const item = pageLookup[page] || pageLookup.default;
-
-  const {
-    value,
-    text,
-    cssClass,
-    ariaLabel,
-  } = item;
-
-  const isActive = currentPage === page;
-
-  const markup = `<li class="${classNames.searchResultsPaginationItem}">
-    <button class="${classNames.searchResultsPaginationButton} ${isActive ? 'active' : ''} ${cssClass}" data-page="${value}" aria-label="Go to ${ariaLabel}" ${isActive ? 'aria-current="page" aria-selected="true"' : ''} role="button">
-      ${text}
-    </button>
-  </li>`;
-
-  return markup;
 };
 
 const createResultItem = (entry) => {
