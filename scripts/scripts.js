@@ -174,7 +174,7 @@ export function decorateLinks(element) {
           a.href = `${url.pathname.replace('.html', '')}${url.search}${url.hash}`;
         } else if (!url.hostname.includes('.stewart.com')) {
           // non local open in a new tab
-          // but if a different stwart.com sub-domain, leave absolute, but don't open in a new tab
+          // but if a different stewart.com sub-domain, leave absolute, don't open in a new tab
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
         }
