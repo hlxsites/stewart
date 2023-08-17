@@ -20,6 +20,7 @@ const VALID_TEMPLATES = [
   'section-landing-page',
   'section-page',
   'blog-article-page',
+  'landing-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
 const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
@@ -461,8 +462,16 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  const template = getMetadata('template');
+  if (toClassName(template) === 'landing-page') {
+    // landing pages get no header or footer
+    // this isn't autoblocking in main, so need to do this here
+    doc.querySelector('header').remove();
+    doc.querySelector('footer').remove();
+  } else {
+    loadHeader(doc.querySelector('header'));
+    loadFooter(doc.querySelector('footer'));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   sampleRUM('lazy');
