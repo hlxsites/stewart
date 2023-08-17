@@ -144,7 +144,7 @@
 
 @media (min-width: 900px) {
   .columns .row {
-    gap: 2rem;;
+    gap: 2rem;
   }
 
   .columns.card.gray .row {
