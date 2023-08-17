@@ -445,7 +445,6 @@ async function loadEager(doc) {
     await decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
-    await waitForLCP(LCP_BLOCKS);
   }
 }
 
