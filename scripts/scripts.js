@@ -22,7 +22,7 @@ const VALID_TEMPLATES = [
   'blog-article-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'alert']; // add your LCP blocks to the list
 
 /**
  * create an element.
@@ -444,6 +444,7 @@ async function loadEager(doc) {
   if (main) {
     await decorateMain(main);
     document.body.classList.add('appear');
+    await waitForLCP(LCP_BLOCKS);
     await waitForLCP(LCP_BLOCKS);
   }
 }
