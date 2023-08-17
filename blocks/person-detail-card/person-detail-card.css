@@ -60,9 +60,19 @@
   font-weight: 300;
 }
 
+@media (min-width: 600px) {
+  .default-content-wrapper .person-detail-card {
+    max-width: calc(50% - 0.75rem);
+  }
+}
+
 @media (min-width: 900px) {
   .person-detail-card {
     padding: 0.625rem;
+  }
+
+  .default-content-wrapper .person-detail-card {
+    max-width: calc(50% - 1rem);
   }
 
   .person-detail-card .content-wrapper h3 {
