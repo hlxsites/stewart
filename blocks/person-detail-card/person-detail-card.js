@@ -21,8 +21,8 @@ export default async function decorate(block) {
       contentWrapperNew.append(contentWrapper.querySelector('h3'));
     }
 
-    if (contentWrapper.querySelector('h5')) {
-      contentWrapperNew.append(createElement('h4', { class: 'title' }, contentWrapper.querySelector('h5').innerHTML));
+    if (contentWrapper.querySelector('.job-title')) {
+      contentWrapperNew.append(createElement('h4', { class: 'title' }, contentWrapper.querySelector('.job-title').innerHTML));
     }
 
     [...contentWrapper.querySelectorAll('p')].forEach((p) => {

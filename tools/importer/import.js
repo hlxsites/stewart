@@ -223,6 +223,10 @@ const buildPersonDetailCards = (builder, section) => {
   section.querySelectorAll('.cmp-container#person-detail-card').forEach((card) => {
     const content = card.querySelector('.contentcontainer');
     const image = card.querySelector('.cmp-imageattributeprojection img');
+    const jobTitle = content.querySelector('[property="jobTitle"]');
+    if (jobTitle) {
+      jobTitle.parentElement.innerHTML = `<p class='job-title'>${jobTitle.innerHTML}</p>`;
+    }
     builder.replace(card, () => {
       builder.block('Person Detail Card', 2, true).append(image).column().append(content);
     });
@@ -770,7 +774,7 @@ const updateLinks = (document) => {
   });
 };
 
-const preocessHeadingIcons = (document) => {
+const processHeadingIcons = (document) => {
   document.querySelectorAll('.ss-heading-icon-location').forEach((iconHeadingWrapper) => {
     const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
     if (heading) {
@@ -933,7 +937,7 @@ export default {
     updateLinks(document);
 
     // add icon markup to headings with icons
-    preocessHeadingIcons(document);
+    processHeadingIcons(document);
 
     const docPath = generateDocumentPath({
       document,

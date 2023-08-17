@@ -144,13 +144,13 @@
 
 @media (min-width: 900px) {
   .columns .row {
-    gap: 32px;;
+    gap: 2rem;;
   }
 
   .columns.card.gray .row {
     align-items: center;
     flex-direction: unset;
-    gap: 32px;
+    gap: 2rem;
   }
 
   .columns.card.gray > div > div {
