@@ -225,7 +225,7 @@ const buildPersonDetailCards = (builder, section) => {
     const image = card.querySelector('.cmp-imageattributeprojection img');
     const jobTitle = content.querySelector('[property="jobTitle"]');
     if (jobTitle) {
-      jobTitle.parentElement.innerHTML = `<p class='job-title'>${jobTitle.innerHTML}</p>`;
+      jobTitle.parentElement.innerHTML = `<h4 class='title'>${jobTitle.innerHTML.replace(/<br(.*?)[/]?>/gi, "</h4><h4 class='title'>")}</h4>`;
     }
     builder.replace(card, () => {
       builder.block('Person Detail Card', 2, true).append(image).column().append(content);
