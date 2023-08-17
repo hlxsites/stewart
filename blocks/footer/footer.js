@@ -44,7 +44,6 @@ export default async function decorate(block) {
     const footer = createElement('div');
     footer.className = 'inner-wrapper';
     footer.innerHTML = html;
-
     decorateIcons(footer);
 
     const firstColumn = document.createElement('div');
@@ -53,7 +52,7 @@ export default async function decorate(block) {
     secondColumn.className = 'column-2';
 
     [...footer.children].forEach((ele, index, array) => {
-      if (array.length - 1 === index) {
+      if (array.length - 1 === index && ele.querySelector('.icon, .fa-icon')) {
         const iconsList = createIconsList(ele);
         secondColumn.append(iconsList);
       } else {
