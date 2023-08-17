@@ -555,12 +555,16 @@ main .section>div {
 }
 
 .section.teal {
+  --text-color: var(--clr-white);
+
   background: linear-gradient(180deg, var(--clr-teal), #002f39);
   box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
   color: var(--clr-white);
 }
 
 .section.black {
+  --text-color: var(--clr-white);
+
   background-color: var(--clr-black);
   color: var(--clr-white);
 }
@@ -575,6 +579,8 @@ main .section>div {
 }
 
 .section.blue {
+  --text-color: var(--clr-white);
+  
   background-color: var(--clr-teal);
   color: var(--clr-white);
 }
