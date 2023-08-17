@@ -165,14 +165,14 @@ export function decorateLinks(element) {
     try {
       if (a.href) {
         const url = new URL(a.href);
-
-        // local links are relative
-        // non local and non email links open in a new tab
         const hostMatch = hosts.some((host) => url.hostname.includes(host));
 
         if (hostMatch) {
+          // local links are rewritten to be relative
           a.href = `${url.pathname.replace('.html', '')}${url.search}${url.hash}`;
-        } else {
+        } else if (!url.hostname.includes('.stewart.com')) {
+          // non local open in a new tab
+          // but if a different stwart.com sub-domain, leave absolute, but don't open in a new tab
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
         }
