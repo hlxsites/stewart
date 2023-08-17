@@ -1,6 +1,6 @@
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 
-const placeholders = fetchPlaceholders();
+const placeholders = await fetchPlaceholders();
 let thisform;
 
 function formatAsMoney(amount, locale, currency) {
