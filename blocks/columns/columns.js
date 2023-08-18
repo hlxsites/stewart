@@ -30,6 +30,7 @@ export default async function decorate(block) {
   block.classList.add(`columns-${cols.length}-cols`);
   if (block.closest('.section').classList.contains('has-bg-image')) {
     block.classList.add('opacity');
+    if (block.closest('.section').classList.contains('dark')) block.classList.add('dark');
   }
 
   [...block.children].forEach((row, rdx) => {
