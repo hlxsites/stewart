@@ -378,8 +378,6 @@ export default async function decorate(block) {
         const formJson = await formData.json();
         const form = await buildForm(formJson, formHref);
         block.replaceWith(form);
-      } else {
-        block.innerHTML = '';
       }
     });
   });
