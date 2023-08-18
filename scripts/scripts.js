@@ -108,42 +108,44 @@ export function buildHeroBlock(main) {
   section.append(block);
 }
 
-export function buildEmbedBlocks(main) {
-  // For every youtube link, convert to an embed block
-  main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
-    // Get picture if it exists and move it to the block
-    const picture = a.closest('div').querySelector('picture');
-    const block = buildBlock('embed', { elems: picture ? [picture, a.cloneNode()] : [a.cloneNode()] });
-    a.replaceWith(block);
-    decorateBlock(block);
-  });
+export function buildEmbed(link) {
+  const picture = link.closest('div').querySelector('picture');
+  const block = buildBlock('embed', { elems: picture ? [picture, link.cloneNode()] : [link.cloneNode()] });
+  link.replaceWith(block);
+  decorateBlock(block);
 }
 
-export function buildFragmentBlocks(main) {
+export function buildFragment(link) {
+  const block = buildBlock('fragment', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildForm(link) {
+  const block = buildBlock('form', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildLinkAutoBlocks(main) {
   const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
-  // links to /fragments/* become fragment blocks
-  main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
-    if (a.href) {
-      const url = new URL(a.href);
-
-      // for safety, we do a host match, and make sure the text content matches the path
-      const hostMatch = hosts.some((host) => url.hostname.includes(host));
-      if (hostMatch && a.textContent.includes(url.pathname)) {
-        const block = buildBlock('fragment', a.cloneNode(true));
-        a.replaceWith(block);
-        decorateBlock(block);
-      }
+  main.querySelectorAll('a[href]').forEach((a) => {
+    const url = new URL(a.href);
+    const hostMatch = hosts.some((host) => url.hostname.includes(host));
+    if (hostMatch && url.pathname.contains('/fragments/') && a.textContent.includes(url.pathname)) {
+      buildFragment(a);
+      return;
     }
-  });
-}
 
-function buildFormBlocks(main) {
-  main.querySelectorAll('code').forEach((code) => {
-    if (code.textContent.toLowerCase().startsWith('form:')) {
-      const formId = code.textContent.split(':')[1].trim();
-      const block = buildBlock('form', { elems: [formId] });
-      code.replaceWith(block);
-      decorateBlock(block);
+    if (hostMatch
+      && url.pathname.contains('/forms/') && url.pathname.endsWith('.json')
+      && a.textContent.includes(url.pathname)) {
+      buildForm(a);
+      return;
+    }
+
+    if (url.hostname === 'youtube.com' && url.pathname.startsWith('embed')) {
+      buildEmbed(a);
     }
   });
 }
@@ -154,9 +156,7 @@ function buildFormBlocks(main) {
  */
 export function buildAutoBlocks(main) {
   buildHeroBlock(main);
-  buildEmbedBlocks(main);
-  buildFragmentBlocks(main);
-  buildFormBlocks(main);
+  buildLinkAutoBlocks(main);
 }
 
 export function decorateLinks(element) {

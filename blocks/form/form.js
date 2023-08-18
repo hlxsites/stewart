@@ -358,12 +358,15 @@ export default async function decorate(block) {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
         observer.disconnect();
-        const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
-        // The form id is everything after the colon in the text
-        const formData = await fetch(`/forms/${formId}.json`);
-        const formJson = await formData.json();
-        const form = await buildForm(formJson, `/forms/${formId}`);
-        block.replaceWith(form);
+
+        const formLink = block.querySelector('a');
+        if (formLink) {
+          // The form id is everything after the colon in the text
+          const formData = await fetch(formLink.href);
+          const formJson = await formData.json();
+          const form = await buildForm(formJson, formLink.href);
+          block.replaceWith(form);
+        }
       }
     });
   });

@@ -1,5 +1,5 @@
 import { fetchPlaceholders, getMetadata } from '../../scripts/lib-franklin.js';
-import { buildEmbedBlocks, buildFragmentBlocks } from '../../scripts/scripts.js';
+import { buildLinkAutoBlocks } from '../../scripts/scripts.js';
 
 async function addBlogPostInfo(main) {
   const h1 = main.querySelector('h1');
@@ -29,7 +29,6 @@ async function addBlogPostInfo(main) {
 }
 
 export default async function buildTemplateAutoBlocks(main) {
-  buildEmbedBlocks(main);
-  buildFragmentBlocks(main);
+  buildLinkAutoBlocks(main);
   await addBlogPostInfo(main);
 }
