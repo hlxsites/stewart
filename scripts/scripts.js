@@ -132,19 +132,19 @@ export function buildLinkAutoBlocks(main) {
   main.querySelectorAll('a[href]').forEach((a) => {
     const url = new URL(a.href);
     const hostMatch = hosts.some((host) => url.hostname.includes(host));
-    if (hostMatch && url.pathname.contains('/fragments/') && a.textContent.includes(url.pathname)) {
+    if (hostMatch && url.pathname.includes('/fragments/') && a.textContent.includes(url.pathname)) {
       buildFragment(a);
       return;
     }
 
     if (hostMatch
-      && url.pathname.contains('/forms/') && url.pathname.endsWith('.json')
+      && url.pathname.includes('/forms/') && url.pathname.endsWith('.json')
       && a.textContent.includes(url.pathname)) {
       buildForm(a);
       return;
     }
 
-    if (url.hostname === 'youtube.com' && url.pathname.startsWith('embed')) {
+    if (url.hostname.includes('youtube.com') && url.pathname.startsWith('/embed')) {
       buildEmbed(a);
     }
   });
