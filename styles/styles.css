@@ -339,6 +339,7 @@ button:disabled:hover {
 
 a.button.secondary,
 a.button.tertiary  {
+  color: currentcolor;
   background-color: transparent;
   border: 3px solid currentcolor;
 }
