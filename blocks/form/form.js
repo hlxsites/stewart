@@ -420,8 +420,6 @@ export default async function decorate(block) {
             if (isCmdShiftPressed) autofillForm(form);
           });
         }
-      } else {
-        block.innerHTML = '';
       }
     });
   });
