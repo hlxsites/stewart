@@ -908,6 +908,12 @@ export default {
     // Strip out header and footers that are not needed
     document.querySelector('page-header, page-footer')?.remove();
 
+    // some landing page specific stuff before we do anything else
+    if (getMetadata(document, 'template') === 'landing-page-template') {
+      const footer = document.querySelector('.embed .footer');
+      footer.closest('.embed').remove();
+    }
+
     // deal with breadcrumbs
     const bc = document.querySelector('.breadcrumbnavigation');
     if (bc) {

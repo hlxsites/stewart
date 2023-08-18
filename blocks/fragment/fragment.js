@@ -45,7 +45,6 @@ export default async function decorate(block) {
       block.closest('.section').classList.add(...fragmentSection.classList);
       const fragmentWrapper = block.closest('.fragment-wrapper');
       if (fragmentWrapper) {
-        fragmentWrapper.classList.remove('button-container');
         const containingBlock = block.parentElement.closest('.block');
         if (!containingBlock) {
           fragmentWrapper.replaceWith(...fragmentSection.childNodes);

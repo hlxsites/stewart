@@ -383,15 +383,29 @@ function autofillForm(form) {
  * @param {Element} formEmbed The marker for the form embed
  */
 export default async function decorate(block) {
+  const formLink = block.querySelector('a');
+  let formHref = formLink ? formLink.href : '';
+  if (!formHref) {
+    // probably no link, check for name in text content
+    const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
+    if (formId) {
+      formHref = `/forms/${formId}.json`;
+    }
+  }
+
+  block.innerHTML = '';
+  if (!formHref) {
+    return;
+  }
+
   const observer = new IntersectionObserver(async (entries) => {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
         observer.disconnect();
-        const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
-        // The form id is everything after the colon in the text
-        const formData = await fetch(`/forms/${formId}.json`);
+
+        const formData = await fetch(formHref);
         const formJson = await formData.json();
-        const form = await buildForm(formJson, `/forms/${formId}`);
+        const form = await buildForm(formJson, formHref);
         block.replaceWith(form);
 
         // If domain is localhost or contains hlxsites.hlx then track keboard events
