@@ -405,12 +405,13 @@ async function loadTemplate(templateName) {
 }
 
 const decorateCardSections = (main) => {
+  const template = getMetadata('template');
+  const isLanding = toClassName(template) === 'landing-page';
   main.querySelectorAll('.section.card').forEach((cardSect) => {
     const newWrapper = createElement('div');
     const contentWrappers = cardSect.querySelectorAll(':scope > div');
     contentWrappers.forEach((wrapper) => {
-      // avoid swallowing landing page footer
-      if (!wrapper.classList.contains('footer-wrapper')) {
+      if (!(isLanding && wrapper.classList.contains('footer-wrapper'))) {
         newWrapper.append(wrapper);
       }
     });
@@ -418,6 +419,16 @@ const decorateCardSections = (main) => {
     cardSect.prepend(block);
     decorateBlock(block);
     cardSect.classList.remove('card');
+
+    if (isLanding) {
+      // find logo image and lift it out of card
+      const cardLogo = block.querySelector('.default-content-wrapper .bg-image + p > picture');
+      if (cardLogo) {
+        const logoWrapper = createElement('div', { class: 'default-content-wrapper' });
+        logoWrapper.append(cardLogo.parentElement);
+        block.insertAdjacentElement('beforebegin', logoWrapper);
+      }
+    }
   });
 };
 
