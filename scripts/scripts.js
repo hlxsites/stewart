@@ -203,6 +203,7 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
+  const ignorePatterns = ['/fragments/', '/forms/'];
   const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
     // need to deal with 2 use cases here
@@ -212,6 +213,9 @@ export function wrapImgsInLinks(container) {
       && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
       const link = pic.nextElementSibling.nextElementSibling;
       if (link.textContent.includes(link.getAttribute('href'))) {
+        if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+          return;
+        }
         pic.nextElementSibling.remove();
         link.innerHTML = pic.outerHTML;
         pic.replaceWith(link);
@@ -227,6 +231,9 @@ export function wrapImgsInLinks(container) {
     }
     const link = parent.nextElementSibling.querySelector('a');
     if (link && link.textContent.includes(link.getAttribute('href'))) {
+      if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+        return;
+      }
       link.parentElement.remove();
       link.innerHTML = pic.outerHTML;
       pic.replaceWith(link);
