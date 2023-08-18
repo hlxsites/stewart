@@ -388,7 +388,14 @@ export default async function decorate(block) {
       if (entry.isIntersecting) {
         observer.disconnect();
         const formLink = block.querySelector('a');
-        if (formLink) {
+        let formHref = formLink ? formLink.href : '';
+        if (!formHref) {
+          // probably no link, check for name in text content
+          const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
+          formHref = `/forms/${formId}.json`;
+        }
+
+        if (formHref) {
           // The form id is everything after the colon in the text
           const formData = await fetch(formLink.href);
           const formJson = await formData.json();
@@ -407,6 +414,8 @@ export default async function decorate(block) {
               if (isCmdShiftPressed) autofillForm(form);
             });
           }
+        } else {
+          block.innerHTML = '';
         }
       }
     });
