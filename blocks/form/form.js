@@ -403,9 +403,9 @@ export default async function decorate(block) {
       if (entry.isIntersecting) {
         observer.disconnect();
 
-        const formData = await fetch(formLink.href);
+        const formData = await fetch(formHref);
         const formJson = await formData.json();
-        const form = await buildForm(formJson, formLink.href);
+        const form = await buildForm(formJson, formHref);
         block.replaceWith(form);
 
         // If domain is localhost or contains hlxsites.hlx then track keboard events
