@@ -911,7 +911,7 @@ export default {
     // some landing page specific stuff before we do anything else
     if (getMetadata(document, 'template') === 'landing-page-template') {
       const footer = document.querySelector('.embed .footer');
-      footer.closest('.embed').remove();
+      footer?.closest('.embed')?.remove();
     }
 
     // deal with breadcrumbs

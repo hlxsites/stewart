@@ -97,6 +97,7 @@ export function buildHeroBlock(main) {
   }
 
   const section = h1.closest('div');
+
   const picture = section.querySelector('picture');
   if (!picture) {
     return;
@@ -317,7 +318,7 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
-    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
+    const thisHasBg = section.querySelector('.hero') || [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
@@ -403,6 +404,18 @@ async function loadTemplate(templateName) {
   return null;
 }
 
+const decorateCardSections = (main) => {
+  main.querySelectorAll('.section.card').forEach((cardSect) => {
+    const newWrapper = createElement('div');
+    const contentWrappers = cardSect.querySelectorAll(':scope > div');
+    contentWrappers.forEach((wrapper) => newWrapper.append(wrapper));
+    const block = buildBlock('card', [[newWrapper]]);
+    cardSect.append(block);
+    decorateBlock(block);
+    cardSect.classList.remove('card');
+  });
+};
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -435,6 +448,7 @@ export async function decorateMain(main, isFragment = false) {
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
+  decorateCardSections(main);
 }
 
 /**

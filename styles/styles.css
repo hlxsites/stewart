@@ -563,6 +563,10 @@ main .section>div {
   color: var(--clr-white);
 }
 
+.section.teal a {
+  color: var(--clr-white);
+}
+
 .section.black {
   --text-color: var(--clr-white);
 
@@ -583,6 +587,10 @@ main .section>div {
   --text-color: var(--clr-white);
   
   background-color: var(--clr-teal);
+  color: var(--clr-white);
+}
+
+.section.blue a {
   color: var(--clr-white);
 }
 
