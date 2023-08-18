@@ -408,9 +408,14 @@ const decorateCardSections = (main) => {
   main.querySelectorAll('.section.card').forEach((cardSect) => {
     const newWrapper = createElement('div');
     const contentWrappers = cardSect.querySelectorAll(':scope > div');
-    contentWrappers.forEach((wrapper) => newWrapper.append(wrapper));
+    contentWrappers.forEach((wrapper) => {
+      // avoid swallowing landing page footer
+      if (!wrapper.classList.contains('footer-wrapper')) {
+        newWrapper.append(wrapper);
+      }
+    });
     const block = buildBlock('card', [[newWrapper]]);
-    cardSect.append(block);
+    cardSect.prepend(block);
     decorateBlock(block);
     cardSect.classList.remove('card');
   });
