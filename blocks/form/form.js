@@ -388,7 +388,9 @@ export default async function decorate(block) {
   if (!formHref) {
     // probably no link, check for name in text content
     const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
-    formHref = `/forms/${formId}.json`;
+    if (formId) {
+      formHref = `/forms/${formId}.json`;
+    }
   }
 
   block.innerHTML = '';
@@ -400,7 +402,7 @@ export default async function decorate(block) {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
         observer.disconnect();
-        // The form id is everything after the colon in the text
+
         const formData = await fetch(formLink.href);
         const formJson = await formData.json();
         const form = await buildForm(formJson, formLink.href);
