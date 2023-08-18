@@ -383,40 +383,43 @@ function autofillForm(form) {
  * @param {Element} formEmbed The marker for the form embed
  */
 export default async function decorate(block) {
+  const formLink = block.querySelector('a');
+  let formHref = formLink ? formLink.href : '';
+  if (!formHref) {
+    // probably no link, check for name in text content
+    const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
+    formHref = `/forms/${formId}.json`;
+  }
+
+  block.innerHTML = '';
+  if (!formHref) {
+    return;
+  }
+
   const observer = new IntersectionObserver(async (entries) => {
     entries.forEach(async (entry) => {
       if (entry.isIntersecting) {
         observer.disconnect();
-        const formLink = block.querySelector('a');
-        let formHref = formLink ? formLink.href : '';
-        if (!formHref) {
-          // probably no link, check for name in text content
-          const formId = block.textContent.trim().toLowerCase().replace(/\s/g, '-');
-          formHref = `/forms/${formId}.json`;
-        }
+        // The form id is everything after the colon in the text
+        const formData = await fetch(formLink.href);
+        const formJson = await formData.json();
+        const form = await buildForm(formJson, formLink.href);
+        block.replaceWith(form);
 
-        if (formHref) {
-          // The form id is everything after the colon in the text
-          const formData = await fetch(formLink.href);
-          const formJson = await formData.json();
-          const form = await buildForm(formJson, formLink.href);
-          block.replaceWith(form);
-
-          // If domain is localhost or contains hlxsites.hlx then track keboard events
-          if (window.location.hostname === 'localhost' || window.location.hostname.includes('hlxsites.hlx')) {
-            const handler = (event) => {
-              isCmdShiftPressed = (event.ctrlKey || event.metaKey) && event.shiftKey;
-            };
-            document.addEventListener('keydown', handler);
-            document.addEventListener('keyup', handler);
-            // Cmd+Shift+DoubleClick autofills everything with test data
-            form.addEventListener('dblclick', () => {
-              if (isCmdShiftPressed) autofillForm(form);
-            });
-          }
-        } else {
-          block.innerHTML = '';
+        // If domain is localhost or contains hlxsites.hlx then track keboard events
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('hlxsites.hlx')) {
+          const handler = (event) => {
+            isCmdShiftPressed = (event.ctrlKey || event.metaKey) && event.shiftKey;
+          };
+          document.addEventListener('keydown', handler);
+          document.addEventListener('keyup', handler);
+          // Cmd+Shift+DoubleClick autofills everything with test data
+          form.addEventListener('dblclick', () => {
+            if (isCmdShiftPressed) autofillForm(form);
+          });
         }
+      } else {
+        block.innerHTML = '';
       }
     });
   });

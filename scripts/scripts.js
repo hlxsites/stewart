@@ -133,20 +133,23 @@ export function buildLinkAutoBlocks(main) {
   main.querySelectorAll('a[href]').forEach((a) => {
     const url = new URL(a.href);
     const hostMatch = hosts.some((host) => url.hostname.includes(host));
+    let autoBlocked = false;
     if (hostMatch && url.pathname.includes('/fragments/') && a.textContent.includes(url.pathname)) {
       buildFragment(a);
-      return;
-    }
-
-    if (hostMatch
+      autoBlocked = true;
+    } else if (hostMatch
       && url.pathname.includes('/forms/') && url.pathname.endsWith('.json')
       && a.textContent.includes(url.pathname)) {
       buildForm(a);
-      return;
+      autoBlocked = true;
+    } else if (url.hostname.includes('youtube.com') && url.pathname.startsWith('/embed')) {
+      buildEmbed(a);
+      autoBlocked = true;
     }
 
-    if (url.hostname.includes('youtube.com') && url.pathname.startsWith('/embed')) {
-      buildEmbed(a);
+    if (autoBlocked) {
+      const buttonContainer = a.closest('.button-container');
+      if (buttonContainer) buttonContainer.classList.remove('button-container');
     }
   });
 }
