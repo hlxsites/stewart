@@ -79,7 +79,7 @@ main .accordion .accordion-item .accordion-panel.accordion-item-active {
 
 main .accordion .accordion-item .accordion-panel .table th, main .accordion .accordion-item .accordion-panel .table td {
     border: solid 1px;
-    border-color: gray;
+    border-color: var(--clr-gray);
     font-weight: 300;
     font-size: 20px;
     padding: 0;
