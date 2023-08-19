@@ -33,7 +33,6 @@ export default function decorate(block) {
       extraDiv.remove();
     }
 
-
     const header = accordionItem.querySelector('h3, h2');
     const headerText = header.textContent;
     header.innerHTML = '';
@@ -52,7 +51,6 @@ export default function decorate(block) {
     panel.setAttribute('id', `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`);
     panel.setAttribute('role', 'region');
     panel.setAttribute('aria-labelledby', `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`);
-//    panel.setAttribute('hidden', '');
   });
 
   const accordionTriggers = block.querySelectorAll(`.${classNames.accordionItemTrigger}`);
