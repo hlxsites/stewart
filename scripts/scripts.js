@@ -248,19 +248,28 @@ function buildAccordions(main) {
     const contentWrappers = accordion.querySelectorAll(':scope > div');
     const blockTable = [];
     let row;
-    const newWrapper = createElement('div');
+    let panelRow = [];
     contentWrappers.forEach((wrapper) => {
       let removeWrapper = true;
       [...wrapper.children].forEach((child) => {
         if (child.nodeName === 'H2') {
           if (row) {
-            blockTable.push([{ elems: row }]);
+            if (panelRow.length > 0) {
+              const panelWrapper = createElement('div');
+              [...panelRow].forEach((element) => {
+                panelWrapper.append(element);
+              });
+              row.push(panelWrapper);
+              blockTable.push([{ elems: row }]);
+            }
+            panelRow = [];
           }
           row = [];
-        }
-        if (row) {
           row.push(child);
         } else {
+          panelRow.push(child);
+        }
+        if (!row) {
           // if there is content in the section before the first h2
           // then that content is preserved
           // otherwise, we remove the wrapper
@@ -269,14 +278,21 @@ function buildAccordions(main) {
       });
       if (removeWrapper) wrapper.remove();
     });
+
     // add last row
     if (row) {
+      if (panelRow.length > 0) {
+        const panelWrapper = createElement('div');
+        [...panelRow].forEach((element) => {
+          panelWrapper.append(element);
+        });
+        row.push(panelWrapper);
+      }
       blockTable.push([{ elems: row }]);
     }
 
     const block = buildBlock('accordion', blockTable);
-    newWrapper.append(block);
-    accordion.append(newWrapper);
+    accordion.append(block);
     decorateBlock(block);
   });
 }

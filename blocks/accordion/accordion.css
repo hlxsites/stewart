@@ -1,32 +1,48 @@
 main .accordion .accordion-item {
-    margin-bottom: 40px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--clr-black);
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--clr-black);
 }
 
-main .accordion .accordion-item .accordion-item-trigger {
-    margin: 0;
-    min-width: auto;
-    display: inline-block;
-    box-sizing: border-box;
-    text-decoration: none;
-    padding: inherit;
-    cursor: pointer;
-    color: inherit;
-    background-color: inherit;
-    margin-block-end: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border:none;
+main .accordion .accordion-item > h3,
+main .accordion .accordion-item > h2 {
+  margin: 0;
+  display: flex;
+}
+
+main .accordion .accordion-item > h3 > .accordion-item-trigger,
+main .accordion .accordion-item > h2 > .accordion-item-trigger {
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  color: var(--clr-black);
+  padding: 20px 0;
+  border: 0;
+  margin: 0;
+  display: flex;
+  white-space: normal;
+}
+
+main .accordion .accordion-item-active > h3 > .accordion-item-trigger,
+main .accordion .accordion-item-active > h2 > .accordion-item-trigger {
+  border: 0;
+}
+
+main .accordion .accordion-item > h3 > .accordion-item-trigger:hover,
+main .accordion .accordion-item > h3 > .accordion-item-trigger:active,
+main .accordion .accordion-item > h3 > .accordion-item-trigger:focus,
+main .accordion .accordion-item > h2 > .accordion-item-trigger:hover,
+main .accordion .accordion-item > h2 > .accordion-item-trigger:active,
+main .accordion .accordion-item > h2 > .accordion-item-trigger:focus {
+  background-color: transparent;
 }
 
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
-    font-family: var(--heading-font-family);
-    font-size: var(--heading-font-size-s);
-    display: flex;
-    line-height: 46px;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  display: flex;
+  line-height: 46px;
 }
+
 
 main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title::before {
     font-family: 'Font Awesome 5 Pro'; /* stylelint-disable-line font-family-no-missing-generic-family-keyword */
@@ -45,29 +61,20 @@ main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title:
 }
 
 main .accordion .accordion-item-active .accordion-item-trigger > .accordion-item-title::before {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 main .accordion .accordion-item .accordion-panel {
-    padding-top: 20px;
-    padding-left: 55px;
-    border-bottom: none;
-    transition: all .5s;
-    opacity: 0;
-    max-height: 0;
+  padding: 20px 24px;
+  transition: all .5s;
+  opacity: 0;
+  max-height: 40px;
 }
 
 main .accordion .accordion-item .accordion-panel.accordion-item-active {
-    padding-top: 0;
-    opacity: 1;
-    padding-bottom: 55px;
-    max-height: none;
-}
-
-@media (min-width: 900px) {
-    main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
-        font-size: var(--heading-font-size-m);
-    }
+  padding-top: 0;
+  opacity: 1;
+  max-height: none;
 }
 
 main .accordion .accordion-item .accordion-panel .table th, main .accordion .accordion-item .accordion-panel .table td {
@@ -109,3 +116,13 @@ main .accordion .accordion-item .accordion-panel .table a:hover {
   text-decoration: underline;
 }
 
+@media (min-width: 900px) {
+  main .accordion .accordion-item .accordion-item-trigger > .accordion-item-title {
+    font-size: var(--heading-font-size-m);
+  }
+
+  main .accordion .accordion-item .accordion-panel {
+    padding: 20px 50px;
+    max-height: 40px;
+  }
+}

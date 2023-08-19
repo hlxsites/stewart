@@ -18,34 +18,41 @@ export default function decorate(block) {
 
   [...block.children].forEach((accordionItem, accordionItemIndex) => {
     accordionItem.classList.add(classNames.accordionItem);
+    const accordionStandardBlock = accordionItem.querySelector('h3') !== null;
+    const { children } = accordionItem;
+    if (accordionStandardBlock) {
+      // Removing header wrapper only for regular accordion block
+      const headerDiv = children[0];
+      headerDiv.outerHTML = headerDiv.innerHTML;
+    } else {
+      // Removing extra div on autoblock accordion
+      const extraDiv = children[0];
+      [...extraDiv.children].forEach((child) => {
+        extraDiv.parentNode.append(child);
+      });
+      extraDiv.remove();
+    }
 
-    const header = accordionItem.querySelector('h2');
+
+    const header = accordionItem.querySelector('h3, h2');
     const headerText = header.textContent;
     header.innerHTML = '';
 
-    const newHeader = createElement('button', {
+    const button = createElement('button', {
       class: classNames.accordionItemTrigger,
       'aria-expanded': 'false',
       'aria-controls': `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
       id: `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
     }, createElement('span', { class: classNames.accordionItemTitle }, headerText));
 
-    header.outerHTML = newHeader.outerHTML;
-    const panel = createElement('div', {
-      class: classNames.accordionPanel,
-      role: 'region',
-      'aria-labelledby': `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`,
-      id: `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`,
-    });
+    header.append(button);
+    const panel = header.nextElementSibling;
 
-    const panelParent = accordionItem.firstChild;
-    const panelElements = [...panelParent.children];
-    [...panelElements].forEach((element) => {
-      if (!element.classList.contains('accordion-item-trigger')) {
-        panel.append(element);
-      }
-    });
-    panelParent.append(panel);
+    panel.classList.add(classNames.accordionPanel);
+    panel.setAttribute('id', `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`);
+    panel.setAttribute('role', 'region');
+    panel.setAttribute('aria-labelledby', `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`);
+//    panel.setAttribute('hidden', '');
   });
 
   const accordionTriggers = block.querySelectorAll(`.${classNames.accordionItemTrigger}`);
@@ -53,7 +60,7 @@ export default function decorate(block) {
   [...accordionTriggers].forEach((trigger) => {
     trigger.addEventListener('click', () => {
       trigger.closest(`.${classNames.accordionItem}`).classList.toggle(classNames.accordionItemActive);
-      const panel = trigger.nextElementSibling;
+      const panel = trigger.parentElement.nextElementSibling;
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true' || false;
       trigger.setAttribute('aria-expanded', !isExpanded);
       panel.classList.toggle(classNames.accordionItemActive);
