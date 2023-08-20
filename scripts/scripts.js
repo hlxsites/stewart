@@ -110,14 +110,7 @@ export function buildHeroBlock(main) {
 }
 
 export function buildEmbed(link) {
-  const elems = [link.cloneNode()];
-  const picture = link.closest('div').querySelector('picture');
-  // eslint-disable-next-line no-bitwise
-  if (picture && (link.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_FOLLOWING)) {
-    // only use picture if it's after the link
-    // I think this could be refined more if needed
-    elems.push(picture);
-  }
+  const elems = [link.cloneNode(true)];
   const block = buildBlock('embed', { elems });
   link.replaceWith(block);
   decorateBlock(block);
