@@ -55,7 +55,7 @@ export default async function decorate(block) {
   const list = document.createElement('ul');
 
   [...block.children].forEach((ele) => {
-    list.append(getListItemRestructured(ele.querySelector(':scope > div')));
+    ele.querySelectorAll(':scope > div').forEach((el) => list.append(getListItemRestructured(el)));
   });
 
   block.replaceChildren(list);
