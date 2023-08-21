@@ -75,15 +75,15 @@ main .accordion .accordion-item .accordion-panel.accordion-item-active {
 
 main .accordion .accordion-item .accordion-panel .table th, main .accordion .accordion-item .accordion-panel .table td {
     border: solid 1px;
-    border-color: var(--clr-gray);
     font-weight: 300;
-    font-size: 20px;
+    font-size: inherit;
     padding: 0;
     line-height: normal;
 }
 
 main .accordion .accordion-item .accordion-panel .table th {
     color: var(--clr-white);
+    border-color: var(--clr-gray-dark);
     background: linear-gradient(180deg,#006781,#002f39);
     font-weight: 700;
     font-size: 15px;
