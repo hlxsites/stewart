@@ -124,8 +124,17 @@ function buildFormSection(lastSection, form, label, cols, options) {
   }
   if (options.includes('transparent')) {
     newSection.classList.add('transparent');
+  } else if (options.includes('white')) {
+    newSection.classList.add('white');
   }
-  if (options.includes('2-col')) {
+  if (options.includes('nested')) {
+    newSection.classList.add('section-nested');
+    if (lastSection.classList.contains('section-nested')) {
+      lastSection.closest('.form-section').append(createElement('div', { class: ['form-field', cols ? `col-${cols}` : ''] }, newSection));
+    } else {
+      lastSection.append(createElement('div', { class: ['form-field', cols ? `col-${cols}` : ''] }, newSection));
+    }
+  } else if (options.includes('2-col')) {
     newSection.classList.add('section-col-2');
     if (previousIs2Col) {
       previousIs2Col = false;
@@ -157,7 +166,7 @@ async function buildForm(formData, defaultAction) {
   form.setAttribute('method', 'POST');
   const formFieldData = formData?.form?.data || formData.data;
   let currentSection = form;
-  const placeholders = fetchPlaceholders();
+  const placeholders = await fetchPlaceholders();
   const formOptions = {
     successMessage: placeholders?.formSuccessMessage || '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.',
     failureMessage: placeholders?.formFailureMessage || '*An error has occurred!* Please contact webmaster@stewart.com and let us know the name and URL of the form you just tried to complete. Something happened and it didn\'t accept your information. We apologize!',
@@ -320,6 +329,14 @@ async function buildForm(formData, defaultAction) {
             input.setAttribute('placeholder', placeholder);
             if (required) { input.setAttribute('required', true); }
             if (defaultValue) { input.textContent = defaultValue; }
+            fieldDiv.append(input);
+            break;
+          case 'legend':
+            input = createElement('legend', { class: 'legend' }, defaultValue || '');
+            fieldDiv.append(input);
+            break;
+          case 'info':
+            input = createElement('div', { role: 'alert', class: 'info-alert' }, defaultValue || '');
             fieldDiv.append(input);
             break;
           default:
