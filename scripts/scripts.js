@@ -23,7 +23,7 @@ const VALID_TEMPLATES = [
   'landing-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'alert']; // add your LCP blocks to the list
 
 /**
  * create an element.
@@ -103,10 +103,9 @@ export function buildHeroBlock(main) {
   }
 
   const elems = [...section.children];
-  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata') && !el.classList.contains('alert'));
   const block = buildBlock('hero', { elems: filtered });
   section.append(block);
-  main.prepend(section);
 }
 
 export function buildEmbed(link) {
@@ -439,6 +438,18 @@ export async function decorateMain(main, isFragment = false) {
 }
 
 /**
+ * load fonts.css and set a session storage flag
+ */
+async function loadFonts() {
+  await loadCSS(`${window.hlx.codeBasePath}/fonts/fonts.css`);
+  try {
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+  } catch (e) {
+    // do nothing
+  }
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
@@ -450,6 +461,15 @@ async function loadEager(doc) {
     await decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
+  }
+
+  try {
+    /* if fonts already loaded, load fonts.css */
+    if (sessionStorage.getItem('fonts-loaded')) {
+      loadFonts();
+    }
+  } catch (e) {
+    // do nothing
   }
 }
 
@@ -477,6 +497,8 @@ async function loadLazy(doc) {
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
