@@ -22,9 +22,9 @@ export default function decorate(block) {
     // if (accordionStandardBlock) {
     // Removing header wrapper only for regular accordion block
     const headerDiv = children[0];
-    headerDiv.outerHTML = headerDiv.innerHTML;
+    const header = headerDiv.querySelector('h3, h2');
+    headerDiv.replaceWith(...headerDiv.children);
 
-    const header = accordionItem.querySelector('h3, h2');
     const headerText = header.textContent;
     header.classList.add('accordion-item-heading');
     header.innerHTML = '';
