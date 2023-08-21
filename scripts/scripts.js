@@ -303,32 +303,26 @@ function buildAccordions(main) {
     const contentWrappers = accordion.querySelectorAll(':scope > div');
     const blockTable = [];
     let row;
-    let panelRow = [];
     contentWrappers.forEach((wrapper) => {
       let removeWrapper = true;
       [...wrapper.children].forEach((child) => {
         if (child.nodeName === 'H2') {
           if (row) {
-            if (panelRow.length > 0) {
-              const panelWrapper = createElement('div');
-              [...panelRow].forEach((element) => {
-                panelWrapper.append(element);
-              });
-              row.push(panelWrapper);
-              blockTable.push([{ elems: row }]);
-            }
-            panelRow = [];
+            blockTable.push(row);
           }
-          row = [];
-          row.push(child);
-        } else {
-          panelRow.push(child);
+
+          row = [{ elems: [] }, { elems: [] }];
+          row[0].elems.push(child);
         }
+
         if (!row) {
           // if there is content in the section before the first h2
           // then that content is preserved
           // otherwise, we remove the wrapper
           removeWrapper = false;
+        }
+        if (row && child.nodeName !== 'H2') {
+          row[1].elems.push(child);
         }
       });
       if (removeWrapper) wrapper.remove();
@@ -336,18 +330,13 @@ function buildAccordions(main) {
 
     // add last row
     if (row) {
-      if (panelRow.length > 0) {
-        const panelWrapper = createElement('div');
-        [...panelRow].forEach((element) => {
-          panelWrapper.append(element);
-        });
-        row.push(panelWrapper);
-      }
-      blockTable.push([{ elems: row }]);
+      blockTable.push(row);
     }
 
     const block = buildBlock('accordion', blockTable);
-    accordion.append(block);
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    accordion.append(wrapper);
     decorateBlock(block);
   });
 }

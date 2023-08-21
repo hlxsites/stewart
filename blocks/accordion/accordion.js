@@ -18,20 +18,11 @@ export default function decorate(block) {
 
   [...block.children].forEach((accordionItem, accordionItemIndex) => {
     accordionItem.classList.add(classNames.accordionItem);
-    const accordionStandardBlock = accordionItem.querySelector('h3') !== null;
     const { children } = accordionItem;
-    if (accordionStandardBlock) {
-      // Removing header wrapper only for regular accordion block
-      const headerDiv = children[0];
-      headerDiv.outerHTML = headerDiv.innerHTML;
-    } else {
-      // Removing extra div on autoblock accordion
-      const extraDiv = children[0];
-      [...extraDiv.children].forEach((child) => {
-        extraDiv.parentNode.append(child);
-      });
-      extraDiv.remove();
-    }
+    // if (accordionStandardBlock) {
+    // Removing header wrapper only for regular accordion block
+    const headerDiv = children[0];
+    headerDiv.outerHTML = headerDiv.innerHTML;
 
     const header = accordionItem.querySelector('h3, h2');
     const headerText = header.textContent;
