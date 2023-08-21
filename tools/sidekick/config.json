@@ -1,6 +1,6 @@
 {
   "project": "Stewart Title",
-  "host": "https://www.stewart.com",
+  "host": "",
   "plugins": [
     {
       "id": "library",
@@ -12,6 +12,14 @@
       "includePaths": [
         "**.docx**"
       ]
+    },
+    {
+      "id": "tagger",
+      "title": "Tagger",
+      "environments": [
+        "edit"
+      ],
+      "url": "/tools/sidekick/tagger/tagger.html"
     }
   ]
 }

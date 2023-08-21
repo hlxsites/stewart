@@ -30,20 +30,11 @@ export default async function decorate(block) {
   block.classList.add(`columns-${cols.length}-cols`);
   if (block.closest('.section').classList.contains('has-bg-image')) {
     block.classList.add('opacity');
+    if (block.closest('.section').classList.contains('dark')) block.classList.add('dark');
   }
 
-  const rowCount = [...block.children].length;
-
   [...block.children].forEach((row, rdx) => {
-    /*
-    The columns of first row should occupy full width when more than one row exists.
-    "row" class is used to set the column width. So, not adding "row" class for the first row.
-    */
-    if (rowCount > 1 && rdx === 0) {
-      row.classList.add(`row-${rdx + 1}`);
-    } else {
-      row.classList.add('row', `row-${rdx + 1}`);
-    }
+    row.classList.add('row', `row-${rdx + 1}`);
     [...row.children].forEach((col, cdx) => {
       col.classList.add('column', `column-${cdx + 1}`);
 

@@ -1,4 +1,5 @@
 import { createElement } from '../../scripts/scripts.js';
+import { toClassName } from '../../scripts/lib-franklin.js';
 import ffetch from '../../scripts/ffetch.js';
 
 // media query match that indicates mobile/tablet width
@@ -31,7 +32,7 @@ function bindMouseOverEvents(navDrop, navList) {
 async function findRootLandingPage() {
   const results = await ffetch('/query-index.json')
     .sheet('nav')
-    .filter((p) => p.template === 'primary-site-section-landing-page')
+    .filter((p) => toClassName(p.template) === 'section-landing-page')
     .all();
 
   let root;
@@ -78,7 +79,7 @@ async function buildNavList(block) {
   const navUl = block.querySelector('.nav-list');
   mappedResults.forEach((result) => {
     const li = createElement('li', { 'data-path': result.path }, [
-      createElement('a', { href: result.path }, result.navigationTitle || result.title),
+      createElement('a', { href: result.path }, result['navigation-title'] || result.title),
     ]);
 
     let parent = navUl;

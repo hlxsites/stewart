@@ -1,3 +1,6 @@
+import { createOptimizedPicture, fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import { createElement, fetchMetadataJson } from '../../scripts/scripts.js';
+
 const blockName = 'teaser-list';
 
 const classNames = {
@@ -38,10 +41,40 @@ const assignContentClasses = (teaser) => {
   }
 };
 
+/**
+ * decorate the teaser list
+ * @param {Element} block the block element
+ */
 export default async function decorate(block) {
-  [...block.children].forEach((teaser) => {
+  const placeholders = await fetchPlaceholders();
+  const teaserPromises = [...block.children].map(async (teaser) => {
     teaser.classList.add(classNames.teaser);
-    assignContainerClasses(teaser);
-    assignContentClasses(teaser);
+
+    const pic = teaser.querySelector('picture');
+    const link = teaser.querySelector('a');
+    if (link && !pic) {
+      const teaserPageMeta = await fetchMetadataJson(new URL(link.href).pathname);
+      if (teaserPageMeta['og:image']) {
+        const imageDiv = createElement('div', {}, [
+          createOptimizedPicture(teaserPageMeta['og:image']),
+        ]);
+        const contentDiv = createElement('div', {}, [
+          createElement('h3', {}, createElement('a', { href: link.href }, teaserPageMeta['navigation-title'] || teaserPageMeta['og:title'])),
+          createElement('p', {}, teaserPageMeta.description),
+          createElement('p', {}, createElement('a', { href: link.href }, placeholders.readMore || 'Read More')),
+        ]);
+        if (teaserPageMeta['publication-date']) {
+          contentDiv.prepend(createElement('p', {}, teaserPageMeta['publication-date']));
+        }
+
+        teaser.replaceChildren(imageDiv, contentDiv);
+        assignContainerClasses(teaser);
+        assignContentClasses(teaser);
+      } else {
+        teaser.remove();
+      }
+    }
   });
+
+  await Promise.all(teaserPromises);
 }

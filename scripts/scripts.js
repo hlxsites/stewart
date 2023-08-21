@@ -17,12 +17,13 @@ import {
 
 // valid template for which we have css/js files
 const VALID_TEMPLATES = [
-  'primary-site-section-landing-page',
-  'primary-site-subsection-landing-page',
-  'detail-content-page',
+  'section-landing-page',
+  'section-page',
+  'blog-article-page',
+  'landing-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'alert']; // add your LCP blocks to the list
 
 /**
  * create an element.
@@ -102,37 +103,52 @@ export function buildHeroBlock(main) {
   }
 
   const elems = [...section.children];
-  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata') && !el.classList.contains('alert'));
   const block = buildBlock('hero', { elems: filtered });
   section.append(block);
-  main.prepend(section);
 }
 
-export function buildEmbedBlocks(main) {
-  // For every youtube link, convert to an embed block
-  main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
-    // Get picture if it exists and move it to the block
-    const picture = a.closest('div').querySelector('picture');
-    const block = buildBlock('embed', { elems: picture ? [picture, a.cloneNode()] : [a.cloneNode()] });
-    a.replaceWith(block);
-    decorateBlock(block);
-  });
+export function buildEmbed(link) {
+  const picture = link.closest('div').querySelector('picture');
+  const block = buildBlock('embed', { elems: picture ? [picture, link.cloneNode()] : [link.cloneNode()] });
+  link.replaceWith(block);
+  decorateBlock(block);
 }
 
-function buildFragmentBlocks(main) {
+export function buildFragment(link) {
+  const block = buildBlock('fragment', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildForm(link) {
+  const block = buildBlock('form', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildLinkAutoBlocks(main) {
   const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
-  // links to /fragments/* become fragment blocks
-  main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
-    if (a.href) {
-      const url = new URL(a.href);
+  main.querySelectorAll('a[href]').forEach((a) => {
+    const url = new URL(a.href);
+    const hostMatch = hosts.some((host) => url.hostname.includes(host));
+    let autoBlocked = false;
+    if (hostMatch && url.pathname.includes('/fragments/') && a.textContent.includes(url.pathname)) {
+      buildFragment(a);
+      autoBlocked = true;
+    } else if (hostMatch
+      && url.pathname.includes('/forms/') && url.pathname.endsWith('.json')
+      && a.textContent.includes(url.pathname)) {
+      buildForm(a);
+      autoBlocked = true;
+    } else if (url.hostname.includes('youtube.com') && url.pathname.startsWith('/embed')) {
+      buildEmbed(a);
+      autoBlocked = true;
+    }
 
-      // for safety, we do a host match, and make sure the text content matches the path
-      const hostMatch = hosts.some((host) => url.hostname.includes(host));
-      if (hostMatch && a.textContent.includes(url.pathname)) {
-        const block = buildBlock('fragment', a.cloneNode(true));
-        a.replaceWith(block);
-        decorateBlock(block);
-      }
+    if (autoBlocked) {
+      const buttonContainer = a.closest('.button-container');
+      if (buttonContainer) buttonContainer.classList.remove('button-container');
     }
   });
 }
@@ -142,14 +158,8 @@ function buildFragmentBlocks(main) {
  * @param {Element} main The container element
  */
 export function buildAutoBlocks(main) {
-  try {
-    buildHeroBlock(main);
-    buildEmbedBlocks(main);
-    buildFragmentBlocks(main);
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Auto Blocking failed', error);
-  }
+  buildHeroBlock(main);
+  buildLinkAutoBlocks(main);
 }
 
 export function decorateLinks(element) {
@@ -158,14 +168,16 @@ export function decorateLinks(element) {
     try {
       if (a.href) {
         const url = new URL(a.href);
+        // protect against maito: links or other weirdness
+        if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
 
-        // local links are relative
-        // non local and non email links open in a new tab
         const hostMatch = hosts.some((host) => url.hostname.includes(host));
-
         if (hostMatch) {
+          // local links are rewritten to be relative
           a.href = `${url.pathname.replace('.html', '')}${url.search}${url.hash}`;
-        } else {
+        } else if (!url.hostname.includes('.stewart.com')) {
+          // non local open in a new tab
+          // but if a different stewart.com sub-domain, leave absolute, don't open in a new tab
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
         }
@@ -183,10 +195,24 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
-  const pictures = container.querySelectorAll('p picture');
+  const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
+    // need to deal with 2 use cases here
+    // 1) <picture><br/><a>
+    // 2) <p><picture></p><p><a></p>
+    if (pic.nextElementSibling && pic.nextElementSibling.tagName === 'BR'
+      && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
+      const link = pic.nextElementSibling.nextElementSibling;
+      if (link.textContent.includes(link.getAttribute('href'))) {
+        pic.nextElementSibling.remove();
+        link.innerHTML = pic.outerHTML;
+        pic.replaceWith(link);
+        return;
+      }
+    }
+
     const parent = pic.parentNode;
-    if (!parent.nextElementSibling) {
+    if (parent.tagName !== 'P' || !parent.nextElementSibling || parent.nextElementSibling.tagName !== 'P') {
       // eslint-disable-next-line no-console
       console.warn('no next element');
       return;
@@ -211,6 +237,35 @@ export async function fetchNavigationHTML() {
   return response.text();
 }
 
+/**
+ * fetches page and returns a json representation of all it's metadata
+ * @param {string} path path to the page to fetch
+ */
+export async function fetchMetadataJson(path) {
+  const data = {};
+  const resp = await fetch(path);
+  if (resp.ok) {
+    const html = await resp.text();
+    const parser = new DOMParser();
+    const contentDoc = parser.parseFromString(html, 'text/html');
+    contentDoc.querySelectorAll('head > meta').forEach((metaTag) => {
+      const name = metaTag.getAttribute('name') || metaTag.getAttribute('property');
+      const value = metaTag.getAttribute('content');
+      if (data[name]) {
+        let val = data[name];
+        if (!Array.isArray(val)) {
+          val = [val];
+        }
+        val.push(value);
+        data[name] = val;
+      } else {
+        data[name] = value;
+      }
+    });
+  }
+
+  return data;
+}
 /**
  * decorates section background images out of section metadata
  * @param {element} main the container element
@@ -321,13 +376,13 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
+    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
-      const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
         section.classList.add('no-margin');
       }
-    } else {
+    } else if (thisHasBg) {
       section.classList.add('no-margin');
     }
   }
@@ -412,29 +467,46 @@ async function loadTemplate(templateName) {
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function decorateMain(main) {
+export async function decorateMain(main, isFragment = false) {
   // hopefully forward compatible button decoration
   wrapImgsInLinks(main);
   decorateLinks(main);
   decorateButtons(main);
   decorateIcons(main);
 
-  const template = getMetadata('template');
-  let autoBlocksFunc = buildAutoBlocks;
-  if (template) {
-    // template js, if they exist, must call appropriate auto-blocks on their own
-    const templateMod = await loadTemplate(template);
-    if (templateMod && templateMod.default) {
-      autoBlocksFunc = templateMod.default;
+  try {
+    const template = getMetadata('template');
+    let autoBlocksFunc = buildAutoBlocks;
+    if (template && !isFragment) {
+      // template js, if they exist, must call appropriate auto-blocks on their own
+      const templateMod = await loadTemplate(toClassName(template));
+      if (templateMod && templateMod.default) {
+        autoBlocksFunc = templateMod.default;
+      }
     }
+    await autoBlocksFunc(main, isFragment);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Auto Blocking failed', error);
   }
-  await autoBlocksFunc(main);
 
   decorateSectionBackgroundImages(main);
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
   buildAccordions(main);
+}
+
+/**
+ * load fonts.css and set a session storage flag
+ */
+async function loadFonts() {
+  await loadCSS(`${window.hlx.codeBasePath}/fonts/fonts.css`);
+  try {
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+  } catch (e) {
+    // do nothing
+  }
 }
 
 /**
@@ -450,6 +522,15 @@ async function loadEager(doc) {
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
+
+  try {
+    /* if fonts already loaded, load fonts.css */
+    if (sessionStorage.getItem('fonts-loaded')) {
+      loadFonts();
+    }
+  } catch (e) {
+    // do nothing
+  }
 }
 
 /**
@@ -464,10 +545,20 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  const template = getMetadata('template');
+  if (toClassName(template) === 'landing-page') {
+    // landing pages get no header or footer
+    // this isn't autoblocking in main, so need to do this here
+    doc.querySelector('header').remove();
+    doc.querySelector('footer').remove();
+  } else {
+    loadHeader(doc.querySelector('header'));
+    loadFooter(doc.querySelector('footer'));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));

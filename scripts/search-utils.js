@@ -19,7 +19,7 @@ const SearchConfigs = {
   insights: {
     path: '/en/insights/',
     sheet: 'blog',
-    tagFacet: true,
+    tagFacet: 'content-types/insights',
     'page-size': 10,
   },
   news: {
@@ -68,7 +68,7 @@ export const createSearchForm = async ({ type }) => {
     class: ['search-form', type],
     role: 'search',
   }, `<label class="search-label" for="searchbox-${uuid}"></label>
-          <input type="search" name="q" id="searchbox-${uuid}" required placeholder="${searchFieldPlaceholder || 'Enter a search term...'}">
+          <input type="search" class="search-input" name="q" id="searchbox-${uuid}" required placeholder="${searchFieldPlaceholder || 'Enter a search term...'}">
             <button class="search-form-button" type="submit">
               ${buttonHTML[type]}
             </button>`));

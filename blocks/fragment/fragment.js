@@ -23,7 +23,7 @@ async function loadFragment(path) {
     if (resp.ok) {
       const main = document.createElement('main');
       main.innerHTML = await resp.text();
-      decorateMain(main);
+      await decorateMain(main, true);
       await loadBlocks(main);
       return main;
     }
@@ -43,8 +43,15 @@ export default async function decorate(block) {
     const fragmentSection = fragment.querySelector(':scope .section');
     if (fragmentSection) {
       block.closest('.section').classList.add(...fragmentSection.classList);
-      if (block.closest('.fragment-wrapper')) {
-        block.closest('.fragment-wrapper').replaceWith(...fragmentSection.childNodes);
+      const fragmentWrapper = block.closest('.fragment-wrapper');
+      if (fragmentWrapper) {
+        const containingBlock = block.parentElement.closest('.block');
+        if (!containingBlock) {
+          fragmentWrapper.replaceWith(...fragmentSection.childNodes);
+        } else {
+          // to avoid disrupting block dom structure
+          fragmentWrapper.replaceChildren(...fragmentSection.childNodes);
+        }
       } else {
         block.replaceChildren(...fragmentSection.childNodes);
       }

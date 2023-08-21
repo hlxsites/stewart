@@ -139,6 +139,7 @@ main .search-results .search-results-facet-container :is(h5, label) {
 
 main .search-results .search-results-facet-container[aria-expanded="true"] {
   display: block;
+  min-width: 20rem;
   padding-block: 1rem;
 }
 

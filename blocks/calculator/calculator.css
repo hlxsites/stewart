@@ -1,0 +1,382 @@
+.calculator .calculator-form {
+  background-color: var(--clr-gray);
+  box-shadow: 0 0.25rem 0.25rem 0 rgb(0 0 0 / 15%);
+  padding: 1rem;
+  border: 1px solid var(--clr-gray-dark);
+  margin-bottom: 2.5rem;
+}
+
+.calculator .row {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.calculator .row .column {
+  margin-bottom: 1.5rem;
+}
+
+.calculator legend {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-size: var(--heading-font-size-s);
+  line-height: 2.25rem;
+  color: inherit;
+  white-space: normal;
+}
+
+.calculator .form-group {
+  margin-bottom: 0.9375rem;
+}
+
+.calculator .form-group input[type='radio']{
+  font-size: inherit;
+  line-height: inherit;
+  display: inline;
+  border: none;
+  color: inherit;
+  background: none;
+  width: unset;
+  max-width: unset;
+  margin: 0;
+}
+
+.calculator label {
+  font-size: var(--body-font-size-xxs);
+  font-weight: 400;
+  line-height: 1.125rem;
+  letter-spacing: 0.0075rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.calculator .form-group label {
+  font-size: var(--body-font-size-m);
+}
+
+.calculator input.invalid {
+  border: 1px solid var(--clr-brand-red);
+}
+
+.calculator .inputerrormessage {
+  font-weight: 700;
+  color: var(--clr-brand-red);
+  font-size: 1.125rem;
+}
+
+.calculator .calculator-form-results {
+  padding: 2.5rem 1.5rem;
+}
+
+.calculator .results-summary {
+  margin-bottom: 2.5rem;
+}
+
+.calculator .results-summary .title,
+.calculator .results-summary .dataitem,
+.calculator .results-calculated .title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calculator .results-summary .title>i,
+.calculator .results-calculated .title>i {
+  border-radius: 100%;
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+  flex: 0 0 2.5rem;
+  font-size: 1.25rem;
+  height: 2.5rem;
+  width: 2.5rem;
+  line-height: 2.5rem;
+  letter-spacing: 0.0125rem;
+  text-align: center;
+  margin-inline-end: 1.0625rem;
+}
+
+.calculator .results-summary .title h4,
+.calculator .results-calculated .title h4 {
+  flex-grow: 1;
+  margin-bottom: 0;
+}
+
+.calculator .results-summary .dataitem .data {
+  font-weight: 700;
+}
+
+.calculator .results-calculated .title .printbutton, 
+.calculator .results-calculated .title .togglefield label,
+.calculator .results-calculated .title .togglefield input[type='checkbox'],
+.calculator .results-calculated .amortization table thead {
+  display: none;
+}
+
+.calculator .results-calculated .title .togglefield-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.calculator .results-calculated .title .togglefield-option {
+  flex-grow: 1;
+  color: var(--clr-primary);
+  border: 2px solid var(--clr-primary);
+  padding: 0.4375rem 0.75rem;
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--body-font-size-xxxs);
+  line-height: 0.875rem;
+  letter-spacing: -0.005rem;
+  cursor: pointer;
+}
+
+.calculator .results-calculated .title .togglefield-option[data-selected] {
+  background-color: var(--clr-primary);
+  color: var(--clr-white);
+}
+
+.calculator .results-calculated .amortization table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calculator .results-calculated .amortization table thead th {
+  color: var(--clr-white);
+  background: linear-gradient(180deg, var(--clr-teal), var(--clr-black));
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  text-align: -webkit-match-parent;
+}
+
+.calculator .results-calculated .amortization table tbody tr {
+  display: block;
+  margin-bottom: 0.875rem;
+}
+
+.calculator .results-calculated .amortization table tbody tr td {
+  font-size: var(--body-font-size-xxs);
+  font-weight: 400;
+  line-height: 1.125rem;
+  letter-spacing: 0.0075rem;
+  text-align: start;
+  padding: 0.75rem;
+  display: block;
+  border-inline-start: 1px solid var(--clr-gray-light);
+  border-inline-end: 1px solid var(--clr-gray-light);
+  position: relative;
+}
+
+.calculator .results-calculated .amortization table tbody tr td:first-child {
+  color: var(--clr-white);
+  background: linear-gradient(180deg, var(--clr-teal), var(--clr-black));
+  font-weight: 700;
+  font-size: var(--body-font-size-s);
+  border: 0;
+}
+
+.calculator .results-calculated .amortization table tbody tr td:nth-child(odd) {
+  background-color: var(--clr-gray);
+}
+
+.calculator .results-calculated .amortization table tbody tr td span {
+  display: inline-block;
+  width: 50%;
+}
+
+.calculator .results-calculated .amortization table tbody tr td span:last-child {
+  text-align: end;
+}
+
+.calculator .results-calculated .amortization table tbody tr td:last-child {
+  border-bottom: 1px solid var(--clr-gray-light);
+}
+
+@media (min-width: 600px) {
+  .calculator .calculator-form {
+    padding: 3.4375rem;
+    margin-bottom: 5rem;
+  }
+
+  .calculator .row {
+    flex-direction: unset;
+    margin-inline-start: -0.9375rem;
+    margin-inline-end: -0.9375rem;
+  }
+
+  .calculator .form-group {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .calculator .form-group > div {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .calculator .row .column {
+    position: relative;
+    width: 100%;
+    padding-inline-start: 0.9375rem;
+    padding-inline-end: 0.9375rem;
+  }
+
+  .calculator .row .column.col-50 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 900px) {
+  .calculator .calculator-form {
+    padding-inline-start: 13.125rem;
+    padding-inline-end: 13.125rem;
+  }
+
+  .calculator label {
+    font-size: var(--body-font-size-l);
+    line-height: 1.625rem;
+    letter-spacing: 0.0113rem;
+  }
+
+  .calculator input {
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .calculator button {
+    font-size: var(--body-font-size-xl);
+    line-height: 1.625rem;
+    letter-spacing: 0.0113rem;
+    min-width: 280px;
+    padding: 1rem;
+  }
+
+  .calculator .calculator-form-results {
+    padding: 8rem 13.125rem;
+  }
+
+  .calculator .results-summary {
+    margin-bottom: 6.25rem;
+  }
+
+  .calculator .results-summary .title,
+  .calculator .results-calculated .title {
+    margin-bottom: 2.5rem;
+    margin-inline-start: -5.1875rem;
+  }
+
+  .calculator .results-summary .title>i,
+  .calculator .results-calculated .title>i {
+    font-size: 1.75rem;
+    height: 3.75rem;
+    width: 3.75rem;
+    letter-spacing: 0.0313rem;
+    line-height: 3.75rem;
+    flex: 0 0 3.75rem;
+    margin-inline-end: 1.4375rem;
+  }
+
+  .calculator .results-summary .title h4 {
+    font-size: 2rem;
+    line-height: 2.625rem;
+    letter-spacing: 0.02rem;
+  }
+
+  .calculator .results-summary .dataitem {
+    margin-bottom: 1.875rem;
+    display: block;
+  }
+
+  .calculator .results-summary .dataitem span {
+    display: block;
+    text-align: start;
+    font-size: var(--body-font-size-xl);
+    line-height: 2rem;
+  }
+
+  .calculator .results-summary .dataitem .data {
+    font-size: var(--body-font-size-xxl);
+    line-height: 2.375rem;
+    letter-spacing: 0.0163rem;
+  }
+
+  .calculator .results-calculated .title .printbutton {
+    display: block;
+    color: var(--clr-primary);
+    font-weight: 600;
+    margin-inline-end: 3.125rem;
+    font-size: var(--body-font-size-xl);
+  }
+
+  .calculator .results-calculated .title .togglefield-option {
+    font-size: var(--body-font-size-s);
+    line-height: 1.375rem;
+    letter-spacing: -0.0094rem;
+  }
+
+  .calculator .results-calculated .amortization table thead {
+    display: table-header-group;
+  }
+
+  .calculator .results-calculated .amortization table thead th {
+    padding: 1.25rem 1.4375rem;
+    text-align: start;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr {
+    display: table-row;
+    margin-bottom: 0;
+    border-inline-start: 1px solid var(--clr-gray-light);
+    border-inline-end: 1px solid var(--clr-gray-light);
+  }
+
+  .calculator .results-calculated .amortization table tbody tr:nth-child(odd) {
+    background-color: var(--clr-white);
+  }
+
+  .calculator .results-calculated .amortization table tbody tr:nth-child(2n) {
+    background-color: var(--clr-gray);
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td {
+    font-size: var(--body-font-size-l);
+    line-height: 1.625rem;
+    letter-spacing: 0.0113rem;
+    display: table-cell;
+    background: none;
+    font-weight: 300;
+    padding: 0.75rem 1.4375rem;
+    border: 0;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td span:first-child {
+    display: none;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td span:last-child {
+    text-align: start;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td:first-child {
+    color: inherit;
+    background: none;
+    font-size: var(--body-font-size-l);
+    font-weight: 300;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td:nth-child(odd) {
+    background: none;
+  }
+
+  .calculator .results-calculated .amortization table tbody tr td:last-child {
+    border: 0;
+  }
+}

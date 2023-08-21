@@ -4,48 +4,19 @@ import {
   buildBlock,
   decorateBlock,
   loadBlock,
-  fetchPlaceholders,
 } from '../../scripts/lib-franklin.js';
 
 import { createElement } from '../../scripts/scripts.js';
 
 const buildTeaserListFromResults = async (results, block) => {
-  const { recentArticlesCta } = await fetchPlaceholders();
-  const cta = recentArticlesCta || 'Read more';
-
   const teasers = [];
 
   // eslint-disable-next-line no-restricted-syntax
   for await (const entry of results) {
-    const teaserElements = [];
-    const {
-      date,
-      path,
-      image,
-      title,
-      description,
-    } = entry;
+    const { path } = entry;
 
-    const teaserImageElement = createElement('div', {}, createElement('img', { src: image, alt: title }));
-    const teaserDateElement = createElement('p', {}, new Date(date * 1000).toDateString());
-    const teaserContentElement = createElement('div');
-    const teaserTitleElement = createElement('h3', {}, `<a href="${path}" title="${title}">${title}</a>`);
-    const teaserDescriptionElement = createElement('p', {}, description);
-    const teaserLinkElement = createElement('a', {}, `<a href="${path}" title="${cta}">${cta}</a>`);
-
-    teaserContentElement.append(
-      teaserDateElement,
-      teaserTitleElement,
-      teaserDescriptionElement,
-      teaserLinkElement,
-    );
-
-    if (image && !image.includes('default-meta-image')) {
-      teaserElements.push(teaserImageElement);
-    }
-
-    teaserElements.push(teaserContentElement);
-    teasers.push(teaserElements);
+    const teaserLinkElement = createElement('a', { href: path }, path);
+    teasers.push([teaserLinkElement]);
   }
 
   const teaserListBlock = buildBlock('teaser-list', teasers);
@@ -59,7 +30,7 @@ export default async function decorate(block) {
   const config = getSearchConfig(block);
   block.innerHTML = '';
   const { count } = config;
-  const results = fetchResults(config, '', '', -1).limit(Number(count));
+  const results = fetchResults(config, '', '', -1).limit(Number(count || 4));
 
   buildTeaserListFromResults(results, block);
 }

@@ -1,5 +1,10 @@
 import { readBlockConfig } from '../../scripts/lib-franklin.js';
-import { createElement, decorateIcons, wrapImgsInLinks } from '../../scripts/scripts.js';
+import {
+  createElement,
+  decorateIcons,
+  wrapImgsInLinks,
+  decorateLinks,
+} from '../../scripts/scripts.js';
 
 function createIconsList(ele) {
   const list = document.createElement('ul');
@@ -44,7 +49,6 @@ export default async function decorate(block) {
     const footer = createElement('div');
     footer.className = 'inner-wrapper';
     footer.innerHTML = html;
-
     decorateIcons(footer);
 
     const firstColumn = document.createElement('div');
@@ -53,7 +57,7 @@ export default async function decorate(block) {
     secondColumn.className = 'column-2';
 
     [...footer.children].forEach((ele, index, array) => {
-      if (array.length - 1 === index) {
+      if (array.length - 1 === index && ele.querySelector('.icon, .fa-icon')) {
         const iconsList = createIconsList(ele);
         secondColumn.append(iconsList);
       } else {
@@ -73,6 +77,7 @@ export default async function decorate(block) {
       }
     });
     footer.replaceChildren(firstColumn, secondColumn);
+    decorateLinks(footer);
     block.append(footer);
   }
 }

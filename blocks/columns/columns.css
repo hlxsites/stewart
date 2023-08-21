@@ -1,10 +1,7 @@
-.columns-container.content-break {
-  padding: 2.5rem 1.5rem;
-}
-
 .columns > .row {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
 }
 
 .columns img {
@@ -21,6 +18,10 @@
 
 .columns > div > .columns-img-col img {
   display: block;
+}
+
+.columns .column.button-container .button {
+  width: 100%;
 }
 
 .columns.card .row .column {
@@ -63,24 +64,13 @@
   margin-bottom: 1.5rem;
 }
 
-.columns-container .columns.left-border .row .column-1 {
-  border-inline-start: 0.25rem solid var(--clr-white);
-  padding-inline-start: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-.columns-container.grey .columns.left-border .row .column-1 {
-  border-inline-start: 0.25rem solid var(--clr-teal);
-}
-
 @media (min-width: 600px) {
   .columns .row {
-    align-items: center;
     flex-direction: unset;
-    gap: 32px;
   }
 
-  .columns.card .row {
+  .columns.card .row,
+  .columns.people-card .row {
     align-items: stretch;
   }
 
@@ -101,15 +91,35 @@
   }
 
   .columns.split-66-33 .row .column-1 {
-    flex-grow: 2;
+    flex-basis: 66.666%;
+  }
+
+  .columns.split-66-33 .row .column-2 {
+    flex-basis: 33.333%;
   }
 
   .columns.split-75-25 .row .column-1 {
-    flex-grow: 3;
+    flex-basis: 75%;
   }
 
-  .columns-container.content-break {
-    padding: 7.5rem;
+  .columns.split-75-25 .row .column-2 {
+    flex-basis: 25%;
+  }
+
+  .columns.split-33-66 .row .column-1 {
+    flex-basis: 33.333%;
+  }
+
+  .columns.split-33-66 .row .column-2 {
+    flex-basis: 66.666%;
+  }
+
+  .columns.split-25-75 .row .column-1 {
+    flex-basis: 25%;
+  }
+
+  .columns.split-25-75 .row .column-2 {
+    flex-basis: 75%;
   }
 
   .columns.card .row .column {
@@ -122,17 +132,25 @@
     margin-bottom: 1rem;
   }
 
-  .columns-container .columns.left-border .row .column-1 {
-    padding-inline-start: 1.5rem;
-    margin-bottom: 0;
+  /* align buttons right */
+  .columns .column.button-container .button {
+    width: unset;
+  }
+
+  .columns .column.button-container {
+    text-align: right;
   }
 }
 
 @media (min-width: 900px) {
+  .columns .row {
+    gap: 2rem;
+  }
+
   .columns.card.gray .row {
     align-items: center;
     flex-direction: unset;
-    gap: 32px;
+    gap: 2rem;
   }
 
   .columns.card.gray > div > div {
@@ -151,14 +169,5 @@
 
   .columns.card.gray .row .column:last-child {
     padding: 3.5rem;
-  }
-}
-
-
-
-@media (min-width: 600px) {
-  /* align buttons right */
-  .columns .column.button-container {
-    text-align: right;
   }
 }
