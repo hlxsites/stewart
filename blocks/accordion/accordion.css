@@ -67,6 +67,7 @@ main .accordion .accordion-item-active .accordion-item-trigger > .accordion-item
 main .accordion .accordion-item .accordion-panel {
   padding: 20px 24px;
   transition: all .5s;
+  visibility: hidden;
   opacity: 0;
   max-height: 40px;
 }
@@ -74,6 +75,7 @@ main .accordion .accordion-item .accordion-panel {
 main .accordion .accordion-item .accordion-panel.accordion-item-active {
   padding-top: 0;
   opacity: 1;
+  visibility: visible;
   max-height: none;
 }
 
