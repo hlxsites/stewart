@@ -26,6 +26,7 @@ export default function decorate(block) {
 
     const header = accordionItem.querySelector('h3, h2');
     const headerText = header.textContent;
+    header.classList.add('accordion-item-heading');
     header.innerHTML = '';
 
     const button = createElement('button', {

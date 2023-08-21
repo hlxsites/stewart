@@ -3,14 +3,12 @@ main .accordion .accordion-item {
   border-bottom: 1px solid var(--clr-black);
 }
 
-main .accordion .accordion-item > h3,
-main .accordion .accordion-item > h2 {
+main .accordion .accordion-item > .accordion-item-heading {
   margin: 0;
   display: flex;
 }
 
-main .accordion .accordion-item > h3 > .accordion-item-trigger,
-main .accordion .accordion-item > h2 > .accordion-item-trigger {
+main .accordion .accordion-item > .accordion-item-heading > .accordion-item-trigger {
   width: 100%;
   text-align: left;
   background-color: transparent;
@@ -22,17 +20,13 @@ main .accordion .accordion-item > h2 > .accordion-item-trigger {
   white-space: normal;
 }
 
-main .accordion .accordion-item-active > h3 > .accordion-item-trigger,
-main .accordion .accordion-item-active > h2 > .accordion-item-trigger {
+main .accordion .accordion-item-active > .accordion-item-heading > .accordion-item-trigger {
   border: 0;
 }
 
-main .accordion .accordion-item > h3 > .accordion-item-trigger:hover,
-main .accordion .accordion-item > h3 > .accordion-item-trigger:active,
-main .accordion .accordion-item > h3 > .accordion-item-trigger:focus,
-main .accordion .accordion-item > h2 > .accordion-item-trigger:hover,
-main .accordion .accordion-item > h2 > .accordion-item-trigger:active,
-main .accordion .accordion-item > h2 > .accordion-item-trigger:focus {
+main .accordion .accordion-item > .accordion-item-heading > .accordion-item-trigger:hover,
+main .accordion .accordion-item > .accordion-item-heading > .accordion-item-trigger:active,
+main .accordion .accordion-item > .accordion-item-heading > .accordion-item-trigger:focus {
   background-color: transparent;
 }
 
