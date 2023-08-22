@@ -302,6 +302,54 @@ function decorateSectionBackgroundImages(main) {
 }
 
 /**
+ * Builds accordion blocks from default content
+ * @param {Element} main The container element
+ */
+function buildAccordions(main) {
+  const accordionSectionContainers = main.querySelectorAll('.section.accordion');
+  accordionSectionContainers.forEach((accordion) => {
+    const contentWrappers = accordion.querySelectorAll(':scope > div');
+    const blockTable = [];
+    let row;
+    contentWrappers.forEach((wrapper) => {
+      let removeWrapper = true;
+      [...wrapper.children].forEach((child) => {
+        if (child.nodeName === 'H2') {
+          if (row) {
+            blockTable.push(row);
+          }
+
+          row = [{ elems: [] }, { elems: [] }];
+          row[0].elems.push(child);
+        }
+
+        if (!row) {
+          // if there is content in the section before the first h2
+          // then that content is preserved
+          // otherwise, we remove the wrapper
+          removeWrapper = false;
+        }
+        if (row && child.nodeName !== 'H2') {
+          row[1].elems.push(child);
+        }
+      });
+      if (removeWrapper) wrapper.remove();
+    });
+
+    // add last row
+    if (row) {
+      blockTable.push(row);
+    }
+
+    const block = buildBlock('accordion', blockTable);
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    accordion.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * perform additional section class decoration
  * @param {Element} main the container element
  */
@@ -471,7 +519,7 @@ export async function decorateMain(main, isFragment = false) {
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
-  decorateCardSections(main);
+  buildAccordions(main);
 }
 
 /**
