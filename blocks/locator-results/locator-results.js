@@ -149,6 +149,36 @@ const handleMapMarkerClick = (e, listing, infobox, map) => {
 };
 
 /**
+ * Customizes the cluster pin.
+ * @param {Object} cluster the bing map pin cluster.
+ */
+const customizeClusterPin = (cluster) => {
+  const isAgencyCluster = (pin) => pin.metadata.AgentType === 'I';
+
+  const colorLookup = {
+    agency: {
+      condition: cluster.containedPushpins.every((pin) => isAgencyCluster(pin)),
+      color: 'purple',
+    },
+    office: {
+      condition: cluster.containedPushpins.every((pin) => !isAgencyCluster(pin)),
+      color: 'teal',
+    },
+    agencyAndOffice: {
+      condition: cluster.containedPushpins.some((pin) => !isAgencyCluster(pin))
+        && cluster.containedPushpins.some((pin) => !isAgencyCluster(pin)),
+      color: '#3a3a3a',
+    },
+  };
+
+  const { color } = Object.values(colorLookup).find((item) => item.condition);
+
+  cluster.setOptions({
+    color,
+  });
+};
+
+/**
  * populates markers on the map with the listings.
  */
 const populateMapMarkers = () => {
@@ -163,6 +193,7 @@ const populateMapMarkers = () => {
 
   infobox.setMap(map);
   const pins = [];
+  const pinLocations = [];
 
   currentListings.forEach((listing) => {
     const { Latitude, Longitude } = listing;
@@ -170,23 +201,34 @@ const populateMapMarkers = () => {
 
     if (Latitude && Longitude) {
       const pinLocation = new Microsoft.Maps.Location(Latitude, Longitude);
-      pins.push(pinLocation);
-
-      const mapMarker = new Microsoft.Maps.Pushpin(pinLocation, {
+      pinLocations.push(pinLocation);
+      const pin = new Microsoft.Maps.Pushpin(pinLocation, {
         color: isAgency ? 'purple' : 'teal',
       });
 
       map.setView({ center: pinLocation });
 
-      mapMarker.metadata = listing;
+      pin.metadata = listing;
 
-      Microsoft.Maps.Events.addHandler(mapMarker, 'click', (e) => handleMapMarkerClick(e, listing, infobox, map));
-      map.entities.push(mapMarker);
+      Microsoft.Maps.Events.addHandler(pin, 'click', (e) => handleMapMarkerClick(e, listing, infobox, map));
+      pins.push(pin);
     }
   });
 
-  const bounds = Microsoft.Maps.LocationRect.fromLocations(pins);
-  map.setView({ bounds });
+  Microsoft.Maps.loadModule('Microsoft.Maps.Clustering', () => {
+    const clusterLayer = new Microsoft.Maps.ClusterLayer(pins, {
+      clusteredPinCallback: (cluster) => customizeClusterPin(cluster),
+    });
+
+    map.layers.insert(clusterLayer);
+  });
+
+  const bounds = Microsoft.Maps.LocationRect.fromLocations(pinLocations);
+  map.setView({
+    bounds,
+    zoom: 500,
+  });
+
   map.setOptions({
     disableScrollWheelZoom: true,
     disableStreetside: true,
