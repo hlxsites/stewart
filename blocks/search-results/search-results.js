@@ -1,7 +1,7 @@
 import { createSearchForm, getSearchConfig, queryIndexPath } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
 import { createElement } from '../../scripts/scripts.js';
-import { toClassName, sampleRUM } from '../../scripts/lib-franklin.js';
+import { toClassName, sampleRUM, fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import getTaxonomy from '../../scripts/taxonomy.js';
 
 // media query match that indicates mobile/tablet width
@@ -20,6 +20,16 @@ const classNames = {
   searchResultsPaginationItem: `${blockName}-pagination-item`,
   searchResultsPaginationButton: `${blockName}-pagination-button`,
 };
+
+const placeholders = await fetchPlaceholders();
+const {
+  filterBy,
+  contentTypes,
+  nextPage,
+  previousPage,
+  searchResultsPagination,
+  resultsFound,
+} = placeholders;
 
 const generatePaginationData = (currentPage, totalPages) => {
   if (!currentPage || !totalPages) {
@@ -88,19 +98,19 @@ const createPaginationButton = (page, currentPage) => {
       value: currentPage + 1,
       text: '<span class="fa-icon far fa-chevron-right"></span>',
       cssClass: 'arrow',
-      ariaLabel: 'Next page',
+      ariaLabel: nextPage || 'Next page',
     },
     '<': {
       cssClass: 'arrow',
       value: currentPage - 1,
       text: '<span class="fa-icon far fa-chevron-left"></span>',
-      ariaLabel: 'Previous page',
+      ariaLabel: previousPage || 'Previous page',
     },
     default: {
       cssClass: '',
       value: page,
       text: page,
-      ariaLabel: `Page ${page}`,
+      ariaLabel: `${placeholders.page || 'Page'} ${page}`,
     },
   };
 
@@ -287,15 +297,15 @@ function renderSearchResultsScaffolding() {
       createElement('h3', { class: 'search-result-count' }),
     ]),
     createElement('div', { class: classNames.searchResultsFilterContainer }, [
-      createElement('h4', { class: 'search-results-filterby' }, 'Filter By:'),
+      createElement('h4', { class: 'search-results-filterby' }, filterBy || 'Filter By:'),
       createElement('div', { class: 'search-results-facet-container', 'aria-expanded': 'false' }, [
-        createElement('h5', {}, 'Content Types'),
+        createElement('h5', {}, contentTypes || 'Content Types'),
         createElement('ul'),
       ]),
     ]),
     createElement('div', { class: classNames.searchResultsListContainer }, [
       createElement('ul', { class: classNames.searchResultsDataList }),
-      createElement('nav', { class: classNames.searchResultsNav, 'aria-label': 'Search Results Pagination' }, [
+      createElement('nav', { class: classNames.searchResultsNav, 'aria-label': searchResultsPagination || 'Search Results Pagination' }, [
         createElement('ul', { class: classNames.searchResultsPagination }),
       ]),
     ]),
@@ -324,7 +334,7 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
     }
 
     if (!partial) {
-      block.querySelector('.search-result-count').textContent = `${allResCount} Results Found`;
+      block.querySelector('.search-result-count').textContent = `${allResCount} ${resultsFound || 'Results Found'}`;
       if (cfg.tagFacet) {
         buildFacets(resArray, block, cfg, q, tag);
       }
