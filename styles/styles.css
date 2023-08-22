@@ -39,6 +39,7 @@
   --clr-gray-dark: #757575;
   --clr-teal: #006781;
   --clr-teal-light: #248464;
+  --clr-green: #0f5132;
   --clr-teal-dark: #002f39;
   --clr-purple: #53469c;
   --clr-cyan: #96e0ff;
@@ -423,10 +424,6 @@ main .section {
   margin-block-end: 2rem;
 }
 
-/* main .section.centered {
-  text-align: center;
-} */
-
 @media (min-width: 900px) {
   main .section {
     padding-inline: 6rem;
@@ -563,6 +560,8 @@ main .section>div {
 }
 
 .section.teal {
+  --text-color: var(--clr-white);
+
   background: linear-gradient(180deg, var(--clr-teal), var(--clr-teal-dark));
   box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
   color: var(--clr-white);
