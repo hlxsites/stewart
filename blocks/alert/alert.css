@@ -1,0 +1,14 @@
+.alert {
+  background-color: var(--clr-primary);
+  color: var(--clr-white);
+  font-weight: 700;
+}
+
+.alert a { 
+  color: var(--clr-white);
+  text-decoration: underline;
+}
+
+.alert > div {
+  padding: 1rem;
+}
