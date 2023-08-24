@@ -12,6 +12,11 @@ main .hero {
   position: relative;
   padding: 3.125rem 1.5rem;
   min-height: 300px;
+  color: var(--clr-white); 
+}
+
+main .light .hero {
+  color: var(--text-color); 
 }
 
 main .hero-container.opacity-10 .hero {
@@ -36,14 +41,6 @@ main .hero-container.opacity-40 .hero {
 
 main .hero-container.opacity-50 .hero {
   background-color: rgb(0 0 0 / 50%);
-}
-
-main .hero {
-  color: var(--clr-white); 
-}
-
-main .light .hero {
-  color: var(--text-color); 
 }
 
 main .hero .hero-inner {
