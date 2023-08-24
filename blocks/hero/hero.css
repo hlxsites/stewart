@@ -89,6 +89,10 @@ main .hero .button-container {
   margin-bottom: 2.5rem;
 }
 
+main .hero .block .button-container {
+  text-align: unset;
+}
+
 main .hero .button-container a {
   margin-block-end: 0;
 }
