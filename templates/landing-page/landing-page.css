@@ -1,3 +1,7 @@
+:root {
+  --nav-height: 0;
+}
+
 /* footer styles */
 .landing-page .footer {
   --footer-text-color: var(--text-color);
