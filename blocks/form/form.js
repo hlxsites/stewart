@@ -1,5 +1,6 @@
 import { createElement } from '../../scripts/scripts.js';
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import handleCCPA from './ccpa.js';
 
 let isCmdShiftPressed = false;
 let commonOptions;
@@ -331,6 +332,17 @@ async function buildForm(formData, defaultAction) {
             if (defaultValue) { input.textContent = defaultValue; }
             fieldDiv.append(input);
             break;
+          case 'password':
+            input = createElement('input');
+            input.setAttribute('name', name);
+            input.setAttribute('type', 'password');
+            input.setAttribute('aria-labelledby', labelId);
+            input.setAttribute('placeholder', placeholder);
+            input.setAttribute('autocomplete', 'off');
+            if (required) { input.setAttribute('required', true); }
+            if (defaultValue) { input.textContent = defaultValue; }
+            fieldDiv.append(input);
+            break;
           case 'legend':
             input = createElement('legend', { class: 'legend' }, defaultValue || '');
             fieldDiv.append(input);
@@ -423,7 +435,12 @@ export default async function decorate(block) {
         const formData = await fetch(formHref);
         const formJson = await formData.json();
         const form = await buildForm(formJson, formHref);
+        form.classList.add(...block.classList.value.split(' ')); // Retain the block class names to handle form variations
         block.replaceWith(form);
+
+        if (form.classList.contains('ccpa')) {
+          handleCCPA(form);
+        }
 
         // If domain is localhost or contains hlxsites.hlx then track keboard events
         if (window.location.hostname === 'localhost' || window.location.hostname.includes('hlxsites.hlx')) {
