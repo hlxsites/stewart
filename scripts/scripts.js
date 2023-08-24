@@ -217,12 +217,18 @@ export function wrapImgsInLinks(container) {
     }
 
     const parent = pic.parentNode;
-    if (parent.tagName !== 'P' || !parent.nextElementSibling || parent.nextElementSibling.tagName !== 'P') {
+    if (!parent.nextElementSibling) {
       // eslint-disable-next-line no-console
       console.warn('no next element');
       return;
     }
-    const link = parent.nextElementSibling.querySelector('a');
+    const nextSibling = parent.nextElementSibling;
+    if (parent.tagName !== 'P' || nextSibling.tagName !== 'P' || nextSibling.children.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('next element not viable link container');
+      return;
+    }
+    const link = nextSibling.querySelector('a');
     if (link && link.textContent.includes(link.getAttribute('href'))) {
       if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
         return;
