@@ -12,6 +12,11 @@ main .hero {
   position: relative;
   padding: 3.125rem 1.5rem;
   min-height: 300px;
+  color: var(--clr-white); 
+}
+
+main .hero-container.light .hero {
+  color: var(--text-color); 
 }
 
 main .hero-container.opacity-10 .hero {
@@ -38,11 +43,13 @@ main .hero-container.opacity-50 .hero {
   background-color: rgb(0 0 0 / 50%);
 }
 
-main .hero h1 {
+main .hero .hero-inner {
   max-width: var(--max-content-width);
+}
+
+main .hero h1 {
   margin-left: auto;
-  margin-right: auto;
-  color: var(--clr-white);  
+  margin-right: auto;   
 }
 
 main .hero h1::after {
@@ -72,7 +79,6 @@ main .hero picture.hero-bg img {
 }
 
 main .hero h2 {
-  color: var(--clr-white);
   margin-bottom: 0.5rem;
   font-weight: 400;
 }
@@ -83,6 +89,10 @@ main .hero .button-container {
   margin-bottom: 2.5rem;
 }
 
+main .hero .block .button-container {
+  text-align: unset;
+}
+
 main .hero .button-container a {
   margin-block-end: 0;
 }
@@ -90,7 +100,6 @@ main .hero .button-container a {
 @media (min-width: 600px) {
   .section.narrow.hero-container {
     max-width: 100%;
-    margin-bottom: 2rem;
     margin-inline: 0;
   }
 }
@@ -112,8 +121,7 @@ main .hero .button-container a {
 }
 
 @media (min-width: 1200px) {
-  .section.narrow.hero-container h1,
-  .section.narrow.hero-container h2 {
+  .section.narrow.hero-container .hero-inner {
     max-width: 60%;
     margin-left: 0;
   }

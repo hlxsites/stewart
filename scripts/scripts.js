@@ -97,6 +97,7 @@ export function buildHeroBlock(main) {
   }
 
   const section = h1.closest('div');
+
   const picture = section.querySelector('picture');
   if (!picture) {
     return;
@@ -109,8 +110,8 @@ export function buildHeroBlock(main) {
 }
 
 export function buildEmbed(link) {
-  const picture = link.closest('div').querySelector('picture');
-  const block = buildBlock('embed', { elems: picture ? [picture, link.cloneNode()] : [link.cloneNode()] });
+  const elems = [link.cloneNode(true)];
+  const block = buildBlock('embed', { elems });
   link.replaceWith(block);
   decorateBlock(block);
 }
@@ -195,6 +196,7 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
+  const ignorePatterns = ['/fragments/', '/forms/'];
   const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
     // need to deal with 2 use cases here
@@ -204,6 +206,9 @@ export function wrapImgsInLinks(container) {
       && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
       const link = pic.nextElementSibling.nextElementSibling;
       if (link.textContent.includes(link.getAttribute('href'))) {
+        if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+          return;
+        }
         pic.nextElementSibling.remove();
         link.innerHTML = pic.outerHTML;
         pic.replaceWith(link);
@@ -219,6 +224,9 @@ export function wrapImgsInLinks(container) {
     }
     const link = parent.nextElementSibling.querySelector('a');
     if (link && link.textContent.includes(link.getAttribute('href'))) {
+      if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+        return;
+      }
       link.parentElement.remove();
       link.innerHTML = pic.outerHTML;
       pic.replaceWith(link);
@@ -365,7 +373,7 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
-    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
+    const thisHasBg = section.querySelector('.hero') || [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
@@ -451,6 +459,34 @@ async function loadTemplate(templateName) {
   return null;
 }
 
+const decorateCardSections = (main) => {
+  const template = getMetadata('template');
+  const isLanding = toClassName(template) === 'landing-page';
+  main.querySelectorAll('.section.card').forEach((cardSect) => {
+    const newWrapper = createElement('div');
+    const contentWrappers = cardSect.querySelectorAll(':scope > div');
+    contentWrappers.forEach((wrapper) => {
+      if (!(isLanding && wrapper.classList.contains('footer-wrapper'))) {
+        newWrapper.append(wrapper);
+      }
+    });
+    const block = buildBlock('card', [[newWrapper]]);
+    cardSect.prepend(block);
+    decorateBlock(block);
+    cardSect.classList.remove('card');
+
+    if (isLanding) {
+      // find logo image and lift it out of card
+      const cardLogo = block.querySelector('.default-content-wrapper .bg-image + p > picture');
+      if (cardLogo) {
+        const logoWrapper = createElement('div', { class: 'default-content-wrapper' });
+        logoWrapper.append(cardLogo.parentElement);
+        block.insertAdjacentElement('beforebegin', logoWrapper);
+      }
+    }
+  });
+};
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -483,6 +519,7 @@ export async function decorateMain(main, isFragment = false) {
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
+  decorateCardSections(main);
   buildAccordions(main);
 }
 
