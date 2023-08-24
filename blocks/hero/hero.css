@@ -15,7 +15,7 @@ main .hero {
   color: var(--clr-white); 
 }
 
-main .light .hero {
+main .hero-container.light .hero {
   color: var(--text-color); 
 }
 
