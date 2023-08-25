@@ -63,7 +63,6 @@ async function submitStep3(e) {
   } else {
     // TODO: handle fail scenario
   }
-  requestInfoForm.submit();
 }
 
 function handleStep1(section) {
