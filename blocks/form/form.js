@@ -3,6 +3,7 @@ import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 
 let isCmdShiftPressed = false;
 let commonOptions;
+let image;
 
 async function getCommonOptions(listName) {
   if (!commonOptions) {
@@ -45,8 +46,9 @@ function attr(object, name) {
  * @param {*} form the form element
  * @param {*} successMessage Success message
  * @param {*} failureMessage Failure message
+ * @param {*} multipartFormdata multipart/form-data flag
  */
-function configureDefaultFormPost(form, successMessage, failureMessage) {
+function configureDefaultFormPost(form, successMessage, failureMessage, multipartFormdata) {
   form.addEventListener('submit', async (event) => {
     const data = {};
     event.preventDefault();
@@ -57,14 +59,21 @@ function configureDefaultFormPost(form, successMessage, failureMessage) {
     }
     let response;
     try {
-      response = await fetch(action, {
+      const options = {
         method: 'POST',
         cache: 'no-cache',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ data }),
-      });
+      };
+
+      if (multipartFormdata) {
+        options.headers['Content-Type'] = 'multipart/form-data';
+        options.body = new FormData(form);
+      }
+
+      response = await fetch(action, options);
     } finally {
       let message;
       if (response && response.ok) {
@@ -101,7 +110,11 @@ function configureEmailFormPost(form, subject) {
 function processFormOption(name, form, options, defaultValue, formOptions, label) {
   if (name.toLowerCase() === 'url' || name.toLowerCase() === 'action') {
     form.setAttribute('action', options || defaultValue);
-    formOptions.usesDefaultAction = false;
+    if (label.toLowerCase() === 'fetch') {
+      formOptions.multipartFormdata = true;
+    } else {
+      formOptions.usesDefaultAction = false;
+    }
   } else if (name.toLowerCase() === 'method') {
     form.setAttribute('method', options || defaultValue);
   } else if (name.toLowerCase() === 'success') {
@@ -173,6 +186,7 @@ async function buildForm(formData, defaultAction) {
     subject: placeholders?.formSubject || 'Form Submission',
     submitLabel: placeholders?.formSubmitLabel || 'Submit',
     usesDefaultAction: true,
+    multipartFormdata: false,
   };
   const encounteredFieldLabels = new Set();
   // eslint-disable-next-line no-restricted-syntax
@@ -237,8 +251,9 @@ async function buildForm(formData, defaultAction) {
             input.setAttribute('name', name);
             input.setAttribute('aria-labelledby', labelId);
             if (placeholder) { input.setAttribute('placeholder', placeholder); }
-            if (defaultValue) { input.textContent = defaultValue; }
+            if (defaultValue) { input.value = defaultValue; }
             if (required) { input.setAttribute('required', true); }
+            if (options.includes('hide')) { fieldDiv.classList.add('hidden'); }
             fieldDiv.append(input);
             break;
           case 'textarea':
@@ -339,6 +354,11 @@ async function buildForm(formData, defaultAction) {
             input = createElement('div', { role: 'alert', class: 'info-alert' }, defaultValue || '');
             fieldDiv.append(input);
             break;
+          case 'image':
+            if (image) {
+              fieldDiv.append(image);
+            }
+            break;
           default:
             break;
         }
@@ -362,7 +382,12 @@ async function buildForm(formData, defaultAction) {
   form.append(createElement('input', { type: 'submit', value: formOptions.submitLabel }));
   if (formOptions.usesDefaultAction) {
     // Default action uses AJAX to post the form
-    configureDefaultFormPost(form, formOptions.successMessage, formOptions.failureMessage);
+    configureDefaultFormPost(
+      form,
+      formOptions.successMessage,
+      formOptions.failureMessage,
+      formOptions.multipartFormdata,
+    );
   } else if (form.getAttribute('action').startsWith('mailto:')) {
     // Mailto action opens the user's email client
     configureEmailFormPost(form, formOptions.subject);
@@ -400,6 +425,7 @@ function autofillForm(form) {
  * @param {Element} formEmbed The marker for the form embed
  */
 export default async function decorate(block) {
+  image = block.querySelector('picture');
   const formLink = block.querySelector('a');
   let formHref = formLink ? formLink.href : '';
   if (!formHref) {
