@@ -542,6 +542,38 @@ async function loadFonts() {
 }
 
 /**
+ * Adds a parameter to the URL.
+ * @param {String} key
+ * @param {String} value
+ */
+export function addQueryParamToURL(key, value) {
+  const url = new URL(window.location.href);
+  url.searchParams.set(key, value);
+  window.history.pushState({}, '', url.toString());
+}
+
+/**
+ * Gets a query param from the URL.
+ * @param {String} key
+ * @returns {String} the value of the query parameter
+ */
+export function getQueryParamFromURL(key) {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(key) || '';
+}
+
+/**
+ * Generic debounce function
+ */
+export const debounce = (func, timeout = 300) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+};
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */

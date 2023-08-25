@@ -40,9 +40,11 @@
   --clr-teal: #006781;
   --clr-teal-light: #248464;
   --clr-green: #0f5132;
+  --clr-teal-dark: #002f39;
   --clr-purple: #53469c;
   --clr-cyan: #96e0ff;
   --clr-blue-light: #eaf9ff;
+  --clr-danger: #dc3545;
   
 
   /* element colors */
@@ -299,6 +301,7 @@ button {
   text-align: center;
   font-size: 0.875rem;
   font-style: normal;
+  font-family: var(--body-font-family);
   font-weight: 600;
   cursor: pointer;
   color: var(--clr-white);
@@ -339,8 +342,9 @@ button:disabled:hover {
 }
 
 a.button.secondary,
-a.button.tertiary  {
-  color: currentcolor;
+a.button.tertiary,
+button.secondary,
+button.tertiary {
   background-color: transparent;
   border: 3px solid currentcolor;
 }
@@ -559,7 +563,7 @@ main .section>div {
 .section.teal {
   --text-color: var(--clr-white);
 
-  background: linear-gradient(180deg, var(--clr-teal), #002f39);
+  background: linear-gradient(180deg, var(--clr-teal), var(--clr-teal-dark));
   box-shadow: 0 4px 4px 0 rgba(0 0 0 / 25%);
   color: var(--clr-white);
 }
@@ -684,4 +688,66 @@ main .section>div {
   background: var(--clr-white);
   border: 1px solid #6e6e6e;
   border-left: 0;
+}
+
+/**
+  Global styles for pagination
+**/
+main .search-results-pagination {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+main .search-results-pagination .search-results-pagination-item {
+  display: inline-block;
+  margin: 0 0.125rem;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+main .search-results-pagination .search-results-pagination-item > button {
+  background: none;
+  border: 0;
+  color: var(--clr-teal);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--body-font-size-m);
+  font-family: var(--body-font-family);
+  font-weight: normal;
+  min-width: initial;
+  margin-block-end: 0;
+}
+
+main .search-results-pagination .search-results-pagination-item > button.arrow {
+  border: 2px solid var(--clr-teal);
+}
+
+main .search-results-pagination .search-results-pagination-item > button.active {
+  font-weight: bold;
+}
+
+main .search-results-pagination.dark-bg .search-results-pagination-item > button {
+  color: var(--clr-white);
+}
+
+main .search-results-pagination.dark-bg .search-results-pagination-item > button.active {
+  background-color: var(--clr-white);
+  color: var(--clr-teal);
+}
+
+main .search-results-pagination.dark-bg .search-results-pagination-item > button.arrow {
+  background-color: transparent;
+  border: 2px solid var(--clr-white);
+  color: var(--clr-teal-light);
+}
+
+
+@media (min-width: 900px) {
+  main .search-results-pagination .search-results-pagination-item > button {
+    font-size: var(--body-font-size-xl);
+    padding: 0.5rem 1rem;
+  }
+
+  main .search-results-pagination .search-results-pagination-item {
+    margin: 0 0.5rem;
+  }
 }
