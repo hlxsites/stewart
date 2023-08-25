@@ -5,7 +5,7 @@
 }
 
 .columns img {
-  width: 100%;
+  max-width: 100%;
 }
 
 .columns > div > div {
@@ -24,39 +24,12 @@
   width: 100%;
 }
 
-.columns.card .row .column {
-  background-color: var(--clr-white);
-  box-shadow: 0.0625rem 0.0625rem 0.1875rem 0 rgb(0 0 0 / 15%);
-  border: .0625rem solid var(--clr-gray-light);
-  padding: 1.5rem 1rem;
-  margin-bottom: 1.5rem;
-}
 
-.columns.card .row .column:last-child {
+.columns.with-cards .row .column:last-child {
   margin-bottom: 0;
 }
 
-.columns.card.opacity .row .column {
-  background-color: rgb(255 255 255 / 75%);
-}
-
-.columns.card.dark .row .column {
-  background-color: var(--clr-black);
-}
-
-.columns.card.gray .row .column {
-  background-color: unset;
-  box-shadow: unset;
-  border: unset;
-  padding: unset;
-  margin-bottom: unset;
-}
-
-.columns.card.dark.opacity .row .column {
-  background-color: rgb(0 0 0 / 50%);
-}
-
-.columns.card.gray .row .column:last-child {
+.columns.with-cards.gray .row .column:last-child {
   background-color: var(--clr-gray);
   box-shadow: 0.0625rem 0.0625rem 0.1875rem 0 rgb(0 0 0 / 15%);
   border: .0625rem solid var(--clr-gray-dark);
@@ -69,12 +42,12 @@
     flex-direction: unset;
   }
 
-  .columns.card .row,
+  .columns.with-cards .row,
   .columns.people-card .row {
     align-items: stretch;
   }
 
-  .columns.card.gray .row {
+  .columns.with-cards.gray .row {
     align-items: unset;
     flex-direction: column;
     gap: unset;
@@ -85,7 +58,7 @@
     order: unset;
   }
 
-  .columns.card.gray > div > div {
+  .columns.with-cards.gray > div > div {
     flex: unset;
     order: 1;
   }
@@ -122,13 +95,7 @@
     flex-basis: 75%;
   }
 
-  .columns.card .row .column {
-    box-shadow: 0 0.25rem 0.25rem 0 rgba(0 0 0 / 25%);
-    border: .0625rem solid var(--clr-gray-dark);
-    min-width: 0;
-  }
-
-  .columns.card .row .column:last-child {
+  .columns.with-cards .row .column:last-child {
     margin-bottom: 1rem;
   }
 
@@ -147,27 +114,22 @@
     gap: 2rem;
   }
 
-  .columns.card.gray .row {
+  .columns.with-cards.gray .row {
     align-items: center;
     flex-direction: unset;
     gap: 2rem;
   }
 
-  .columns.card.gray > div > div {
+  .columns.with-cards.gray > div > div {
     flex: 1;
     order: unset;
   }
 
-  .columns.card .row .column {
-    padding: 4.5rem 4rem;
+  .columns.with-cards .row .column:last-child {
     margin-bottom: 2.5rem;
   }
 
-  .columns.card .row .column:last-child {
-    margin-bottom: 2.5rem;
-  }
-
-  .columns.card.gray .row .column:last-child {
+  .columns.with-cards.gray .row .column:last-child {
     padding: 3.5rem;
   }
 }

@@ -23,7 +23,7 @@ const VALID_TEMPLATES = [
   'landing-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'alert']; // add your LCP blocks to the list
 
 /**
  * create an element.
@@ -97,21 +97,21 @@ export function buildHeroBlock(main) {
   }
 
   const section = h1.closest('div');
+
   const picture = section.querySelector('picture');
   if (!picture) {
     return;
   }
 
   const elems = [...section.children];
-  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata') && !el.classList.contains('alert'));
   const block = buildBlock('hero', { elems: filtered });
   section.append(block);
-  main.prepend(section);
 }
 
 export function buildEmbed(link) {
-  const picture = link.closest('div').querySelector('picture');
-  const block = buildBlock('embed', { elems: picture ? [picture, link.cloneNode()] : [link.cloneNode()] });
+  const elems = [link.cloneNode(true)];
+  const block = buildBlock('embed', { elems });
   link.replaceWith(block);
   decorateBlock(block);
 }
@@ -196,6 +196,7 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
+  const ignorePatterns = ['/fragments/', '/forms/'];
   const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
     // need to deal with 2 use cases here
@@ -205,6 +206,9 @@ export function wrapImgsInLinks(container) {
       && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
       const link = pic.nextElementSibling.nextElementSibling;
       if (link.textContent.includes(link.getAttribute('href'))) {
+        if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+          return;
+        }
         pic.nextElementSibling.remove();
         link.innerHTML = pic.outerHTML;
         pic.replaceWith(link);
@@ -213,13 +217,22 @@ export function wrapImgsInLinks(container) {
     }
 
     const parent = pic.parentNode;
-    if (parent.tagName !== 'P' || !parent.nextElementSibling || parent.nextElementSibling.tagName !== 'P') {
+    if (!parent.nextElementSibling) {
       // eslint-disable-next-line no-console
       console.warn('no next element');
       return;
     }
-    const link = parent.nextElementSibling.querySelector('a');
+    const nextSibling = parent.nextElementSibling;
+    if (parent.tagName !== 'P' || nextSibling.tagName !== 'P' || nextSibling.children.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('next element not viable link container');
+      return;
+    }
+    const link = nextSibling.querySelector('a');
     if (link && link.textContent.includes(link.getAttribute('href'))) {
+      if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+        return;
+      }
       link.parentElement.remove();
       link.innerHTML = pic.outerHTML;
       pic.replaceWith(link);
@@ -295,6 +308,54 @@ function decorateSectionBackgroundImages(main) {
 }
 
 /**
+ * Builds accordion blocks from default content
+ * @param {Element} main The container element
+ */
+function buildAccordions(main) {
+  const accordionSectionContainers = main.querySelectorAll('.section.accordion');
+  accordionSectionContainers.forEach((accordion) => {
+    const contentWrappers = accordion.querySelectorAll(':scope > div');
+    const blockTable = [];
+    let row;
+    contentWrappers.forEach((wrapper) => {
+      let removeWrapper = true;
+      [...wrapper.children].forEach((child) => {
+        if (child.nodeName === 'H2') {
+          if (row) {
+            blockTable.push(row);
+          }
+
+          row = [{ elems: [] }, { elems: [] }];
+          row[0].elems.push(child);
+        }
+
+        if (!row) {
+          // if there is content in the section before the first h2
+          // then that content is preserved
+          // otherwise, we remove the wrapper
+          removeWrapper = false;
+        }
+        if (row && child.nodeName !== 'H2') {
+          row[1].elems.push(child);
+        }
+      });
+      if (removeWrapper) wrapper.remove();
+    });
+
+    // add last row
+    if (row) {
+      blockTable.push(row);
+    }
+
+    const block = buildBlock('accordion', blockTable);
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    accordion.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * perform additional section class decoration
  * @param {Element} main the container element
  */
@@ -318,7 +379,7 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
-    const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
+    const thisHasBg = section.querySelector('.hero') || [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
@@ -404,6 +465,34 @@ async function loadTemplate(templateName) {
   return null;
 }
 
+const decorateCardSections = (main) => {
+  const template = getMetadata('template');
+  const isLanding = toClassName(template) === 'landing-page';
+  main.querySelectorAll('.section.card').forEach((cardSect) => {
+    const newWrapper = createElement('div');
+    const contentWrappers = cardSect.querySelectorAll(':scope > div');
+    contentWrappers.forEach((wrapper) => {
+      if (!(isLanding && wrapper.classList.contains('footer-wrapper'))) {
+        newWrapper.append(wrapper);
+      }
+    });
+    const block = buildBlock('card', [[newWrapper]]);
+    cardSect.prepend(block);
+    decorateBlock(block);
+    cardSect.classList.remove('card');
+
+    if (isLanding) {
+      // find logo image and lift it out of card
+      const cardLogo = block.querySelector('.default-content-wrapper .bg-image + p > picture');
+      if (cardLogo) {
+        const logoWrapper = createElement('div', { class: 'default-content-wrapper' });
+        logoWrapper.append(cardLogo.parentElement);
+        block.insertAdjacentElement('beforebegin', logoWrapper);
+      }
+    }
+  });
+};
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -436,7 +525,53 @@ export async function decorateMain(main, isFragment = false) {
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
+  decorateCardSections(main);
+  buildAccordions(main);
 }
+
+/**
+ * load fonts.css and set a session storage flag
+ */
+async function loadFonts() {
+  await loadCSS(`${window.hlx.codeBasePath}/fonts/fonts.css`);
+  try {
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+  } catch (e) {
+    // do nothing
+  }
+}
+
+/**
+ * Adds a parameter to the URL.
+ * @param {String} key
+ * @param {String} value
+ */
+export function addQueryParamToURL(key, value) {
+  const url = new URL(window.location.href);
+  url.searchParams.set(key, value);
+  window.history.pushState({}, '', url.toString());
+}
+
+/**
+ * Gets a query param from the URL.
+ * @param {String} key
+ * @returns {String} the value of the query parameter
+ */
+export function getQueryParamFromURL(key) {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(key) || '';
+}
+
+/**
+ * Generic debounce function
+ */
+export const debounce = (func, timeout = 300) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+};
 
 /**
  * Loads everything needed to get to LCP.
@@ -450,6 +585,15 @@ async function loadEager(doc) {
     await decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
+  }
+
+  try {
+    /* if fonts already loaded, load fonts.css */
+    if (sessionStorage.getItem('fonts-loaded')) {
+      loadFonts();
+    }
+  } catch (e) {
+    // do nothing
   }
 }
 
@@ -477,6 +621,8 @@ async function loadLazy(doc) {
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));

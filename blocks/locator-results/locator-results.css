@@ -1,0 +1,356 @@
+main .section.locator-results-container,
+main .section>.locator-results-wrapper {
+  padding: 0;
+  margin-inline: initial;
+  max-width: initial;
+}
+
+main .locator-results .locator-results-search-bar {
+  background: linear-gradient(180deg, var(--clr-teal), var(--clr-teal-dark));
+  width: 100%;
+  padding: 4rem 2.5rem;
+  color: var(--clr-white);
+  text-align: left;
+}
+
+main .locator-results .locator-results-search-bar h2 {
+  margin-bottom: 0;
+}
+
+main .locator-results .locator-results-loading-spinner {
+  text-align: center;
+  font-size: 4rem;
+}
+
+main .locator-results i {
+  font-style: normal;
+  display: inline-block;
+}
+
+main .locator-results .locator-results-loading-spinner>i {
+  margin-block-start: 1rem;
+}
+
+main .locator-results.loading .locator-results-loading-spinner {
+  display: block;
+}
+
+main .locator-results .locator-results-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+}
+
+main .locator-results .locator-results-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+main .locator-results .locator-results-view-filter {
+  display: flex;
+  justify-content: center;
+}
+
+main .locator-results .locator-results-filter-button {
+  width: 100%;
+  margin-right: 1rem;
+}
+
+main .locator-results .locator-results-filter-button.active {
+  background-color: var(--clr-white);
+  border-color: var(--clr-white);
+  color: var(--clr-teal);
+}
+
+main .locator-results .locator-results-loader {
+  display: none;
+}
+
+main .locator-results .locator-results-list {
+  list-style: none;
+  margin: 1rem;
+  padding: 0;
+}
+
+main .locator-results .locator-results-list.hide {
+  display: none;
+}
+
+main .locator-results .locator-results-list-item {
+  background-color: var(--clr-white);
+  box-shadow: 0 0.25rem 0.75rem 0 rgba(0 0 0 / 15%);
+  padding: 1rem;
+  margin-block-end: 1.5rem;
+}
+
+main .locator-results .locator-results-list-item h4 {
+  margin-block-end: 1rem;
+  padding-block-end: 1rem;
+  border-bottom: 1px solid var(--clr-gray-dark);
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-type {
+  color: var(--clr-teal);
+  font-size: 1.125rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  margin-block-end: 2rem;
+  margin-block-start: 1rem;
+}
+
+main .locator-results .locator-results-list-item.indy .locator-results-listing-type {
+  color: var(--clr-purple);
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-address {
+  display: flex;
+  flex-direction: column;
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-details>a {
+  font-size: 1rem;
+  padding-right: 2rem;
+  color: var(--clr-teal);
+  font-weight: 600;
+}
+
+main .locator-results .locator-results-list-item.indy .locator-results-listing-details>a {
+  color: var(--clr-purple);
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-details>a>i {
+  margin-right: 0.5rem;
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-phone {
+  display: flex;
+  flex-direction: column;
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-address-1 {
+  flex-basis: 60%;
+  color: var(--clr-teal);
+  font-weight: 600;
+}
+
+main .locator-results .locator-results-list-item.indy .locator-results-listing-address-1 {
+  color: var(--clr-purple);
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+main .locator-results .locator-results-list-item .locator-results-listing-type i {
+  color: var(--clr-white);
+  background-color: var(--clr-teal);
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+main .locator-results .locator-results-list-item.indy .locator-results-listing-type i {
+  background-color: var(--clr-purple);
+}
+
+main .locator-results .locator-results-list-item .locator-results-listing-contact-info {
+  margin-block-end: 1rem;
+}
+
+main .locator-results .search-results-pagination {
+  margin-block-start: 2rem;
+}
+
+main .locator-results .search-results-pagination.hide,
+main .locator-results .search-results-pagination:empty {
+  display: none;
+}
+
+main .locator-results .search-results-pagination.dark-bg .search-results-pagination-item>button {
+  padding: 0.5rem 0.75rem;
+}
+
+main .locator-results .locator-results-map-container {
+  display: none;
+}
+
+main .locator-results .locator-results-map-container.active {
+  display: block;
+  height: 100vh;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+main .locator-results .locator-results-loading-spinner,
+main .locator-results .locator-results-search-bar.hide,
+main .locator-results.loading .locator-results-search-bar .locator-results-actions,
+main .locator-results.error .locator-results-search-bar .locator-results-actions,
+main .locator-results.error .locator-results-list {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  main .locator-results .search-bar {
+    padding: 4rem 8.5rem;
+  }
+
+  main .locator-results .locator-results-list {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding: 5.5rem 1rem;
+    max-width: var(--max-content-width);
+  }
+
+  main .locator-results .locator-results-filter {
+    flex-direction: row;
+    width: auto;
+  }
+
+  main .locator-results .locator-results-list-item {
+    flex-basis: 49%;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  main .locator-results .locator-results-list-item .locator-results-listing-contact-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  main .locator-results .locator-results-list-item .locator-results-listing-details>a {
+    font-size: 1.25rem;
+  }
+
+  main .locator-results .locator-results-filter-button {
+    min-width: initial;
+    width: auto;
+    font-size: 1.5rem;
+  }
+
+  main .locator-results .search-results-pagination .search-results-pagination-item {
+    margin: 0 0.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  main .locator-results .locator-results-actions {
+    flex-direction: row;
+  }
+
+  main .locator-results .search-results-pagination {
+    margin-block-start: 0;
+    margin-left: auto;
+  }
+}
+
+/**
+ * Agency Locator Specific Styles
+ * -----------------------------------------------------------------------------
+ */
+
+/* stylelint-disable-next-line  no-descending-specificity */
+main .locator-results.agency .locator-results-actions {
+  justify-content: flex-end;
+}
+
+main .locator-results.agency .locator-results-listing-title {
+  border-bottom: 0;
+}
+
+main .locator-results.agency .locator-results-listing-address-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+main .locator-results.agency .locator-results-listing-address {
+  line-height: 1.50rem;
+  margin-block-end: 2rem;
+}
+
+main .locator-results.agency .locator-results-listing-other-info {
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  margin-block-end: 1rem;
+}
+
+main .locator-results.agency .locator-results-listing-other-info>span {
+  margin-right: 2rem;
+}
+
+
+main .locator-results.agency .search-results-pagination .search-results-pagination-item:last-child {
+  margin-right: 0;
+}
+
+/* stylelint-disable-next-line selector-not-notation */
+main .locator-results.agency:not(.loading):not(.error) .locator-results-search-bar h2 {
+  border-bottom: 1px solid var(--clr-gray);
+  padding-block-end: 1rem;
+  margin-block-end: 1rem;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+main .locator-results.agency .locator-results-listing-address-1,
+main .locator-results.agency .locator-results-list-item.indy .locator-results-listing-address-1,
+main .locator-results.agency .locator-results-listing-address-2,
+main .locator-results.agency .locator-results-listing-city {
+  font-size: 1rem;
+  color: var(--clr-black);
+  font-weight: normal;
+}
+
+@media (min-width: 900px) {
+  main .locator-results.agency .locator-results-listing-title {
+    padding-block-start: 3rem;
+  }
+
+  main .locator-results.agency .locator-results-list-item {
+    padding: 0 5rem;
+  }
+}
+
+/**
+ * Map Marker Infobox Styless
+ * -----------------------------------------------------------------------------
+ */
+
+/* stylelint-disable selector-class-pattern */
+main .MicrosoftMap .infobox-body .locator-results-list-item {
+  max-width: 500px;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 1.5rem;
+}
+
+main .MicrosoftMap .infobox-body .locator-results .locator-results-list-item .locator-results-listing-title {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+main .MicrosoftMap .close-button {
+  cursor: pointer;
+  position: absolute;
+  top: -10px;
+  right: -7px;
+  background: black;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--clr-white);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: initial;
+ }
