@@ -9,33 +9,60 @@ const notCaliforniaResident = `Currently, this form is only available to Califor
 
 let currentForm;
 let contactInfoForm;
+let contactInfoFormData;
 let requestInfoForm;
+let requestInfoFormData;
 
 async function submitStep2(e) {
   e.preventDefault();
   const token = await executeGrecaptcha();
 
-  contactInfoForm.querySelector('input[name="recaptcha-token"]').value = token;
+  contactInfoForm.querySelector('input[name=":recaptchatoken"]').value = token;
+  contactInfoFormData = new FormData(e.target);
 
   const response = await fetch(experianUrl, {
     method: 'POST',
-    body: new URLSearchParams(new FormData(e.target)),
+    body: contactInfoFormData,
   });
 
   if (response.ok) {
-    const data = await response.json();
+    // const data = await response.json();
 
-    // Process Data
-    console.log(data);
+    // TODO: Process Data
 
     contactInfoForm.classList.add('hidden');
     requestInfoForm.classList.remove('hidden');
   } else {
-    console.log(response);
+    // TODO: handle fail scenario
   }
 }
 
-function submitStep3() {
+async function submitStep3(e) {
+  e.preventDefault();
+
+  requestInfoFormData = new FormData(e.target);
+
+  contactInfoFormData.forEach((obj) => {
+    if (!['RequestType', 'stewartcomid', 'reason', 'propAddr'].includes(obj[0])) {
+      requestInfoFormData.append(obj[0], obj[1]);
+    }
+  });
+
+  const response = await fetch(experianUrl, {
+    method: 'POST',
+    body: requestInfoFormData,
+  });
+
+  if (response.ok) {
+    // const data = await response.json();
+
+    // TODO: Process Data
+
+    requestInfoForm.classList.add('hidden');
+    requestInfoForm.insertAdjacentElement(createElement('p', { class: 'thankyou-message' }, 'Thank you'));
+  } else {
+    // TODO: handle fail scenario
+  }
   requestInfoForm.submit();
 }
 
@@ -55,10 +82,19 @@ function handleStep1(section) {
 }
 
 function handleStep2(section) {
-  const recaptchaInput = createElement('input', { type: 'text', class: 'hidden', name: 'recaptcha-token' });
+  const recaptchaInput = createElement('input', { type: 'text', class: 'hidden', name: ':recaptchatoken' });
   contactInfoForm = createElement('form', { action: experianUrl, class: 'hidden' }, section);
   contactInfoForm.append(recaptchaInput);
+  contactInfoForm.append(createElement('input', {
+    type: 'text',
+    class: 'hidden',
+    name: ':currentstep',
+    value: 'customer-form',
+  }));
   contactInfoForm.append(createElement('input', { type: 'submit', value: 'Next' }));
+  if (contactInfoForm.querySelector('select[name="State"]')) {
+    contactInfoForm.querySelector('select[name="State"]').value = 'CA';
+  }
 
   contactInfoForm.addEventListener('submit', submitStep2);
 
@@ -69,6 +105,12 @@ function handleStep2(section) {
 
 function handleStep3(section) {
   requestInfoForm = createElement('form', { action: stewartUrl, class: 'hidden' }, section);
+  requestInfoForm.append(createElement('input', {
+    type: 'text',
+    class: 'hidden',
+    name: ':currentstep',
+    value: 'request-form',
+  }));
   requestInfoForm.append(createElement('input', { type: 'submit' }));
 
   requestInfoForm.addEventListener('submit', submitStep3);
