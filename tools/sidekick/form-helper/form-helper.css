@@ -1,0 +1,13 @@
+h1 {
+    border: 1px solid blue;
+    background-color: #000040;
+    color: #ffffff;
+    text-align:center;
+}
+
+h2 {
+    border: 1px solid green;
+    background-color: #004000;
+    color: #ffff00;
+    text-align:center;
+}
