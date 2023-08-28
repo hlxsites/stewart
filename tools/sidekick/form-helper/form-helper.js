@@ -57,7 +57,7 @@ function registerForms() {
         submitButton.parentElement.append(autoFillButton);
         // Append a button to trigger form registration
         const registerButton = document.createElement('button');
-        registerButton.innerText = 'Register Franklin';
+        registerButton.innerText = 'Register Form';
         registerButton.onclick = () => registerForm(form);
         registerButton.style.cssText = buttonStyle;
         submitButton.parentElement.append(registerButton);
@@ -69,7 +69,7 @@ function registerForms() {
 async function init() {
     const registerFormButton = document.createElement('button');
     registerFormButton.onclick = registerForms;
-    registerFormButton.innerText = 'Register forms';
+    registerFormButton.innerText = 'Test form';
     document.body.querySelector('main').appendChild(registerFormButton);
 }
 
