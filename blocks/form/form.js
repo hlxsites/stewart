@@ -50,7 +50,8 @@ function configureDefaultFormPost(form, successMessage, failureMessage) {
     const data = {};
     event.preventDefault();
     (new FormData(form)).forEach((value, key) => { data[key] = value; });
-    let action = form.getAttribute('action');
+    let action = form.getAttribute('action').replace(/\.json$/, '');
+    action = action;
     let response;
     try {
       response = await fetch(action, {
