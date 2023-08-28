@@ -25,6 +25,7 @@
       "id": "form-helper",
       "title": "Form Helper",
       "environments": [
+        "preview",
         "dev"
       ],
       "isPalette": true,
