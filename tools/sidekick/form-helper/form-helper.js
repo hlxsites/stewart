@@ -70,7 +70,7 @@ async function init() {
     const registerFormButton = document.createElement('button');
     registerFormButton.onclick = registerForms;
     registerFormButton.innerText = 'Register forms';
-    document.body.appendChild(registerFormButton);
+    document.body.querySelector('main').appendChild(registerFormButton);
 }
 
 init();
