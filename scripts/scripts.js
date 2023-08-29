@@ -590,7 +590,7 @@ async function loadEager(doc) {
   try {
     /* if fonts already loaded, load fonts.css */
     if (sessionStorage.getItem('fonts-loaded')) {
-      loadFonts();
+      await loadFonts();
     }
   } catch (e) {
     // do nothing
@@ -621,7 +621,7 @@ async function loadLazy(doc) {
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  loadFonts();
+  await loadFonts();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));

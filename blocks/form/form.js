@@ -1,7 +1,6 @@
 import { createElement } from '../../scripts/scripts.js';
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 
-let isCmdShiftPressed = false;
 let commonOptions;
 
 async function getCommonOptions(listName) {
@@ -51,10 +50,7 @@ function configureDefaultFormPost(form, successMessage, failureMessage) {
     const data = {};
     event.preventDefault();
     (new FormData(form)).forEach((value, key) => { data[key] = value; });
-    let action = form.getAttribute('action');
-    if (isCmdShiftPressed) {
-      action = `https://admin.hlx.page/form/hlxsites/stewart/main${action}.json`;
-    }
+    const action = form.getAttribute('action').replace(/\.json$/, '');
     let response;
     try {
       response = await fetch(action, {
@@ -354,31 +350,6 @@ async function buildForm(formData, defaultAction) {
 }
 
 /**
- * Autofill the form with test data
- * @param {FormElement} form Form to autofill
- */
-function autofillForm(form) {
-  const inputs = form.querySelectorAll('input, textarea, select');
-  inputs.forEach((input) => {
-    const type = input.getAttribute('type');
-    const name = input.getAttribute('name');
-    if (type === 'radio' || type === 'checkbox') {
-      if (Math.random() > 0.5) input.checked = true;
-    } else if (type === 'date') {
-      input.value = '2020-01-01';
-    } else if (type === 'tel') {
-      input.value = '555-555-5555';
-    } else if (type === 'email') {
-      input.value = 'test@test.test';
-    } else if (input.tagName === 'SELECT') {
-      input.selectedIndex = 1 + (Math.floor(Math.random() * input.options.length - 1));
-    } else if (name) {
-      input.value = name;
-    }
-  });
-}
-
-/**
  * loads and generated the form
  * @param {Element} formEmbed The marker for the form embed
  */
@@ -407,19 +378,6 @@ export default async function decorate(block) {
         const formJson = await formData.json();
         const form = await buildForm(formJson, formHref);
         block.replaceWith(form);
-
-        // If domain is localhost or contains hlxsites.hlx then track keboard events
-        if (window.location.hostname === 'localhost' || window.location.hostname.includes('hlxsites.hlx')) {
-          const handler = (event) => {
-            isCmdShiftPressed = (event.ctrlKey || event.metaKey) && event.shiftKey;
-          };
-          document.addEventListener('keydown', handler);
-          document.addEventListener('keyup', handler);
-          // Cmd+Shift+DoubleClick autofills everything with test data
-          form.addEventListener('dblclick', () => {
-            if (isCmdShiftPressed) autofillForm(form);
-          });
-        }
       }
     });
   });
