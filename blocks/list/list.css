@@ -12,9 +12,12 @@
 }
 
 .list-container ul .list-item a {
-  color: var(--clr-teal);
   text-decoration: none;
   background-color: transparent;
+}
+
+.section:not(.teal) ul .list-item a {
+  color: var(--clr-teal);
 }
 
 .list-container ul .list-item .list-inner-wrapper{
@@ -23,11 +26,14 @@
   align-items: center;
 }
 
+.list-container .list.\33 -column ul .list-item .list-inner-wrapper {
+  flex-direction: column;
+  text-align: center;
+}
+
 .list-container ul .list-item .fa-icon {
   display: inline-block;
   border-radius: 100%;
-  background-color: var(--clr-teal);
-  color: var(--clr-white);
   font-size: 1.25rem;
   width: 2.5rem;
   height: 2.5rem;
@@ -37,6 +43,17 @@
   flex: 0 0 2.5rem;
   margin-inline-end: 1rem;
 }
+
+.section:not(.teal).list-container ul .list-item .fa-icon {
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+}
+
+.section.teal .list-container ul .list-item .fa-icon {
+  background-color: none;
+  color: var(--clr-white);
+}
+
 
 .list-container ul .list-item .link-text {
   font-weight: 600;
@@ -101,21 +118,30 @@
 }
 
 @media (min-width: 600px) {
-  .list-container ul {
+  .list-container .list:not(.\33 -column) ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .list-container .list.\33 -column ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .list-container ul .list-item.with-icon {
     padding-bottom: 1rem;
   }
 
-  .list-container ul .list-item:nth-child(odd) {
+  .list-container ul .list-item:not(:last-child) {
     padding-inline-end: 2.5rem;
     border-inline-end: .0625rem solid var(--clr-gray-dark);
   }
 
-  .list-container ul .list-item:nth-child(2n) {
+  .list-container .list:not(.\33 -column) ul .list-item:nth-child(2n) {
+    padding-inline-start: 2.5rem;
+  }
+
+  .list-container .list:not.\33 -column ul .list-item:nth-child(3n) {
     padding-inline-start: 2.5rem;
   }
 }
@@ -136,7 +162,7 @@
     flex: 0 0 6rem;
   }
 
-  .list-container ul .list-item .link-text {
+  .list-container .list:not.\33 -column ul .list-item .link-text {
     padding-inline-start: 2.5rem;
   }
 
@@ -175,5 +201,10 @@
   .list-container ul .list-item .text-wrapper p {
     font-size: var(--body-font-size-xl);
     line-height: 2rem;
+  }
+
+  .list-container .list.\33 -column ul .list-item .text-wrapper p,
+  .list-container .list.\33 -column ul .list-item .text-wrapper strong {
+    font-size: var(--body-font-size-l);
   }
 }
