@@ -567,7 +567,12 @@ export const debounce = (func, timeout = 300) => {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  let lang = 'en';
+  const pathSegments = window.location.pathname.split('/');
+  if (pathSegments.length > 1 && !window.isErrorPage) {
+    [, lang] = pathSegments;
+  }
+  document.documentElement.lang = lang;
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
