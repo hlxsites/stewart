@@ -151,6 +151,7 @@ const translateTemplateName = (templateName) => {
     case 'market-landing-page': return 'Market Landing Page';
     case 'primary-site-section-landing-page': return 'Section Landing Page';
     case 'landing-page-template': return 'Landing Page';
+    case 'state-template': return 'State Landing Page';
     case 'primary-site-subsection-landing-page':
     case 'detail-content-page':
       return 'Section Page';
