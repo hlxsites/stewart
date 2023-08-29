@@ -3,13 +3,24 @@ import {
   decorateLinks,
   createElement,
   decorateIcons,
-  fetchNavigationHTML,
 } from '../../scripts/scripts.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
 
 import { createSearchForm } from '../../scripts/search-utils.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
+
+/**
+ * fetches the navigation markup
+ */
+async function fetchNavigationHTML() {
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
+
+  const response = await fetch(`${navPath}.plain.html`);
+  return response.text();
+}
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -85,8 +96,9 @@ async function buildMobileMenu(nav) {
     sections = sections.cloneNode(true);
     tools = tools.cloneNode(true);
     const searchItem = tools.querySelector('.search-item');
+    const searchAction = searchItem.querySelector('a').href;
     searchItem.innerHTML = '';
-    searchItem.append(await createSearchForm({ type: 'minimal' }));
+    searchItem.append(await createSearchForm({ type: 'minimal', action: searchAction }));
     sections.classList.add('nav-sections-mobile');
     tools.classList.add('nav-tools-mobile');
     mobileMenu.append(sections);
@@ -198,7 +210,8 @@ export default async function decorate(block) {
       if (isSearch) {
         navTool.setAttribute('aria-expanded', 'false');
         navTool.classList.add('search-item');
-        const searchForm = await createSearchForm({ type: 'minimal' });
+        const searchAction = navTool.querySelector('a').href;
+        const searchForm = await createSearchForm({ type: 'minimal', action: searchAction });
         navTool.append(searchForm);
         searchForm.hidden = true;
 
