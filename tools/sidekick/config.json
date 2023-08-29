@@ -29,7 +29,6 @@
         "dev"
       ],
       "isPalette": true,
-      "url_dev": "http://localhost:3000/tools/sidekick/form-helper/form-helper.html",
       "url": "/tools/sidekick/form-helper/form-helper.html"
     }
   ]
