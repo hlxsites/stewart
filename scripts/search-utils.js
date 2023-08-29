@@ -1,14 +1,12 @@
-import { createElement, fetchNavigationHTML } from './scripts.js';
+import { createElement } from './scripts.js';
 import { fetchPlaceholders, readBlockConfig } from './lib-franklin.js';
 
-const placeholders = await fetchPlaceholders();
-
-const getSearchFormAction = async () => {
-  const navHTML = await fetchNavigationHTML();
-  const navElement = document.createElement('nav');
-  navElement.innerHTML = navHTML;
-  const links = navElement.querySelectorAll('li > a');
-  return [...links].find((link) => link.innerHTML.toLowerCase().includes('search') || link.innerHTML.toLowerCase().includes('icon-far-search')).getAttribute('href');
+// avoid top level await
+let placeholders = {};
+const init = () => {
+  fetchPlaceholders().then((data) => {
+    placeholders = data;
+  });
 };
 
 export const queryIndexPath = '/query-index.json';
@@ -136,9 +134,8 @@ export const generatePaginationData = (currentPage, totalPages) => {
   return items;
 };
 
-export const createSearchForm = async ({ type }) => {
-  const searchFormAction = await getSearchFormAction();
-  const formAction = new URL(searchFormAction).pathname;
+export const createSearchForm = async ({ type, action }) => {
+  const formAction = action || '/en/search-results';
   const { searchButtonText, searchFieldPlaceholder } = placeholders;
 
   const buttonHTML = {
@@ -162,3 +159,5 @@ export const createSearchForm = async ({ type }) => {
 
   return formElement;
 };
+
+init();

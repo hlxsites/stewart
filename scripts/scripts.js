@@ -241,17 +241,6 @@ export function wrapImgsInLinks(container) {
 }
 
 /**
- * fetches the navigation markup
- */
-export async function fetchNavigationHTML() {
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
-
-  const response = await fetch(`${navPath}.plain.html`);
-  return response.text();
-}
-
-/**
  * fetches page and returns a json representation of all it's metadata
  * @param {string} path path to the page to fetch
  */
