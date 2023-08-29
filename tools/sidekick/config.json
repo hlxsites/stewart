@@ -20,6 +20,17 @@
         "edit"
       ],
       "url": "/tools/sidekick/tagger/tagger.html"
+    },
+    {
+      "id": "form-helper",
+      "title": "Form Helper",
+      "environments": [
+        "preview",
+        "dev"
+      ],
+      "isPalette": true,
+      "url_dev": "http://localhost:3000/tools/sidekick/form-helper/form-helper.html",
+      "url": "/tools/sidekick/form-helper/form-helper.html"
     }
   ]
 }
