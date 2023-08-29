@@ -152,6 +152,7 @@ const translateTemplateName = (templateName) => {
     case 'primary-site-section-landing-page': return 'Section Landing Page';
     case 'landing-page-template': return 'Landing Page';
     case 'state-template': return 'State Landing Page';
+    case 'office-details-page': return 'Office Details Page';
     case 'primary-site-subsection-landing-page':
     case 'detail-content-page':
       return 'Section Page';
@@ -280,19 +281,47 @@ const buildSearchResults = (builder, section) => {
       builder.block('Search Results', 1, false);
     });
   });
+
+  // office search results
+  section.querySelectorAll('.search-results [data-component="search-results"]').forEach((sr) => {
+    builder.replace(sr, () => {
+      builder.block('Locator Results (Office)', 2, true).append('Source').column().append('Market');
+    });
+  });
 };
 
 const buildOfficeInfos = (builder, section) => {
   section.querySelectorAll('.cmp-officeinformation').forEach((office) => {
     builder.replace(office, () => {
       // todo how do we get office id?
-      const address = office.querySelector('address');
-      builder.block('Office Info', 1, true).append(address);
+      const cityInfo = office.querySelector('.citystatezip').textContent.split(',');
+      const city = cityInfo[0];
+      const stateZip = cityInfo[1].trim().split(' ');
+      const state = stateZip[0];
+      const zip = stateZip[1];
+
+      builder.block('Office Info', 2, false)
+        .row().append('Name').column().append(office.querySelector('h2').textContent)
+        .row().append('Street Address').column().append(office.querySelector('.streetAddress'))
+        .row().append('Street Address 2').column().append(office.querySelector('.streetAddress2'))
+        .row().append('City').column().append(city)
+        .row().append('State').column().append(state)
+        .row().append('Zip').column().append(zip)
+        .row().append('Telephone').column().append(office.querySelector('[property="telephone"]').textContent.replace('ph.', ''))
+        .row().append('Fax').column().append(office.querySelector('[property="faxNumber"]').textContent.replace('fx.', ''))
+        .row().append('Hours').column().append(office.querySelector('.hoursOfOperation ul'))
+        .row().append('Website Link').column().append(office.querySelector('.additionalInfo a'));
     });
   });
 };
 
 const buildForms = (builder, section) => {
+  section.querySelectorAll('.title-order-form').forEach((toForm) => {
+    builder.replace(toForm, () => {
+      builder.block('Title Order Form', 1, false);
+    });
+  });
+
   section.querySelectorAll('.formcontainer').forEach((form) => {
     builder.replace(form, () => {
       builder.block('Form', 1, false);
