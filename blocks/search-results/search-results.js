@@ -36,7 +36,7 @@ const {
 } = placeholders;
 
 const setupSearchForm = async (block) => {
-  block.append(await createSearchForm({ type: 'default' }));
+  block.append(await createSearchForm({ type: 'default', action: window.location.href }));
   const searchInput = block.querySelector('.search-form input[type="search"]');
   searchInput.value = getQueryParamFromURL('q') || '';
 };

@@ -241,17 +241,6 @@ export function wrapImgsInLinks(container) {
 }
 
 /**
- * fetches the navigation markup
- */
-export async function fetchNavigationHTML() {
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
-
-  const response = await fetch(`${navPath}.plain.html`);
-  return response.text();
-}
-
-/**
  * fetches page and returns a json representation of all it's metadata
  * @param {string} path path to the page to fetch
  */
@@ -578,7 +567,12 @@ export const debounce = (func, timeout = 300) => {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  let lang = 'en';
+  const pathSegments = window.location.pathname.split('/');
+  if (pathSegments.length > 1 && !window.isErrorPage) {
+    [, lang] = pathSegments;
+  }
+  document.documentElement.lang = lang;
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
@@ -590,7 +584,7 @@ async function loadEager(doc) {
   try {
     /* if fonts already loaded, load fonts.css */
     if (sessionStorage.getItem('fonts-loaded')) {
-      loadFonts();
+      await loadFonts();
     }
   } catch (e) {
     // do nothing
@@ -621,7 +615,7 @@ async function loadLazy(doc) {
   }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  loadFonts();
+  await loadFonts();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
