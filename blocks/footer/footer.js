@@ -44,8 +44,9 @@ function loadBrightEdge() {
       'sdk.account': 'f00000000186049',
       'whitelist.parameter.list': 'ixf',
     };
-    if (window.BEJSSDK && window.BEJSSDKObserver) {
+    if (window.BEJSSDK) {
       window.BEJSSDK.construct(beSdkOpts);
+      window.BEJSSDK.processCapsule();
     }
   });
 }
