@@ -29,6 +29,10 @@
     box-shadow: 0 5px 4px -2px rgb(0 0 0 / 15%);
 }
 
+.form-section.white {
+  background-color: var(--clr-white);
+}
+
 .form-section h3 {
     font-size: var(--heading-font-size-xs);
     font-weight: bold;
@@ -42,6 +46,20 @@
     flex-grow: 1;
     width: 100%;
     height: 100%;
+}
+
+.form-field .legend {
+  font-size: var(--body-font-size-l);
+  line-height: 1.375rem;
+  letter-spacing: 0.0113rem;
+  padding-bottom: 0.25rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--clr-gray);
+}
+
+.form-field .info-alert {
+  color: var(--clr-teal);
+  background-color: var(--clr-blue-light);
 }
 
 @media (min-width: 900px) {
@@ -67,6 +85,13 @@
 
     .section-col-2-wrapper .section-col-2:nth-of-type(2).col-1 .form-field:last-of-type textarea {
         height: clamp(10em, 50vh, 21em);
+    }
+
+    .form-field .legend {
+      font-size: var(--body-font-size-xxl);
+      line-height: 2rem;
+      letter-spacing: 0.0138rem;
+      padding-bottom: 0.5rem;
     }
 }
 
