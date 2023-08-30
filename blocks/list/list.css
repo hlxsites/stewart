@@ -1,3 +1,4 @@
+/* stylelint-disable selector-class-pattern */
 .list-container ul {
   list-style: none;
   margin: 0;
@@ -14,10 +15,6 @@
 .list-container ul .list-item a {
   text-decoration: none;
   background-color: transparent;
-}
-
-.section:not(.teal) ul .list-item a {
-  color: var(--clr-teal);
 }
 
 .list-container ul .list-item .list-inner-wrapper{
@@ -105,6 +102,10 @@
 
 .list-container .default-content-wrapper:last-child a{
   color: var(--clr-primary);
+}
+
+.section:not(.teal) ul .list-item a {
+  color: var(--clr-teal);
 }
 
 /* Style the default content which is ouside of List block - END */
