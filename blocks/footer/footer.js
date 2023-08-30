@@ -36,7 +36,7 @@ function createLinksList(ele) {
  * since footer is lazy loaded, I'm optimistic this won't kill page speed.
  */
 function loadBrightEdge() {
-  loadScript('http://cdn.bc0a.com/be_ixf_js_sdk.js', {
+  loadScript('https://cdn.bc0a.com/be_ixf_js_sdk.js', {
     type: 'text/javascript',
   }).then(() => {
     const beSdkOpts = {
