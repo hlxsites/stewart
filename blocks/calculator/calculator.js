@@ -1,4 +1,4 @@
-import { createElement } from '../../scripts/scripts.js';
+import { createElement, updatePlaceholders } from '../../scripts/scripts.js';
 import amortizationCalc, { loanAmountUpdate, loanScheduleUpdate, print } from './amortization.js';
 import deedStampsCalc, { inputUpdate, currencyUpdate, conditionalMatch } from './deedstamps.js';
 import mortgageCalc, { currencyUpdate as mortgageCurrenyUpdate } from './mortgage.js';
@@ -51,7 +51,7 @@ function addConditionalMatch() {
   });
 }
 
-export default function decorate(block) {
+export default async function decorate(block) {
   if (block.classList.contains('deedstamps')) {
     block.replaceChildren(buildDeedstamps());
     addConditionalMatch();
@@ -60,4 +60,5 @@ export default function decorate(block) {
   } else {
     block.replaceChildren(buildAmortization());
   }
+  await updatePlaceholders(block);
 }

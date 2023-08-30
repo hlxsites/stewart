@@ -1,15 +1,14 @@
-import { fetchPlaceholders, getMetadata } from '../../scripts/lib-franklin.js';
-import { buildLinkAutoBlocks } from '../../scripts/scripts.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
+import { buildLinkAutoBlocks, updatePlaceholders } from '../../scripts/scripts.js';
 
 async function addBlogPostInfo(main) {
   const h1 = main.querySelector('h1');
   if (h1) {
-    const placeholders = await fetchPlaceholders();
     const pubDate = getMetadata('publication-date');
     const author = getMetadata('author');
     if (author) {
       h1.insertAdjacentHTML('afterend', `
-      <p>${placeholders.by || 'By'} ${author}</p>
+      <p><span data-placeholder="by">By</span> ${author}</p>
     `);
     }
 
@@ -19,12 +18,14 @@ async function addBlogPostInfo(main) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const pubDateStr = pubDateDate.toLocaleString(undefined, options);
         h1.insertAdjacentHTML('afterend', `
-        <p>${placeholders.publishedOn || 'Publish on'}: ${pubDateStr}</p>
+        <p><span data-placeholder="publishedOn">Published on</span>$: ${pubDateStr}</p>
         `);
       } catch {
         // no op, just to catch any weird date format stuff
       }
     }
+
+    updatePlaceholders(h1.parentElement);
   }
 }
 

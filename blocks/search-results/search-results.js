@@ -6,9 +6,11 @@ import {
   createPaginationButton,
 } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
-import { createElement, addQueryParamToURL, getQueryParamFromURL } from '../../scripts/scripts.js';
-import { toClassName, sampleRUM, fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import {
+  createElement, addQueryParamToURL, getQueryParamFromURL, updatePlaceholders,
+} from '../../scripts/scripts.js';
 import { getTaxonomy } from '../../scripts/taxonomy.js';
+import { toClassName, sampleRUM } from '../../scripts/lib-franklin.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -26,14 +28,6 @@ const classNames = {
   searchResultsPaginationItem: `${blockName}-pagination-item`,
   searchResultsPaginationButton: `${blockName}-pagination-button`,
 };
-
-const placeholders = await fetchPlaceholders();
-const {
-  filterBy,
-  contentTypes,
-  searchResultsPagination,
-  resultsFound,
-} = placeholders;
 
 const setupSearchForm = async (block) => {
   block.append(await createSearchForm({ type: 'default', action: window.location.href }));
@@ -201,18 +195,25 @@ function renderSearchResultsScaffolding() {
   return createElement('div', { class: classNames.searchResultsData }, [
     createElement('div', { class: classNames.searchResultsInfo }, [
       createElement('h2', {}, 'Search results for <span class="search-results-term"></span>'),
-      createElement('h3', { class: 'search-result-count' }),
+      createElement('h3', { class: 'search-result-count-heading' }, [
+        createElement('span', { class: 'search-result-count' }, ' '),
+        createElement('span', { 'data-placeholder': 'resultsFound' }, 'Results Found'),
+      ]),
     ]),
     createElement('div', { class: classNames.searchResultsFilterContainer }, [
-      createElement('h4', { class: 'search-results-filterby' }, filterBy || 'Filter By:'),
+      createElement('h4', { class: 'search-results-filterby', 'data-placeholder': 'filterBy' }, 'Filter By:'),
       createElement('div', { class: 'search-results-facet-container', 'aria-expanded': 'false' }, [
-        createElement('h5', {}, contentTypes || 'Content Types'),
+        createElement('h5', { 'data-placeholder': 'contentTypes' }, 'Content Types'),
         createElement('ul'),
       ]),
     ]),
     createElement('div', { class: classNames.searchResultsListContainer }, [
       createElement('ul', { class: classNames.searchResultsDataList }),
-      createElement('nav', { class: classNames.searchResultsNav, 'aria-label': searchResultsPagination || 'Search Results Pagination' }, [
+      createElement('nav', {
+        class: classNames.searchResultsNav,
+        'aria-label': 'Search Results Pagination',
+        'data-placeholder-target': 'aria-label',
+      }, [
         createElement('ul', { class: classNames.searchResultsPagination }),
       ]),
     ]),
@@ -241,7 +242,7 @@ async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
     }
 
     if (!partial) {
-      block.querySelector('.search-result-count').textContent = `${allResCount} ${resultsFound || 'Results Found'}`;
+      block.querySelector('.search-result-count').textContent = `${allResCount} `;
       if (cfg.tagFacet) {
         buildFacets(resArray, block, cfg, q, tag);
       }
@@ -277,6 +278,7 @@ export default async function decorate(block) {
   });
 
   block.append(renderSearchResultsScaffolding());
+  await updatePlaceholders(block);
 
   const usp = new URLSearchParams(window.location.search);
   const q = usp.get('q') || '';

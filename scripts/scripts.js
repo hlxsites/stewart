@@ -13,6 +13,8 @@ import {
   loadCSS,
   toClassName,
   getMetadata,
+  fetchPlaceholders,
+  toCamelCase,
 } from './lib-franklin.js';
 
 // valid template for which we have css/js files
@@ -63,6 +65,25 @@ export function createElement(tagName, props, html) {
   }
 
   return elem;
+}
+
+/**
+ * replace all placeholders with updated text
+ * @param {Element} element the container element to find/replace placeholder
+ */
+export async function updatePlaceholders(element) {
+  const placeholders = await fetchPlaceholders(document.documentElement.lang);
+  element.querySelectorAll('[data-placeholder]').forEach((placeholderEl) => {
+    const key = placeholderEl.getAttribute('data-placeholder');
+    if (key && placeholders[toCamelCase(key)]) {
+      const target = placeholderEl.getAttribute('data-placeholder-target');
+      if (target) {
+        placeholderEl.setAttribute(target, placeholders[toCamelCase(key)]);
+      } else {
+        placeholderEl.textContent = placeholders[toCamelCase(key)];
+      }
+    }
+  });
 }
 
 /**

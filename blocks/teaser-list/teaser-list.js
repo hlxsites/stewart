@@ -1,5 +1,5 @@
-import { createOptimizedPicture, fetchPlaceholders } from '../../scripts/lib-franklin.js';
-import { createElement, fetchMetadataJson } from '../../scripts/scripts.js';
+import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
+import { createElement, fetchMetadataJson, updatePlaceholders } from '../../scripts/scripts.js';
 
 const blockName = 'teaser-list';
 
@@ -46,7 +46,6 @@ const assignContentClasses = (teaser) => {
  * @param {Element} block the block element
  */
 export default async function decorate(block) {
-  const placeholders = await fetchPlaceholders();
   const teaserPromises = [...block.children].map(async (teaser) => {
     teaser.classList.add(classNames.teaser);
 
@@ -61,8 +60,9 @@ export default async function decorate(block) {
         const contentDiv = createElement('div', {}, [
           createElement('h3', {}, createElement('a', { href: link.href }, teaserPageMeta['navigation-title'] || teaserPageMeta['og:title'])),
           createElement('p', {}, teaserPageMeta.description),
-          createElement('p', {}, createElement('a', { href: link.href }, placeholders.readMore || 'Read More')),
+          createElement('p', {}, createElement('a', { href: link.href }, createElement('span', { 'data-placeholder': 'readMore' }, 'Read More'))),
         ]);
+
         if (teaserPageMeta['publication-date']) {
           contentDiv.prepend(createElement('p', {}, teaserPageMeta['publication-date']));
         }
@@ -77,4 +77,5 @@ export default async function decorate(block) {
   });
 
   await Promise.all(teaserPromises);
+  await updatePlaceholders(block);
 }
