@@ -831,14 +831,14 @@ const processFragments = (document, docPath) => {
           assetLinks: 'n/a',
           fragmentPaths: 'isFragment',
           hasNestedSections: 'false',
-          previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
-          liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
+          previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`,
+          liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${cardPath}`,
           prodUrl: `https://www.stewart.com${cardPath}`,
         },
       });
       const link = document.createElement('a');
-      link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
-      link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+      link.href = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
+      link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
       card.replaceWith(link);
     } else {
       card.remove();
@@ -869,14 +869,14 @@ const processFragments = (document, docPath) => {
         assetLinks: 'n/a',
         fragmentPaths: 'isFragment',
         hasNestedSections: 'false',
-        previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
-        liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
+        previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${path}`,
+        liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${path}`,
         prodUrl: `https://www.stewart.com${path}`,
       },
     });
     const link = document.createElement('a');
-    link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
-    link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
+    link.href = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
+    link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
     internalBlock.replaceWith(link);
   });
 
@@ -967,8 +967,8 @@ export default {
       assetLinks,
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       hasNestedSections,
-      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
-      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
     };
 
