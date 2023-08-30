@@ -307,8 +307,8 @@ const buildOfficeInfos = (builder, section) => {
         .row().append('City').column().append(city)
         .row().append('State').column().append(state)
         .row().append('Zip').column().append(zip)
-        .row().append('Telephone').column().append(office.querySelector('[property="telephone"]').textContent.replace('ph.', ''))
-        .row().append('Fax').column().append(office.querySelector('[property="faxNumber"]').textContent.replace('fx.', ''))
+        .row().append('Telephone').column().append(office.querySelector('[property="telephone"]')?.textContent?.replace('ph.', '') || '')
+        .row().append('Fax').column().append(office.querySelector('[property="faxNumber"]')?.textContent?.replace('fx.', '') || '')
         .row().append('Hours').column().append(office.querySelector('.hoursOfOperation ul'))
         .row().append('Website Link').column().append(office.querySelector('.additionalInfo a'));
     });
