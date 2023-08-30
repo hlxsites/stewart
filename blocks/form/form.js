@@ -2,6 +2,7 @@ import { createElement } from '../../scripts/scripts.js';
 import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 
 let commonOptions;
+let image;
 
 async function getCommonOptions(listName) {
   if (!commonOptions) {
@@ -44,8 +45,9 @@ function attr(object, name) {
  * @param {*} form the form element
  * @param {*} successMessage Success message
  * @param {*} failureMessage Failure message
+ * @param {*} multipartFormdata multipart/form-data flag
  */
-function configureDefaultFormPost(form, successMessage, failureMessage) {
+function configureDefaultFormPost(form, successMessage, failureMessage, multipartFormdata) {
   form.addEventListener('submit', async (event) => {
     const data = {};
     event.preventDefault();
@@ -53,14 +55,21 @@ function configureDefaultFormPost(form, successMessage, failureMessage) {
     const action = form.getAttribute('action').replace(/\.json$/, '');
     let response;
     try {
-      response = await fetch(action, {
+      const options = {
         method: 'POST',
         cache: 'no-cache',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ data }),
-      });
+      };
+
+      if (multipartFormdata) {
+        options.headers['Content-Type'] = 'multipart/form-data';
+        options.body = new FormData(form);
+      }
+
+      response = await fetch(action, options);
     } finally {
       let message;
       if (response && response.ok) {
@@ -97,7 +106,11 @@ function configureEmailFormPost(form, subject) {
 function processFormOption(name, form, options, defaultValue, formOptions, label) {
   if (name.toLowerCase() === 'url' || name.toLowerCase() === 'action') {
     form.setAttribute('action', options || defaultValue);
-    formOptions.usesDefaultAction = false;
+    if (label.toLowerCase() === 'fetch') {
+      formOptions.multipartFormdata = true;
+    } else {
+      formOptions.usesDefaultAction = false;
+    }
   } else if (name.toLowerCase() === 'method') {
     form.setAttribute('method', options || defaultValue);
   } else if (name.toLowerCase() === 'success') {
@@ -120,8 +133,17 @@ function buildFormSection(lastSection, form, label, cols, options) {
   }
   if (options.includes('transparent')) {
     newSection.classList.add('transparent');
+  } else if (options.includes('white')) {
+    newSection.classList.add('white');
   }
-  if (options.includes('2-col')) {
+  if (options.includes('nested')) {
+    newSection.classList.add('section-nested');
+    if (lastSection.classList.contains('section-nested')) {
+      lastSection.closest('.form-section').append(createElement('div', { class: ['form-field', cols ? `col-${cols}` : ''] }, newSection));
+    } else {
+      lastSection.append(createElement('div', { class: ['form-field', cols ? `col-${cols}` : ''] }, newSection));
+    }
+  } else if (options.includes('2-col')) {
     newSection.classList.add('section-col-2');
     if (previousIs2Col) {
       previousIs2Col = false;
@@ -153,13 +175,14 @@ async function buildForm(formData, defaultAction) {
   form.setAttribute('method', 'POST');
   const formFieldData = formData?.form?.data || formData.data;
   let currentSection = form;
-  const placeholders = fetchPlaceholders();
+  const placeholders = await fetchPlaceholders();
   const formOptions = {
     successMessage: placeholders?.formSuccessMessage || '*Success!* Thank you for filling out our form. We have received it and will get back to you soon.',
     failureMessage: placeholders?.formFailureMessage || '*An error has occurred!* Please contact webmaster@stewart.com and let us know the name and URL of the form you just tried to complete. Something happened and it didn\'t accept your information. We apologize!',
     subject: placeholders?.formSubject || 'Form Submission',
     submitLabel: placeholders?.formSubmitLabel || 'Submit',
     usesDefaultAction: true,
+    multipartFormdata: false,
   };
   const encounteredFieldLabels = new Set();
   // eslint-disable-next-line no-restricted-syntax
@@ -224,8 +247,9 @@ async function buildForm(formData, defaultAction) {
             input.setAttribute('name', name);
             input.setAttribute('aria-labelledby', labelId);
             if (placeholder) { input.setAttribute('placeholder', placeholder); }
-            if (defaultValue) { input.textContent = defaultValue; }
+            if (defaultValue) { input.value = defaultValue; }
             if (required) { input.setAttribute('required', true); }
+            if (options.includes('hide')) { fieldDiv.classList.add('hidden'); }
             fieldDiv.append(input);
             break;
           case 'textarea':
@@ -318,6 +342,19 @@ async function buildForm(formData, defaultAction) {
             if (defaultValue) { input.textContent = defaultValue; }
             fieldDiv.append(input);
             break;
+          case 'legend':
+            input = createElement('legend', { class: 'legend' }, defaultValue || '');
+            fieldDiv.append(input);
+            break;
+          case 'info':
+            input = createElement('div', { role: 'alert', class: 'info-alert' }, defaultValue || '');
+            fieldDiv.append(input);
+            break;
+          case 'image':
+            if (image) {
+              fieldDiv.append(image);
+            }
+            break;
           default:
             break;
         }
@@ -341,7 +378,12 @@ async function buildForm(formData, defaultAction) {
   form.append(createElement('input', { type: 'submit', value: formOptions.submitLabel }));
   if (formOptions.usesDefaultAction) {
     // Default action uses AJAX to post the form
-    configureDefaultFormPost(form, formOptions.successMessage, formOptions.failureMessage);
+    configureDefaultFormPost(
+      form,
+      formOptions.successMessage,
+      formOptions.failureMessage,
+      formOptions.multipartFormdata,
+    );
   } else if (form.getAttribute('action').startsWith('mailto:')) {
     // Mailto action opens the user's email client
     configureEmailFormPost(form, formOptions.subject);
@@ -354,6 +396,7 @@ async function buildForm(formData, defaultAction) {
  * @param {Element} formEmbed The marker for the form embed
  */
 export default async function decorate(block) {
+  image = block.querySelector('picture');
   const formLink = block.querySelector('a');
   let formHref = formLink ? formLink.href : '';
   if (!formHref) {
