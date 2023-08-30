@@ -30,6 +30,11 @@ function createLinksList(ele) {
   return list;
 }
 
+/**
+ * Load Bright edge links.
+ * can't be deferred til delayed because whole purpose of this is SEO, so we do it here
+ * since footer is lazy loaded, I'm optimistic this won't kill page speed.
+ */
 function loadBrightEdge() {
   loadScript('http://cdn.bc0a.com/be_ixf_js_sdk.js', {
     type: 'text/javascript',
