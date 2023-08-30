@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, loadScript } from '../../scripts/lib-franklin.js';
 import {
   createElement,
   decorateIcons,
@@ -28,6 +28,21 @@ function createLinksList(ele) {
   });
 
   return list;
+}
+
+function loadBrightEdge() {
+  loadScript('http://cdn.bc0a.com/be_ixf_js_sdk.js', {
+    type: 'text/javascript',
+  }).then(() => {
+    const beSdkOpts = {
+      'api.endpoint': 'https://ixfd1-api.bc0a.com/',
+      'sdk.account': 'f00000000186049',
+      'whitelist.parameter.list': 'ixf',
+    };
+    if (window.BEJSSDK && window.BEJSSDKObserver) {
+      window.BEJSSDK.construct(beSdkOpts);
+    }
+  });
 }
 
 /**
@@ -79,5 +94,7 @@ export default async function decorate(block) {
     footer.replaceChildren(firstColumn, secondColumn);
     decorateLinks(footer);
     block.append(footer);
+    block.prepend(createElement('div', { class: 'be-ix-link-block' }));
+    loadBrightEdge();
   }
 }
