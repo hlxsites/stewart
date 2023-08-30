@@ -41,12 +41,12 @@
   margin-inline-end: 1rem;
 }
 
-.section:not(.teal).list-container ul .list-item .fa-icon {
+.list-container:not(.teal) ul .list-item .fa-icon {
   background-color: var(--clr-teal);
   color: var(--clr-white);
 }
 
-.section.teal .list-container ul .list-item .fa-icon {
+.list-container.teal ul .list-item .fa-icon {
   background-color: none;
   color: var(--clr-white);
 }
