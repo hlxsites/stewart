@@ -35,18 +35,46 @@ function createLinksList(ele) {
  * can't be deferred til delayed because whole purpose of this is SEO, so we do it here
  * since footer is lazy loaded, I'm optimistic this won't kill page speed.
  */
-function loadBrightEdge() {
+function loadBrightEdge(block) {
   loadScript('https://cdn.bc0a.com/be_ixf_js_sdk.js', {
     type: 'text/javascript',
   }).then(() => {
-    const beSdkOpts = {
-      'api.endpoint': 'https://ixfd1-api.bc0a.com/',
-      'sdk.account': 'f00000000186049',
-      'whitelist.parameter.list': 'ixf',
-    };
     if (window.BEJSSDK) {
+      const beSdkOpts = {
+        'api.endpoint': 'https://ixfd1-api.bc0a.com',
+        'sdk.account': 'f00000000186049',
+        'whitelist.parameter.list': 'ixf',
+      };
       window.BEJSSDK.construct(beSdkOpts);
-      window.BEJSSDK.processCapsule();
+      const processCapsule = new Promise((resolve, _reject) => {
+        window.BEJSSDK.processCapsule();
+
+        // wait til capsule is populated to resolve
+        let count = 0;
+        const intervalId = setInterval(() => {
+          if (window.BEJSSDK.capsule) {
+            clearInterval(intervalId);
+            resolve(window.BEJSSDK.getNodes());
+          } else {
+            count += 1;
+            if (count > 5) {
+              // failed to load in reasonable time
+              clearInterval(intervalId);
+              resolve([]);
+            }
+          }
+        }, 250);
+      });
+      processCapsule.then((nodes) => {
+        const body = nodes.find((node) => node.feature_group === 'body_1');
+        if (body) {
+          block.querySelector('.be-ix-link-block').insertAdjacentHTML('beforeend', body.content);
+        }
+        // const headOpen = nodes.find((node) => node.feature_group === '_head_open');
+        // if (headOpen) {
+        //   console.log(headOpen.content);
+        // }
+      });
     }
   });
 }
@@ -101,6 +129,6 @@ export default async function decorate(block) {
     decorateLinks(footer);
     block.append(footer);
     block.prepend(createElement('div', { class: 'be-ix-link-block' }));
-    loadBrightEdge();
+    loadBrightEdge(block);
   }
 }
