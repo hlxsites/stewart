@@ -1,3 +1,48 @@
+@import url('../form/form.css');
+
 main .marketo-form {
   min-height: 500px;
+}
+
+main .marketo-form > form {
+  width: 100% !important;
+}
+
+main .marketo-form .mktoFieldWrap,
+main .marketo-form.mktoFormCol {
+  float: none;
+}
+
+
+main .marketo-form .mktoFormRow .mktoFormCol .mktoFieldWrap input.mktoField,
+main .marketo-form .mktoFormRow .mktoFormCol .mktoFieldWrap select.mktoField,
+main .marketo-form .mktoFormRow .mktoFormCol .mktoFieldWrap textarea.mktoField {
+  width: 100% !important;
+  max-width: none;
+}
+
+main .marketo-form > form {
+  width: auto;
+}
+
+main .marketo-form .mktoAsterix {
+  padding-right: 0.5rem;
+  display: inline-block;
+}
+
+main .marketo-form .mktoError {
+  color: var(--clr-danger);
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+main .marketo-form .field-container > * {
+  padding: 0.5rem 0;
+}
+
+main .marketo-form .mktoButtonWrap,
+main .marketo-form button[type="submit"] {
+  margin-left: 0;
 }
