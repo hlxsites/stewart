@@ -1,3 +1,4 @@
+/* stylelint-disable selector-class-pattern, no-duplicate-selectors */
 @import url('../form/form.css');
 
 main .marketo-form {

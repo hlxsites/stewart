@@ -36,9 +36,7 @@ export default async function decorate(block) {
                 [...fields].forEach((field) => {
                   field.classList.add('form-field', `col-${6 / fieldCount}`);
                 });
-                
               });
-             
 
               form.onSuccess(() => {
                 window.dataLayer = window.dataLayer || [];
