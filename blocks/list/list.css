@@ -23,7 +23,7 @@
   align-items: center;
 }
 
-.list-container .list.\33 -column ul .list-item .list-inner-wrapper {
+.list-container .list.three-column ul .list-item .list-inner-wrapper {
   flex-direction: column;
   text-align: center;
 }
@@ -119,7 +119,7 @@
 }
 
 @media (min-width: 600px) {
-  .list-container .list:not(.\33 -column) ul {
+  .list-container .list:not(.three-column) ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -138,11 +138,11 @@
     border-inline-end: .0625rem solid var(--clr-gray-dark);
   }
 
-  .list-container .list:not(.\33 -column) ul .list-item:nth-child(2n) {
+  .list-container .list:not(.three-column) ul .list-item:nth-child(2n) {
     padding-inline-start: 2.5rem;
   }
 
-  .list-container .list:not.\33 -column ul .list-item:nth-child(3n) {
+  .list-container .list.three-column ul .list-item:nth-child(3n) {
     padding-inline-start: 2.5rem;
   }
 }
@@ -163,7 +163,7 @@
     flex: 0 0 6rem;
   }
 
-  .list-container .list:not.\33 -column ul .list-item .link-text {
+  .list-container .list:not(.three-column) ul .list-item .link-text {
     padding-inline-start: 2.5rem;
   }
 
@@ -204,8 +204,8 @@
     line-height: 2rem;
   }
 
-  .list-container .list.\33 -column ul .list-item .text-wrapper p,
-  .list-container .list.\33 -column ul .list-item .text-wrapper strong {
+  .list-container .list.three-column ul .list-item .text-wrapper p,
+  .list-container .list.three-column ul .list-item .text-wrapper strong {
     font-size: var(--body-font-size-l);
   }
 }

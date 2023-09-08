@@ -519,8 +519,10 @@ const buildGenericLists = (builder, section) => {
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
       let name = 'List';
-      if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (1 Col)';
+      if (list.classList.contains('ss-layout-threecolumn')) {
+        name += ' (three column)';
+      } else if (!list.classList.contains('ss-layout-twocolumn')) {
+        name += ' (single column)';
       }
       builder.block(name, 1, false);
       list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
