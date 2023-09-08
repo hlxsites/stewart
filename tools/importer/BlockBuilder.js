@@ -17,21 +17,46 @@ export default class BlockBuilder {
     this.pageMetadata = pageMetadata;
   }
 
+  /**
+   * Jump the current location to a given element
+   * @param {Element} e the element to jump to
+   * @returns the builder
+   */
   jumpTo(e) {
     this.current = e;
     return this;
   }
 
+  /**
+   * move the current location to the parent node
+   * @returns the builder
+   */
   up() { return this.jumpTo(this.current?.parentElement); }
 
+  /**
+   * move the current location to an ancestor node with the given tag name
+   * @param {String} tag the name of the tag to go to
+   * @returns the builder
+   */
   upToTag(tag) {
     const cur = this.current;
     while (this.current && this.current?.tagName !== tag.toUpperCase()) this.up();
     return this.jumpTo(this.current || cur);
   }
 
+  /**
+   * append the content at the current location
+   * @param {Element|String} e the elemnt or string to append
+   * @returns the builder
+   */
   append(e) { return (this.current ? this.current.append(e) : this.root.append(e), this); }
 
+  /**
+   * Replace a DOM element, using a callback to generate the replcaement content.
+   * @param {Element} e the element to replace
+   * @param {Function} f a function that appends the replacement using the builder
+   * @returns the builder
+   */
   replace(e, f) {
     if (!e) { return; }
     const old = this.current;
