@@ -291,7 +291,7 @@ a:hover {
 }
 
 /* buttons */
-.section.grey a.button:any-link {
+.section.grey a.button.tertiary:any-link {
   color: var(--clr-black);
   font-size: var(--body-font-size-l);
 }
