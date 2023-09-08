@@ -519,7 +519,7 @@ const buildGenericLists = (builder, section) => {
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
       if (list.classList.contains('ss-layout-fluid')) {
-
+        builder.append(...list.children);
       } else {
         let name = 'List';
         if (list.classList.contains('ss-layout-threecolumn')) {
