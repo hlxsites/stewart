@@ -518,16 +518,18 @@ const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
-      let name = 'List';
-      if (list.classList.contains('ss-layout-fluid')) {
-        name += ' (Fluid)';
-      } else if (list.classList.contains('ss-layout-threecolumn')) {
-        name += ' (Three Column)';
-      } else if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (One Column)';
+      if (list.classList.contains('ss-layout-fluid') {
+
+      } else {
+        let name = 'List';
+        if (list.classList.contains('ss-layout-threecolumn')) {
+          name += ' (Three Column)';
+        } else if (!list.classList.contains('ss-layout-twocolumn')) {
+          name += ' (One Column)';
+        }
+        builder.block(name, 1, false);
+        list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
       }
-      builder.block(name, 1, false);
-      list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
     });
   });
 };
