@@ -518,7 +518,7 @@ const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
-      if (list.classList.contains('ss-layout-fluid') {
+      if (list.classList.contains('ss-layout-fluid')) {
 
       } else {
         let name = 'List';
