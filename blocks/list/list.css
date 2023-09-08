@@ -118,6 +118,10 @@
   letter-spacing: 0.0138rem;
 }
 
+.list-container .one-column ul .list-item:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
 @media (min-width: 600px) {
   .list-container .list:not(.one-column,.three-column,.fluid) ul {
     display: grid;
