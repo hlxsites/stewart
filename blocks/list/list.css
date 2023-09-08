@@ -129,7 +129,7 @@
   }
   /* fluid items have a purple arrow on the right */
   .list-container .list.fluid ul .list-inner-wrapper::after {
-    content: '  ';
+    content: '';
     position: relative;
     top: 50%;
     width: 0;
