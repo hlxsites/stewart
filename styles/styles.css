@@ -291,6 +291,11 @@ a:hover {
 }
 
 /* buttons */
+.section.grey a.button:any-link {
+  color: var(--clr-black);
+  font-size: var(--body-font-size-l);
+}
+
 a.button:any-link,
 button {
   display: inline-block;
