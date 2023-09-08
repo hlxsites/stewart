@@ -390,18 +390,18 @@ export function decorateButtons(element) {
     if (a.href !== a.textContent) {
       if (!a.querySelector('img')) {
         const up = a.parentElement;
-        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
+        if (up.childNodes.length >= 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
           a.className = 'button primary'; // default
           up.classList.add('button-container');
         }
 
         const twoup = a.parentElement.parentElement;
-        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
+        if (up.childNodes.length >= 1 && up.tagName === 'STRONG'
           && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
           a.className = 'button tertiary';
           twoup.classList.add('button-container');
         }
-        if (up.childNodes.length === 1 && up.tagName === 'EM'
+        if (up.childNodes.length >= 1 && up.tagName === 'EM'
           && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
           a.className = 'button secondary';
           twoup.classList.add('button-container');
