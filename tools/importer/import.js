@@ -517,10 +517,19 @@ const buildAccordions = (builder, section) => {
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
-    builder.replace(list, () => {
-      if (list.classList.contains('ss-layout-fluid')) {
-        builder.append(...list.children);
-      } else {
+    if (list.classList.contains('ss-layout-fluid')) {
+      list.querySelectorAll('li').forEach((listItem) => {
+        const space = builder.doc.createTextNode('\u00A0');
+        listItem.append(space);
+      });
+      list.querySelectorAll('ul, li, div, p').forEach((tag) => {
+        [...tag.childNodes].forEach((child) => {
+          tag.parentElement.insertBefore(child, tag);
+        });
+        tag.remove();
+      });
+    } else {
+      builder.replace(list, () => {
         let name = 'List';
         if (list.classList.contains('ss-layout-threecolumn')) {
           name += ' (Three Column)';
@@ -529,8 +538,8 @@ const buildGenericLists = (builder, section) => {
         }
         builder.block(name, 1, false);
         list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
-      }
-    });
+      });
+    }
   });
 };
 
