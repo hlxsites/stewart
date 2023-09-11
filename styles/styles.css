@@ -291,11 +291,6 @@ a:hover {
 }
 
 /* buttons */
-.section.grey a.button.tertiary:any-link {
-  color: var(--clr-black);
-  font-size: var(--body-font-size-l);
-}
-
 a.button:any-link,
 button {
   display: inline-block;
@@ -359,6 +354,11 @@ a.button.tertiary {
   padding: 1px;
 }
 
+.section.grey a.button.tertiary:any-link {
+  color: var(--clr-black);
+  font-size: var(--body-font-size-l);
+}
+
 a.button.tertiary::after {
   content: "";
   border-top: 0.75rem solid transparent;
@@ -372,6 +372,8 @@ a.button.tertiary::after {
 .section.dark a.button.tertiary::after {
   border-left: 0.875rem solid var(--clr-cyan);
 }
+
+/* ------------------------ */
 
 main input {
   font-size: 1.25rem;

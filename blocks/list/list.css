@@ -123,27 +123,27 @@
 }
 
 @media (min-width: 600px) {
-  .list-container .list:not(.one-column):not(.three-column) ul {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .list-container .list.three-column ul {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .list-container .list:not(.one-column,.three-column) ul {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .list-container ul .list-item.with-icon {
     padding-bottom: 1rem;
   }
 
-  .list-container .list:not(.one-column):not(.three-column) .list-item:nth-child(2n+1),
+  .list-container .list:not(.one-column,.three-column) .list-item:nth-child(2n+1),
   .list-container .list.three-column .list-item:not(:nth-child(3n)) {
     padding-inline-end: 2.5rem;
     border-inline-end: .0625rem solid var(--clr-gray-dark);
   }
 
-  .list-container .list:not(.one-column):not(.three-column) .list-item:nth-child(2n),
+  .list-container .list:not(.one-column,.three-column) .list-item:nth-child(2n),
   .list-container .list.three-column .list-item:not(:nth-child(3n+1)) {
     padding-inline-start: 2.5rem;
   }
