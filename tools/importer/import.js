@@ -1,5 +1,5 @@
 /* global WebImporter */
-/* eslint-disable no-unused-expressions, max-len, no-unused-vars, newline-per-chained-call, no-restricted-syntax, no-console, class-methods-use-this */
+/* eslint-disable newline-per-chained-call, no-restricted-syntax, no-console */
 /*
  * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -11,98 +11,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-class BlockBuilder {
-  constructor(document, pageMetadata = {}) {
-    this.doc = document;
-    this.root = document.createElement('div');
-    this.pageMetadata = pageMetadata;
-  }
-
-  jumpTo(e) {
-    this.current = e;
-    return this;
-  }
-
-  up() { return this.jumpTo(this.current?.parentElement); }
-
-  upToTag(tag) {
-    const cur = this.current;
-    while (this.current && this.current?.tagName !== tag.toUpperCase()) this.up();
-    return this.jumpTo(this.current || cur);
-  }
-
-  append(e) { return (this.current ? this.current.append(e) : this.root.append(e), this); }
-
-  replace(e, f) {
-    if (!e) { return; }
-    const old = this.current;
-    const oldRoot = this.root;
-    this.root = this.doc.createElement('div');
-    this.jumpTo(this.root);
-    f();
-    e.parentElement.replaceChild(this.root, e);
-    this.root = oldRoot;
-    this.jumpTo(old);
-  }
-
-  replaceChildren(parent) { return (this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata), parent.replaceChildren(...this.root.children)); }
-
-  element(tag, attrs = {}) {
-    const e = this.doc.createElement(tag);
-    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-    return this.append(e).jumpTo(e);
-  }
-
-  text(text) { return this.append(this.doc.createTextNode(text)); }
-
-  withText(text) { return this.text(text).up(); }
-
-  section(meta = {}) { return (this.root.children.length ? this.#writeSectionMeta().jumpTo(undefined).element('hr').up() : this).withSectionMetadata(meta); }
-
-  withSectionMetadata(meta) {
-    this.sectionMeta = meta;
-    return this;
-  }
-
-  addSectionMetadata(key, value) {
-    (this.sectionMeta = this.sectionMeta || {})[key] = value;
-    return this;
-  }
-
-  block(name, colspan = 2, createRow = true) {
-    const tableAttrs = {
-    };
-    const variantIndex = name.indexOf('(');
-    if (variantIndex > -1) {
-      // block name has variants, so
-      // eslint-disable-next-line prefer-destructuring
-      tableAttrs['data-block'] = name.slice(0, variantIndex - 1);
-      // eslint-disable-next-line prefer-destructuring
-      tableAttrs['data-block-variants'] = name.slice(variantIndex + 1, -1);
-    } else {
-      tableAttrs['data-block'] = name;
-    }
-    return (this.endBlock().element('table', tableAttrs).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
-  }
-
-  row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
-
-  column(attrs = {}) { return this.upToTag('tr').element('td', attrs); }
-
-  endBlock() { return this.jumpTo(undefined); }
-
-  metaBlock(name, meta) {
-    if (meta && Object.entries(meta).length > 0) {
-      this.block(name, 2, false);
-      for (const [k, v] of Object.entries(meta)) (v && v.children) ? this.row().text(k).column().append(v) : this.row().text(k).column().text(v);
-      this.endBlock();
-    }
-    return this;
-  }
-
-  #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
-}
+import BlockBuilder from './BlockBuilder.js';
 
 const capitalizeWord = (word) => `${word[0].toUpperCase()}${word.slice(1)}`;
 
@@ -152,6 +61,7 @@ const translateTemplateName = (templateName) => {
     case 'primary-site-section-landing-page': return 'Section Landing Page';
     case 'landing-page-template': return 'Landing Page';
     case 'state-template': return 'State Landing Page';
+    case 'office-details-page': return 'Office Details Page';
     case 'primary-site-subsection-landing-page':
     case 'detail-content-page':
       return 'Section Page';
@@ -280,19 +190,47 @@ const buildSearchResults = (builder, section) => {
       builder.block('Search Results', 1, false);
     });
   });
+
+  // office search results
+  section.querySelectorAll('.search-results [data-component="search-results"]').forEach((sr) => {
+    builder.replace(sr, () => {
+      builder.block('Locator Results (Office)', 2, true).append('Source').column().append('Market');
+    });
+  });
 };
 
 const buildOfficeInfos = (builder, section) => {
   section.querySelectorAll('.cmp-officeinformation').forEach((office) => {
     builder.replace(office, () => {
       // todo how do we get office id?
-      const address = office.querySelector('address');
-      builder.block('Office Info', 1, true).append(address);
+      const cityInfo = office.querySelector('.citystatezip').textContent.split(',');
+      const city = cityInfo[0];
+      const stateZip = cityInfo[1].trim().split(' ');
+      const state = stateZip[0];
+      const zip = stateZip[1];
+
+      builder.block('Office Info', 2, false)
+        .row().append('Name').column().append(office.querySelector('h2').textContent)
+        .row().append('Street Address').column().append(office.querySelector('.streetAddress'))
+        .row().append('Street Address 2').column().append(office.querySelector('.streetAddress2'))
+        .row().append('City').column().append(city)
+        .row().append('State').column().append(state)
+        .row().append('Zip').column().append(zip)
+        .row().append('Telephone').column().append(office.querySelector('[property="telephone"]')?.textContent?.replace('ph.', '') || '')
+        .row().append('Fax').column().append(office.querySelector('[property="faxNumber"]')?.textContent?.replace('fx.', '') || '')
+        .row().append('Hours').column().append(office.querySelector('.hoursOfOperation ul'))
+        .row().append('Website Link').column().append(office.querySelector('.additionalInfo a'));
     });
   });
 };
 
 const buildForms = (builder, section) => {
+  section.querySelectorAll('.title-order-form').forEach((toForm) => {
+    builder.replace(toForm, () => {
+      builder.block('Title Order Form', 1, false);
+    });
+  });
+
   section.querySelectorAll('.formcontainer').forEach((form) => {
     builder.replace(form, () => {
       builder.block('Form', 1, false);
@@ -387,7 +325,8 @@ const buildColumnsBlock = (builder, section) => {
 
             if (cols.length > 2 && (index % 2) === 0
               && (col.classList.contains('col-md-6') || col.classList.contains('col-lg-6') || col.classList.contains('col-xl-6'))) {
-              // Move the additional columns into a new row if more than 2 columns(50%) exist in a row
+              // Move the additional columns into a new row
+              // if more than 2 columns(50%) exist in a row
               newRow = true;
             }
 
@@ -490,8 +429,12 @@ const buildGenericLists = (builder, section) => {
   section.querySelectorAll('.genericlist').forEach((list) => {
     builder.replace(list, () => {
       let name = 'List';
-      if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (1 Col)';
+      if (list.classList.contains('ss-layout-fluid')) {
+        name += ' (Fluid)';
+      } else if (list.classList.contains('ss-layout-threecolumn')) {
+        name += ' (Three Column)';
+      } else if (!list.classList.contains('ss-layout-twocolumn')) {
+        name += ' (One Column)';
       }
       builder.block(name, 1, false);
       list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
@@ -650,8 +593,6 @@ const buildBackgroundableSection = (builder, section) => {
 
 const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
-  const meta = {};
-
   let classes = hero.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
@@ -711,31 +652,6 @@ const buildSection = (builder, section) => {
   }
 };
 
-const ICON_PARENT_SELECTOR = '.icon .cmp-icon';
-const ICON_SELECTOR = `${ICON_PARENT_SELECTOR} i`;
-const restoreIcons = (document, originalDocument) => {
-  // For every li with an icon in the original document, find the corresponding li in the imported document and add the icon
-  // Use the index of the li in the query selector to locate in both lists
-  originalDocument.querySelectorAll(ICON_SELECTOR).forEach((icon, index) => {
-    const li = document.querySelectorAll(ICON_PARENT_SELECTOR)[index];
-    if (!li) {
-      console.log('Could not find li for icon: ', icon.innerHTML, ' index ', index);
-      return;
-    }
-    // Change icon to text indicating name of icon instead
-    const iconName = [...icon.classList].filter((c) => c.startsWith('fa')).join(' ').replaceAll(' fa-', '-');
-    if (iconName) {
-      const newIcon = document.createTextNode(`:${iconName}: `);
-      if (li.querySelector('a')) {
-        li.querySelector('a').prepend(newIcon);
-      } else {
-        li.prepend(newIcon);
-      }
-      console.log('Added icon: ', newIcon.textContent, ' to ', li.innerHTML);
-    }
-  });
-};
-
 const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/\.html$/, '').replace(/\/$/, '').toLowerCase());
 
 /**
@@ -748,7 +664,7 @@ const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/
    * @return {string} The path
    */
 const generateDocumentPath = ({
-  document, url, html, params,
+  _document, url, _html, _params,
 }) => sanitizePath(new URL(url).pathname);
 
 const updateLinks = (document) => {
@@ -831,14 +747,14 @@ const processFragments = (document, docPath) => {
           assetLinks: 'n/a',
           fragmentPaths: 'isFragment',
           hasNestedSections: 'false',
-          previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
-          liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
+          previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`,
+          liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${cardPath}`,
           prodUrl: `https://www.stewart.com${cardPath}`,
         },
       });
       const link = document.createElement('a');
-      link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
-      link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+      link.href = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
+      link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
       card.replaceWith(link);
     } else {
       card.remove();
@@ -869,14 +785,14 @@ const processFragments = (document, docPath) => {
         assetLinks: 'n/a',
         fragmentPaths: 'isFragment',
         hasNestedSections: 'false',
-        previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
-        liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
+        previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${path}`,
+        liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${path}`,
         prodUrl: `https://www.stewart.com${path}`,
       },
     });
     const link = document.createElement('a');
-    link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
-    link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
+    link.href = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
+    link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
     internalBlock.replaceWith(link);
   });
 
@@ -884,6 +800,20 @@ const processFragments = (document, docPath) => {
 };
 
 export default {
+  preprocess: ({
+    document, _url, _html, _params,
+  }) => {
+    const faIconPrefixes = ['fa', 'far', 'fab', 'fas', 'fal'];
+    const iconSel = faIconPrefixes.map((prefix) => `i.${prefix}`).join(', ');
+    document.querySelectorAll(iconSel).forEach((icon) => {
+      const iconName = Array.from(icon.classList).find((c) => c.startsWith('fa-')).substring(3);
+      const iconType = Array.from(icon.classList).find((c) => faIconPrefixes.includes(c));
+      const iconSpan = document.createElement('span');
+      iconSpan.innerHTML = `:${iconType}-${iconName}:`;
+      icon.replaceWith(iconSpan);
+    });
+  },
+
   /**
    * Apply DOM operations to the provided document and return
    * the root element to be then transformed to Markdown.
@@ -899,12 +829,6 @@ export default {
   }) => {
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, extractMetadata(document, url));
-
-    const parser = new DOMParser();
-    const originalDoc = parser.parseFromString(html, 'text/html');
-
-    // Restore markup that was stripped out by the importer
-    restoreIcons(document, originalDoc);
 
     // Strip out header and footers that are not needed
     document.querySelector('page-header, page-footer')?.remove();
@@ -967,8 +891,8 @@ export default {
       assetLinks,
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       hasNestedSections,
-      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
-      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
     };
 
