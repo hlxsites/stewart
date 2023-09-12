@@ -355,8 +355,12 @@ a.button.tertiary {
 }
 
 .section.grey a.button.tertiary:any-link {
-  color: var(--clr-black);
   font-size: var(--body-font-size-l);
+  color: var(--clr-black);
+}
+
+.section.grey a.button.secondary {
+  color: var(--clr-primary);
 }
 
 a.button.tertiary::after {
@@ -373,7 +377,6 @@ a.button.tertiary::after {
   border-left: 0.875rem solid var(--clr-cyan);
 }
 
-/* ------------------------ */
 
 main input {
   font-size: 1.25rem;
