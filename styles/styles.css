@@ -377,7 +377,6 @@ a.button.tertiary::after {
   border-left: 0.875rem solid var(--clr-cyan);
 }
 
-
 main input {
   font-size: 1.25rem;
   width: 100%;
