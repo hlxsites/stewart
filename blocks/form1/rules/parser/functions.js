@@ -74,9 +74,8 @@ export default function functions(debug) {
         if (num === 0 || significance === 0) {
           return 0;
         }
-      
         return Math.ceil(num / significance) * significance;
-      }
+      },
     },
 
     min: {
