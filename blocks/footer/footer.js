@@ -47,33 +47,44 @@ function loadBrightEdge(block) {
       };
       window.BEJSSDK.construct(beSdkOpts);
       const processCapsule = new Promise((resolve, _reject) => {
+        /*
+          since this function doesn't return a promise (or really return any value),
+          there is no way to await it.
+          instead we wrap it in our own promise that we wait to resolve until we can detect the
+          data we need is there (or a reasonable time has elapsed)
+        */
         window.BEJSSDK.processCapsule();
 
-        // wait til capsule is populated to resolve
-        let count = 0;
-        const intervalId = setInterval(() => {
+        let elapsed = 0;
+        let timeOutTime = 50;
+        const timeOutFunc = () => {
           if (window.BEJSSDK.capsule) {
-            clearInterval(intervalId);
             resolve(window.BEJSSDK.getNodes());
-          } else {
-            count += 1;
-            if (count > 5) {
-              // failed to load in reasonable time
-              clearInterval(intervalId);
-              resolve([]);
-            }
+            return;
           }
-        }, 250);
+          elapsed += timeOutTime;
+          if (elapsed >= 3000) {
+            // eslint-disable-next-line no-console
+            console.warn('failed to load capsule in under 3 seconds');
+            resolve([]);
+          } else {
+            // progressive backoff waits 100ms longer each time
+            // this is problably more complicated than neccessary, but it works
+            timeOutTime += 100;
+            setTimeout(timeOutFunc, timeOutTime);
+          }
+        };
+        setTimeout(timeOutFunc, timeOutTime);
       });
       processCapsule.then((nodes) => {
         const body = nodes.find((node) => node.feature_group === 'body_1');
         if (body) {
           block.querySelector('.be-ix-link-block').insertAdjacentHTML('beforeend', body.content);
         }
-        // const headOpen = nodes.find((node) => node.feature_group === '_head_open');
-        // if (headOpen) {
-        //   console.log(headOpen.content);
-        // }
+        const headOpen = nodes.find((node) => node.feature_group === '_head_open');
+        if (headOpen) {
+          document.head.insertAdjacentHTML('beforeend', headOpen.content);
+        }
       });
     }
   });
