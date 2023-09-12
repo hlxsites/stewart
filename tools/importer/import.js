@@ -427,18 +427,39 @@ const buildAccordions = (builder, section) => {
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
-    builder.replace(list, () => {
-      let name = 'List';
-      if (list.classList.contains('ss-layout-fluid')) {
-        name += ' (Fluid)';
-      } else if (list.classList.contains('ss-layout-threecolumn')) {
-        name += ' (Three Column)';
-      } else if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (One Column)';
-      }
-      builder.block(name, 1, false);
-      list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
-    });
+    if (list.classList.contains('ss-layout-fluid')) {
+      // Put spaces between each list item, the unicode character is
+      // the only way to retain spaces when converted to markdown. ¯\_(ツ)_/¯
+      list.querySelectorAll('li').forEach((listItem) => {
+        const space = builder.doc.createTextNode('\u00A0');
+        listItem.append(space);
+      });
+      // Get rid of intermediate block-formatted elements,
+      // so they don't cause carriage returns in the markdown output
+      list.querySelectorAll('ul, li, div, p').forEach((tag) => {
+        [...tag.childNodes].forEach((child) => {
+          tag.parentElement.insertBefore(child, tag);
+        });
+        tag.remove();
+      });
+      // Wrap each link in a strong tag so they show in tertiary format
+      [...list.querySelectorAll('a')].forEach((link) => {
+        const strong = builder.doc.createElement('strong');
+        link.replaceWith(strong);
+        strong.append(link);
+      });
+    } else {
+      builder.replace(list, () => {
+        let name = 'List';
+        if (list.classList.contains('ss-layout-threecolumn')) {
+          name += ' (Three Column)';
+        } else if (!list.classList.contains('ss-layout-twocolumn')) {
+          name += ' (One Column)';
+        }
+        builder.block(name, 1, false);
+        list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
+      });
+    }
   });
 };
 

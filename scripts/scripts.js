@@ -380,6 +380,36 @@ function decorateSectionsExt(main) {
   }
 }
 
+function isLinkOutsideParagraph(link) {
+  const parent = link.parentElement;
+
+  if (parent.tagName === 'LI') {
+    return false;
+  }
+
+  // Check for siblings which would indicate this link is in other text.
+  const siblings = [...parent.childNodes].filter((node) => {
+    if (link === node) return false; // The link itself is not a sibling
+    if (node.nodeType === Node.TEXT_NODE) {
+      // If a sibling is a text that is more than whitespace, then this link is inside other text.
+      return node.textContent.trim().length > 0;
+    }
+    if (node.nodeType === Node.ELEMENT_NODE && getComputedStyle(node).display !== 'block') {
+      // If a sibling is an inline element, then this link is inside other text.
+      return false;
+    }
+    return true;
+  });
+  // Recurse up one level if the link should be a secondary or tertiary button.
+  if (parent.tagName === 'STRONG' || parent.tagName === 'EM') {
+    return siblings.length === 0 && (
+      parent.parentElement.childNodes.size === 0
+      || isLinkOutsideParagraph(parent));
+  }
+
+  return siblings.length === 0;
+}
+
 /**
  * Decorates paragraphs containing a single link as buttons.
  * @param {Element} element container element
@@ -387,25 +417,18 @@ function decorateSectionsExt(main) {
 export function decorateButtons(element) {
   element.querySelectorAll('a').forEach((a) => {
     a.title = a.title || a.textContent;
-    if (a.href !== a.textContent) {
-      if (!a.querySelector('img')) {
-        const up = a.parentElement;
-        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
-          a.className = 'button primary'; // default
-          up.classList.add('button-container');
-        }
-
-        const twoup = a.parentElement.parentElement;
-        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
-          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
-          a.className = 'button tertiary';
-          twoup.classList.add('button-container');
-        }
-        if (up.childNodes.length === 1 && up.tagName === 'EM'
-          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
-          a.className = 'button secondary';
-          twoup.classList.add('button-container');
-        }
+    if (a.href !== a.textContent && !a.querySelector('img') && isLinkOutsideParagraph(a)) {
+      const up = a.parentElement;
+      const twoup = up.parentElement;
+      if (up.tagName === 'STRONG') {
+        a.className = 'button tertiary';
+        twoup.classList.add('button-container');
+      } else if (up.tagName === 'EM') {
+        a.className = 'button secondary';
+        twoup.classList.add('button-container');
+      } else if (up) {
+        a.className = 'button primary'; // default
+        up.classList.add('button-container');
       }
     }
   });

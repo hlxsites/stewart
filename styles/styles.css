@@ -354,6 +354,15 @@ a.button.tertiary {
   padding: 1px;
 }
 
+.section.grey a.button.tertiary:any-link {
+  font-size: var(--body-font-size-l);
+  color: var(--clr-black);
+}
+
+.section.grey a.button.secondary {
+  color: var(--clr-primary);
+}
+
 a.button.tertiary::after {
   content: "";
   border-top: 0.75rem solid transparent;
