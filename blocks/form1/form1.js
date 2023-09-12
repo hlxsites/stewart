@@ -320,21 +320,18 @@ function renderField(fd) {
   return field;
 }
 
-async function applyTransformation(formDef, form) {
+async function includeRuleEngine(formDef, form) {
+  // Improve to load Rule engine only if rules are defined in Form definition.
   try {
-    const mod = await import('./transformer.js');
+    const mod = await import('./rules/index.js');
     const {
-      default: {
-        transformDOM = () => {},
-        transformRequest,
-      },
+      applyRuleEngine,
     } = mod;
-    transformDOM(formDef, form);
-    return transformRequest;
+    applyRuleEngine(formDef, form);
   } catch (e) {
-    console.log('no custom decorators found.');
+    // eslint-disable-next-line no-console
+    console.log('unable to load rule engine.');
   }
-  return (req) => req;
 }
 
 async function fetchData(url) {
@@ -368,6 +365,9 @@ async function createForm(formURL) {
       input.name = fd.Name;
       if (input.type !== 'file') {
         input.value = fd.Value;
+        if (input.type === 'radio' || input.type === 'checkbox') {
+          input.checked = fd.Checked === 'true';
+        }
       }
       if (fd.Description) {
         input.setAttribute('aria-describedby', `${fd.Id}-description`);
@@ -376,13 +376,12 @@ async function createForm(formURL) {
     form.append(el);
   });
   groupFieldsByFieldSet(form);
-  const transformRequest = await applyTransformation(data, form);
-  // eslint-disable-next-line prefer-destructuring
-  form.dataset.action = pathname.split('.json')[0];
+  includeRuleEngine(data, form);
+  form.dataset.action = pathname?.split('.json')[0];
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     e.submitter.setAttribute('disabled', '');
-    handleSubmit(form, transformRequest);
+    handleSubmit(form);
   });
   return form;
 }
