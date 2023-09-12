@@ -1,13 +1,5 @@
 import { createElement } from './scripts.js';
-import { fetchPlaceholders, readBlockConfig } from './lib-franklin.js';
-
-// avoid top level await
-let placeholders = {};
-const init = () => {
-  fetchPlaceholders().then((data) => {
-    placeholders = data;
-  });
-};
+import { readBlockConfig } from './lib-franklin.js';
 
 export const queryIndexPath = '/query-index.json';
 const SearchConfigs = {
@@ -49,6 +41,7 @@ export const getSearchConfig = (block) => {
 };
 
 export const createPaginationButton = (page, currentPage) => {
+  const placeholders = window.placeholders[document.documentElement.lang];
   const pageLookup = {
     '>': {
       value: currentPage + 1,
@@ -136,7 +129,10 @@ export const generatePaginationData = (currentPage, totalPages) => {
 
 export const createSearchForm = async ({ type, action }) => {
   const formAction = action || '/en/search-results';
-  const { searchButtonText, searchFieldPlaceholder } = placeholders;
+  const {
+    searchButtonText,
+    searchFieldPlaceholder,
+  } = window.placeholders[document.documentElement.lang];
 
   const buttonHTML = {
     default: `<span>${searchButtonText || 'Search'}</span>`,
@@ -159,5 +155,3 @@ export const createSearchForm = async ({ type, action }) => {
 
   return formElement;
 };
-
-init();

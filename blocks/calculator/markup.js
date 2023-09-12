@@ -1,6 +1,4 @@
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
-
-const placeholders = await fetchPlaceholders();
+const placeholders = window.placeholders[document.documentElement.lang];
 
 export const amortization = `
   <form id='amortization' class='amortization' novalidate>

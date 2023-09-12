@@ -1,4 +1,4 @@
-import { loadScript, fetchPlaceholders, readBlockConfig } from '../../scripts/lib-franklin.js';
+import { loadScript, readBlockConfig } from '../../scripts/lib-franklin.js';
 import { getOfficeListings } from '../../scripts/esb-api-utils.js';
 import { createElement, addQueryParamToURL, getQueryParamFromURL } from '../../scripts/scripts.js';
 import { generatePaginationData, createPaginationButton } from '../../scripts/search-utils.js';
@@ -10,42 +10,8 @@ import {
   BING_MAPS_BASE_URL,
 } from './utils/constants.js';
 
-const {
-  stewartOffice,
-  independentAgency,
-  locatorResultsLoadingText,
-  agenciesFound,
-  officeLocations,
-  locatorSearchErrorText,
-  tryAgainLater,
-  noLocationsFound,
-  expandSearchCriteria,
-  mailingShippingAddress,
-  underwriter,
-  serviceState,
-  details,
-} = await fetchPlaceholders();
-
-const textValues = {
-  stewartOffice: stewartOffice || 'Stewart Office',
-  independentAgency: independentAgency || 'Independent Agency',
-  resultsLoading: locatorResultsLoadingText || 'Searching through our vast network of locations...',
-  officeLocations: async (isAgencyLocator) => (isAgencyLocator ? agenciesFound || 'Agencies Found' : officeLocations || 'Office Locations'),
-  errorFetchingResults: locatorSearchErrorText || 'There was an error fetching the results.',
-  tryAgainLater: tryAgainLater || 'Please try again later.',
-  noResultsFound: noLocationsFound || 'No locations found.',
-  expandSearchCriteria: expandSearchCriteria || 'Try expanding your search criteria.',
-  mailingShippingAddress: mailingShippingAddress || 'Mailing/Shipping Address',
-  underWriter: underwriter || 'Underwriter',
-  serviceState: serviceState || 'Service State',
-  details: details || 'Details',
-  maps: {
-    map: 'Map',
-    googleMapsBaseUrl: 'https://www.google.com/maps/place',
-  },
-};
-
 let currentListings = [];
+let textValues = {};
 
 /**
  * Creates a fontawesome icon.
@@ -700,6 +666,41 @@ export const executeSearch = async (params, block, isAgencyLocator) => {
  * @param {HTMLElement} block
  */
 export default async function decorate(block) {
+  const {
+    stewartOffice,
+    independentAgency,
+    locatorResultsLoadingText,
+    agenciesFound,
+    officeLocations,
+    locatorSearchErrorText,
+    tryAgainLater,
+    noLocationsFound,
+    expandSearchCriteria,
+    mailingShippingAddress,
+    underwriter,
+    serviceState,
+    details,
+  } = window.placeholders[document.documentElement.lang];
+
+  textValues = {
+    stewartOffice: stewartOffice || 'Stewart Office',
+    independentAgency: independentAgency || 'Independent Agency',
+    resultsLoading: locatorResultsLoadingText || 'Searching through our vast network of locations...',
+    officeLocations: async (isAgencyLocator) => (isAgencyLocator ? agenciesFound || 'Agencies Found' : officeLocations || 'Office Locations'),
+    errorFetchingResults: locatorSearchErrorText || 'There was an error fetching the results.',
+    tryAgainLater: tryAgainLater || 'Please try again later.',
+    noResultsFound: noLocationsFound || 'No locations found.',
+    expandSearchCriteria: expandSearchCriteria || 'Try expanding your search criteria.',
+    mailingShippingAddress: mailingShippingAddress || 'Mailing/Shipping Address',
+    underWriter: underwriter || 'Underwriter',
+    serviceState: serviceState || 'Service State',
+    details: details || 'Details',
+    maps: {
+      map: 'Map',
+      googleMapsBaseUrl: 'https://www.google.com/maps/place',
+    },
+  };
+
   const blockConfig = readBlockConfig(block);
   block.dataset.resultsPerPage = blockConfig['results-per-page'] || 10;
   const isAgencyLocator = block.classList.contains('agency');

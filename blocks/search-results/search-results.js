@@ -7,7 +7,7 @@ import {
 } from '../../scripts/search-utils.js';
 import ffetch from '../../scripts/ffetch.js';
 import { createElement, addQueryParamToURL, getQueryParamFromURL } from '../../scripts/scripts.js';
-import { toClassName, sampleRUM, fetchPlaceholders } from '../../scripts/lib-franklin.js';
+import { toClassName, sampleRUM } from '../../scripts/lib-franklin.js';
 import { getTaxonomy } from '../../scripts/taxonomy.js';
 
 // media query match that indicates mobile/tablet width
@@ -26,14 +26,6 @@ const classNames = {
   searchResultsPaginationItem: `${blockName}-pagination-item`,
   searchResultsPaginationButton: `${blockName}-pagination-button`,
 };
-
-const placeholders = await fetchPlaceholders();
-const {
-  filterBy,
-  contentTypes,
-  searchResultsPagination,
-  resultsFound,
-} = placeholders;
 
 const setupSearchForm = async (block) => {
   block.append(await createSearchForm({ type: 'default', action: window.location.href }));
@@ -198,6 +190,9 @@ const renderResults = async (block, filteredResults, searchTerm) => {
 };
 
 function renderSearchResultsScaffolding() {
+  const placeholders = window.placeholders[document.documentElement.lang];
+  const { filterBy, contentTypes, searchResultsPagination } = placeholders;
+
   return createElement('div', { class: classNames.searchResultsData }, [
     createElement('div', { class: classNames.searchResultsInfo }, [
       createElement('h2', {}, 'Search results for <span class="search-results-term"></span>'),
@@ -220,6 +215,8 @@ function renderSearchResultsScaffolding() {
 }
 
 async function renderSearchResults(block, cfg, q, tag, page, partial = false) {
+  const placeholders = window.placeholders[document.documentElement.lang];
+  const { resultsFound } = placeholders;
   const pageNum = Number(page);
   const resultsForPage = fetchResults(cfg, q, tag, pageNum);
   await renderResults(block, resultsForPage, q);

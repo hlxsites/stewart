@@ -13,6 +13,7 @@ import {
   loadCSS,
   toClassName,
   getMetadata,
+  fetchPlaceholders,
 } from './lib-franklin.js';
 
 // valid template for which we have css/js files
@@ -597,6 +598,8 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  await fetchPlaceholders(); // get default placeholders
+  await fetchPlaceholders(document.documentElement.lang); // get locale placeholders
   await loadBlocks(main);
 
   const { hash } = window.location;
