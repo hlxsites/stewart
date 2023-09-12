@@ -12,7 +12,7 @@ export function getRules(fd) {
 
 function extractRules(data) {
   return data
-    .reduce(({ fieldIdMap, rules, fieldIds }, fd, index) => {
+    .reduce(({ fieldIdMap, rules }, fd, index) => {
       const currentRules = getRules(fd);
       return {
         fieldIdMap: {
@@ -20,9 +20,8 @@ function extractRules(data) {
           [index + 2]: { name: fd.Name, id: fd.Id },
         },
         rules: currentRules.length ? rules.concat([[fd.Id, currentRules]]) : rules,
-        fieldIds: currentRules.length ? [...fieldIds, fd.Id] : fieldIds,
       };
-    }, { fieldIdMap: {}, rules: [], fieldIds: [] });
+    }, { fieldIdMap: {}, rules: [] });
 }
 
 export async function applyRuleEngine(form, formTag) {
@@ -30,11 +29,10 @@ export async function applyRuleEngine(form, formTag) {
     const RuleEngine = (await import('./RuleEngine.js')).default;
 
     const formData = extractRules(form);
-    const { fieldIdMap, rules, fieldIds } = formData;
+    const { fieldIdMap, rules } = formData;
 
     const ruleEngine = new RuleEngine(rules, fieldIdMap, formTag);
     ruleEngine.enable();
-    ruleEngine.applyRules(fieldIds);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('unable to apply rules ', e);
