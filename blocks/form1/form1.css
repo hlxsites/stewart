@@ -1,9 +1,9 @@
 :root {
     --background-color-primary: #fff;
-    --label-color: #666;
-    --border-color: #818a91;
-    --button-primary-color: #5F8DDA;
-    --button-primary-hover-color: #035fe6;
+    --label-color: var(--clr-black);
+    --border-color: var(--clr-gray-dark);
+    --button-primary-color: var(--clr-primary);
+    --button-primary-hover-color: #006497;
     --form-font-size-m: 22px;
     --form-font-size-s: 18px;
     --form-font-size-xs: 16px;
@@ -26,7 +26,7 @@
     --form-label-color: var(--label-color);
     --form-label-font-size: var(--form-font-size-s);
     --form-label-font-weight: 400;
-    --form-title-font-weight: 600;
+    --form-title-font-weight: 500;
     --form-fieldset-border: 0;
     --form-fieldset-marign: 0;
     --form-fieldset-legend-color: var(--form-label-color);
