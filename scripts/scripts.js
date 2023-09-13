@@ -88,6 +88,28 @@ export async function decorateIcons(element) {
 }
 
 /**
+ * build columns blocks from sections containing the columns style
+ * @param {Element} main the main element
+ */
+export function buildAutoColumns(main) {
+  main.querySelectorAll('.section.columns').forEach((colSect) => {
+    const blockTable = [];
+    const row = [];
+    [...colSect.children].forEach((wrapper) => {
+      row.push({ elems: [...wrapper.children] });
+      wrapper.remove();
+    });
+    blockTable.push(row);
+    const block = buildBlock('columns', blockTable);
+    // todo add variant classes
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    colSect.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
@@ -540,6 +562,7 @@ export async function decorateMain(main, isFragment = false) {
   decorateBlocks(main);
   decorateCardSections(main);
   buildAccordions(main);
+  buildAutoColumns(main);
 }
 
 /**
@@ -591,12 +614,16 @@ export const debounce = (func, timeout = 300) => {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
+  // init page lang
+  const validLangs = ['en', 'es', 'zh', 'vi', 'ko'];
   let lang = 'en';
   const pathSegments = window.location.pathname.split('/');
   if (pathSegments.length > 1 && !window.isErrorPage) {
     [, lang] = pathSegments;
   }
+  if (!validLangs.includes(lang)) lang = 'en';
   document.documentElement.lang = lang;
+
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
