@@ -101,7 +101,13 @@ export function buildAutoColumns(main) {
     });
     blockTable.push(row);
     const block = buildBlock('columns', blockTable);
-    // todo add variant classes
+
+    const variants = colSect.classList.filter((cls) => cls.startsWith('split-'));
+    block.classList.add(...variants);
+
+    colSect.classList.remove('columns');
+    colSect.classList.remove(...variants);
+
     const wrapper = createElement('div');
     wrapper.append(block);
     colSect.append(wrapper);
