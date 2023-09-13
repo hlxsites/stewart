@@ -90,6 +90,13 @@ const extractMetadata = (document, url) => {
         if (templateName) {
           metadata.Template = templateName;
         }
+      } else if (prop === 'og:title') {
+        if (val.includes('|')) {
+          const titles = val.split('|');
+          metadata.Title = titles[0].trim();
+        } else {
+          metadata.Title = val;
+        }
       } else {
         let propName = prop.replaceAll('og:', '');
         propName = capitalizeWord(propName);
@@ -604,6 +611,7 @@ const buildGenericSection = (builder, section) => {
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
   builder.section();
   if (classes.length > 0) { builder.addSectionMetadata('style', classCombo); }
+
   buildSectionContent(builder, section);
 };
 
@@ -753,6 +761,26 @@ const gatherAssetLinks = (document) => {
   return [...assetLinks].join(', ');
 };
 
+const sectionContainsOnlyCols = (section, colsBlock) => {
+  let containsOnlyCols = true;
+
+  const allTables = section.querySelectorAll('table');
+  allTables.forEach((table) => {
+    if (table === colsBlock) return;
+    if (colsBlock.contains(table)) return;
+
+    containsOnlyCols = false;
+  });
+
+  section.querySelectorAll('p, img').forEach((thing) => {
+    if (colsBlock.contains(thing)) return;
+
+    containsOnlyCols = false;
+  });
+
+  return containsOnlyCols;
+};
+
 const processFragments = (document, docPath) => {
   const fragments = [];
   const pathSegments = docPath.split('/');
@@ -790,6 +818,49 @@ const processFragments = (document, docPath) => {
   // find blocks inside of columns
   let fragmentCount = 1;
   document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
+    // if the section contains no content other than the cols block, then we can auto-block it
+    // rather than a extracting a fragment
+    const colsBlock = internalBlock.closest('[data-block="Columns"]');
+    const section = colsBlock.closest('.pagesection');
+    if (sectionContainsOnlyCols(section, colsBlock)) {
+      [...colsBlock.children].forEach((tr) => {
+        [...tr.children].forEach((td) => {
+          if (td.tagName !== 'TD') return;
+          colsBlock.insertAdjacentElement('beforebegin', td.querySelector('div'));
+        });
+      });
+
+      const sectionMeta = section.nextElementSibling;
+      if (sectionMeta && sectionMeta.getAttribute('data-block') === 'Section Metadata') {
+        // modify style in-line
+        const styleRow = [...sectionMeta.querySelectorAll(':scope > tr')].find((row) => {
+          const key = row.querySelector(':scope > td')?.textContent;
+          return key?.toLowerCase() === 'style';
+        });
+        if (styleRow) {
+          const styleValues = styleRow.querySelector(':scope > td:nth-child(2)');
+          styleValues.textContent = `${styleValues.textContent}, Columns, ${colsBlock.getAttribute('data-block-variants')}`;
+        } else {
+          sectionMeta.insertAdjacentHTML(`<tr>
+            <td>Style</td>
+            <td>Columns, ${colsBlock.getAttribute('data-block-variants')}</td>
+          </tr>`);
+        }
+      } else {
+        const metdataCells = [
+          ['Section Metadata'],
+        ];
+        const sectionStyle = [];
+        sectionStyle.push('Columns', colsBlock.getAttribute('data-block-variants').split(', '));
+        metdataCells.push(['Style', sectionStyle.join(', ')]);
+        const sectionMetadataBlock = WebImporter.DOMUtils.createTable(metdataCells, document);
+        section.insertAdjacentElement('afterend', sectionMetadataBlock);
+      }
+
+      colsBlock.remove();
+      return;
+    }
+
     const blockName = internalBlock.getAttribute('data-block');
     const div = document.createElement('div');
     // name fragments based on site section and page name

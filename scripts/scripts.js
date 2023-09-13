@@ -672,6 +672,26 @@ export function getLocalePlaceholders() {
   return window.placeholders[document.documentElement.lang];
 }
 
+function updateTitleSuffix() {
+  const placeholders = getLocalePlaceholders();
+  if (placeholders.titleSuffix) {
+    const title = document.querySelector('head > title');
+
+    const originalTitle = createElement('meta', '', {
+      name: 'originalTitle',
+      content: title.textContent,
+    });
+    document.querySelector('head').append(originalTitle);
+  }
+  const title = getMetadata('og:title');
+  const ogTitle = document.querySelector('head > meta[property="og:title"]');
+  const twitterTitle = document.querySelector('head > meta[name="twitter:title"]');
+  const withSuffix = `${title.textContent} ${placeholders.titleSuffix}`;
+  document.querySelector('head > title').textContent = withSuffix;
+  ogTitle.content = withSuffix;
+  twitterTitle.content = withSuffix;
+}
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -679,6 +699,8 @@ export function getLocalePlaceholders() {
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
+  updateTitleSuffix();
+
   await loadBlocks(main);
 
   const { hash } = window.location;
