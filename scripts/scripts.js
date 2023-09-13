@@ -593,13 +593,36 @@ async function loadEager(doc) {
 }
 
 /**
+ * @returns the global placeholders from the window object.
+ */
+export function getGlobalPlaceholders() {
+  if (!window.placeholders) {
+    console.error('placeholders not initialized yet.'); // eslint-disable-line no-console
+    return false;
+  }
+
+  return window.placeholders.default;
+}
+
+/**
+ * @returns the locale specific placeholders from the window object.
+ */
+export function getLocalePlaceholders() {
+  if (!window.placeholders) {
+    console.error('placeholders not initialized yet.'); // eslint-disable-line no-console
+    return false;
+  }
+
+  return window.placeholders[document.documentElement.lang];
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
-  await fetchPlaceholders(); // get default placeholders
-  await fetchPlaceholders(document.documentElement.lang); // get locale placeholders
+  await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
   await loadBlocks(main);
 
   const { hash } = window.location;

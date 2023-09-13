@@ -1,4 +1,6 @@
-const placeholders = window.placeholders[document.documentElement.lang];
+import { getLocalePlaceholders } from '../../scripts/scripts.js';
+
+const placeholders = getLocalePlaceholders();
 
 export const amortization = `
   <form id='amortization' class='amortization' novalidate>

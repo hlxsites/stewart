@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/lib-franklin.js';
-import { createElement, fetchMetadataJson } from '../../scripts/scripts.js';
+import { createElement, fetchMetadataJson, getLocalePlaceholders } from '../../scripts/scripts.js';
 
 const blockName = 'teaser-list';
 
@@ -46,7 +46,7 @@ const assignContentClasses = (teaser) => {
  * @param {Element} block the block element
  */
 export default async function decorate(block) {
-  const placeholders = window.placeholders[document.documentElement.lang];
+  const placeholders = getLocalePlaceholders();
   const teaserPromises = [...block.children].map(async (teaser) => {
     teaser.classList.add(classNames.teaser);
 

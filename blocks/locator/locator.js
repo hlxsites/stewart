@@ -3,6 +3,7 @@ import {
   debounce,
   addQueryParamToURL,
   getQueryParamFromURL,
+  getLocalePlaceholders,
 } from '../../scripts/scripts.js';
 import { getTaxonomyCategory } from '../../scripts/taxonomy.js';
 import { getAutoCompleteSuggestions } from '../../scripts/esb-api-utils.js';
@@ -401,7 +402,7 @@ const addEventListeners = (isAgencyLocator, isOnResultsPage, block, locatorForm)
  * Decorates the block.
  */
 export default async function decorate(block) {
-  const placeholders = window.placeholders[document.documentElement.lang];
+  const placeholders = getLocalePlaceholders();
   const {
     agencyName,
     findYourAgency,

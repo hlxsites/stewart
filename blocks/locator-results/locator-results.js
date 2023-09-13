@@ -1,6 +1,11 @@
 import { loadScript, readBlockConfig } from '../../scripts/lib-franklin.js';
 import { getOfficeListings } from '../../scripts/esb-api-utils.js';
-import { createElement, addQueryParamToURL, getQueryParamFromURL } from '../../scripts/scripts.js';
+import {
+  createElement,
+  addQueryParamToURL,
+  getQueryParamFromURL,
+  getLocalePlaceholders,
+} from '../../scripts/scripts.js';
 import { generatePaginationData, createPaginationButton } from '../../scripts/search-utils.js';
 import {
   classes,
@@ -680,7 +685,7 @@ export default async function decorate(block) {
     underwriter,
     serviceState,
     details,
-  } = window.placeholders[document.documentElement.lang];
+  } = getLocalePlaceholders();
 
   textValues = {
     stewartOffice: stewartOffice || 'Stewart Office',
