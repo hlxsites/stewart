@@ -13,6 +13,7 @@ import {
   loadCSS,
   toClassName,
   getMetadata,
+  fetchPlaceholders,
 } from './lib-franklin.js';
 
 // valid template for which we have css/js files
@@ -615,11 +616,36 @@ async function loadEager(doc) {
 }
 
 /**
+ * @returns the global placeholders from the window object.
+ */
+export function getGlobalPlaceholders() {
+  if (!window.placeholders || !window.placeholders.default) {
+    console.error('global placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
+  }
+
+  return window.placeholders.default;
+}
+
+/**
+ * @returns the locale specific placeholders from the window object.
+ */
+export function getLocalePlaceholders() {
+  if (!window.placeholders || !window.placeholders[document.documentElement.lang]) {
+    console.error('locale placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
+  }
+
+  return window.placeholders[document.documentElement.lang];
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
   await loadBlocks(main);
 
   const { hash } = window.location;
