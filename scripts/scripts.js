@@ -596,9 +596,9 @@ async function loadEager(doc) {
  * @returns the global placeholders from the window object.
  */
 export function getGlobalPlaceholders() {
-  if (!window.placeholders) {
-    console.error('placeholders not initialized yet.'); // eslint-disable-line no-console
-    return false;
+  if (!window.placeholders || !window.placeholders.default) {
+    console.error('global placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
   }
 
   return window.placeholders.default;
@@ -608,9 +608,9 @@ export function getGlobalPlaceholders() {
  * @returns the locale specific placeholders from the window object.
  */
 export function getLocalePlaceholders() {
-  if (!window.placeholders) {
-    console.error('placeholders not initialized yet.'); // eslint-disable-line no-console
-    return false;
+  if (!window.placeholders || !window.placeholders[document.documentElement.lang]) {
+    console.error('locale placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
   }
 
   return window.placeholders[document.documentElement.lang];
