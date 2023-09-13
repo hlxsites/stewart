@@ -147,6 +147,11 @@ const buildPersonDetailCards = (builder, section) => {
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
+    // Remove empty embeds
+    if (embed.childNodes.length === 0 || (embed.childNodes.length === 1 && embed.childNodes[0].nodeName === '#text')) {
+      embed.remove();
+      return;
+    }
     builder.replace(embed, () => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
