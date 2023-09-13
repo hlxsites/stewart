@@ -102,7 +102,7 @@ export function buildAutoColumns(main) {
     blockTable.push(row);
     const block = buildBlock('columns', blockTable);
 
-    const variants = colSect.classList.filter((cls) => cls.startsWith('split-'));
+    const variants = [...colSect.classList].filter((cls) => cls.startsWith('split-'));
     block.classList.add(...variants);
 
     colSect.classList.remove('columns');
