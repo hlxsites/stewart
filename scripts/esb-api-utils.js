@@ -1,17 +1,9 @@
-const ESB_BASE_URL = 'https://esb.stewart.com/api';
-const urlSearchParams = new URLSearchParams(window.location.search);
-const ESB_BASIC_AUTH_USER = urlSearchParams.get('esbUser'); // temp
-const ESB_BASIC_AUTH_PASS = urlSearchParams.get('esbPass'); // temp
-const ESB_AUTH_CREDENTIALS = `${ESB_BASIC_AUTH_USER}:${ESB_BASIC_AUTH_PASS}`;
-
-const headers = new Headers();
-headers.set('Authorization', `Basic ${btoa(ESB_AUTH_CREDENTIALS)}`);
+const ESB_BASE_URL = 'https://d28w3vn6d1tm1o.cloudfront.net/esb/api';
 
 const getAutoCompleteSuggestions = async (prefix) => {
   const url = `${ESB_BASE_URL}/Autocomplete?prefix=${prefix}`;
   const suggestions = await fetch(url, {
     method: 'GET',
-    headers,
   });
 
   const { autoCompleteResponse } = await suggestions.json();
@@ -32,7 +24,6 @@ const getOfficeListings = async (params, isAgencyLocator) => {
   try {
     const listings = await fetch(url, {
       method: 'GET',
-      headers,
     });
 
     const { StewartOffices: { StewartOffice } } = await listings.json();
