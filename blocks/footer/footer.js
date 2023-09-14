@@ -35,7 +35,7 @@ function createLinksList(ele) {
  * can't be deferred til delayed because whole purpose of this is SEO, so we do it here
  * since footer is lazy loaded, I'm optimistic this won't kill page speed.
  */
-function loadBrightEdge(block) {
+function loadBrightEdge() {
   loadScript('https://cdn.bc0a.com/be_ixf_js_sdk.js', {
     type: 'text/javascript',
   }).then(() => {
@@ -47,46 +47,6 @@ function loadBrightEdge(block) {
       };
       window.BEJSSDK.construct(beSdkOpts);
       window.BEJSSDK.processCapsule();
-      // const processCapsule = new Promise((resolve, _reject) => {
-      //   /*
-      //     since this function doesn't return a promise (or really return any value),
-      //     there is no way to await it.
-      //     instead we wrap it in our own promise that we wait to resolve until we can detect the
-      //     data we need is there (or a reasonable time has elapsed)
-      //   */
-      //   window.BEJSSDK.processCapsule();
-
-      //   let elapsed = 0;
-      //   let timeOutTime = 50;
-      //   const timeOutFunc = () => {
-      //     if (window.BEJSSDK.capsule) {
-      //       resolve(window.BEJSSDK.getNodes());
-      //       return;
-      //     }
-      //     elapsed += timeOutTime;
-      //     if (elapsed >= 3000) {
-      //       // eslint-disable-next-line no-console
-      //       console.warn('failed to load capsule in under 3 seconds');
-      //       resolve([]);
-      //     } else {
-      //       // progressive backoff waits 100ms longer each time
-      //       // this is problably more complicated than neccessary, but it works
-      //       timeOutTime += 100;
-      //       setTimeout(timeOutFunc, timeOutTime);
-      //     }
-      //   };
-      //   setTimeout(timeOutFunc, timeOutTime);
-      // });
-      // processCapsule.then((nodes) => {
-      //   const body = nodes.find((node) => node.feature_group === 'body_1');
-      //   if (body) {
-      //     block.querySelector('.be-ix-link-block').insertAdjacentHTML('beforeend', body.content);
-      //   }
-      //   const headOpen = nodes.find((node) => node.feature_group === '_head_open');
-      //   if (headOpen) {
-      //     document.head.insertAdjacentHTML('beforeend', headOpen.content);
-      //   }
-      // });
     }
   });
 }
@@ -141,6 +101,6 @@ export default async function decorate(block) {
     decorateLinks(footer);
     block.append(footer);
     block.prepend(createElement('div', { class: 'be-ix-link-block' }));
-    loadBrightEdge(block);
+    loadBrightEdge();
   }
 }
