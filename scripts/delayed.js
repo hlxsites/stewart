@@ -1,10 +1,12 @@
 // eslint-disable-next-line import/no-cycle
 import {
   sampleRUM,
-  fetchPlaceholders,
   loadScript,
   getMetadata,
 } from './lib-franklin.js';
+
+// eslint-disable-next-line import/no-cycle
+import { getGlobalPlaceholders } from './scripts.js';
 
 function loadGoogleTagManager(placeholders) {
   // google tag manager
@@ -17,7 +19,7 @@ function loadGoogleTagManager(placeholders) {
 
 async function loadMuchkin() {
   await loadScript('https://munchkin.marketo.net/munchkin.js');
-  const placeholders = await fetchPlaceholders();
+  const placeholders = getGlobalPlaceholders();
   window.Munchkin.init(placeholders.munchkinId);
 }
 
@@ -80,7 +82,7 @@ async function runDelayed() {
   // skip analytics stuff when in library
   if (!document.body.classList.contains('sidekick-library')) {
     initDataLayer();
-    const placeholders = await fetchPlaceholders();
+    const placeholders = getGlobalPlaceholders();
     // add more delayed functionality here
     await loadOneTrust(placeholders);
     loadGoogleTagManager(placeholders);

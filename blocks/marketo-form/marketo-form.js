@@ -1,4 +1,5 @@
-import { readBlockConfig, fetchPlaceholders, loadScript } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, loadScript } from '../../scripts/lib-franklin.js';
+import { getGlobalPlaceholders } from '../../scripts/scripts.js';
 
 /**
  * decorate the block
@@ -8,7 +9,7 @@ export default async function decorate(block) {
   block.classList.add('form-wrapper');
   const cfg = readBlockConfig(block);
 
-  const placeholders = await fetchPlaceholders();
+  const placeholders = getGlobalPlaceholders();
   const formId = cfg['form-id'];
   const { munchkinId } = placeholders;
   const redirectUrl = cfg.redirect || placeholders.formRedirect;

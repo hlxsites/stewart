@@ -3,28 +3,16 @@ import {
   debounce,
   addQueryParamToURL,
   getQueryParamFromURL,
+  getLocalePlaceholders,
 } from '../../scripts/scripts.js';
 import { getTaxonomyCategory } from '../../scripts/taxonomy.js';
-import { fetchPlaceholders } from '../../scripts/lib-franklin.js';
 import { getAutoCompleteSuggestions } from '../../scripts/esb-api-utils.js';
 import { executeSearch } from '../locator-results/locator-results.js';
 
 const blockName = 'locator';
 
 let AUTOCOMPLETE_ACTIVE_INDEX = -1;
-
-const placeholders = await fetchPlaceholders();
-
-const {
-  agencyName,
-  findYourAgency,
-  findUs,
-  findAnAgency,
-  findAnOffice,
-  locateOfficeResultsPage,
-  locateAgencyResultsPage,
-  cityOrAgencyNameError,
-} = placeholders;
+let defaultValues = {};
 
 const classes = {
   locatorResults: `${blockName}-results`,
@@ -46,20 +34,6 @@ const selectors = {
     cityInput: `.${blockName} #input-city`,
     stateInput: `.${blockName} #input-state`,
   },
-};
-
-const defaultValues = {
-  agencyName: agencyName || 'Agency Name',
-  address: placeholders.address || 'Address',
-  city: placeholders.city || 'City',
-  state: placeholders.state || 'State',
-  zipcode: placeholders.zipCode || 'Zip Code',
-  serviceState: placeholders.serviceState || 'Service State',
-  distance: placeholders.distance || 'Distance',
-  formTitle: (isAgencyLocator) => `Find an ${isAgencyLocator ? 'Agency' : 'Office'}`,
-  submitButtonText: (isAgencyLocator) => `Find an ${isAgencyLocator ? 'Agency' : 'Office'}`,
-  formAction: (isAgencyLocator) => (isAgencyLocator ? '/en/agency-verification' : '/en/locate-an-office'),
-  agencyValidationError: cityOrAgencyNameError || 'Please enter a city or agency name.',
 };
 
 /**
@@ -162,7 +136,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
   const formFields = [
     ...(isAgencyLocator ? [createFormField({
       attributes: {
-        'aria-label': 'Agency Name',
+        'aria-label': defaultValues.agencyName,
         id: 'input-agency-name',
         name: 'agencyName',
         type: 'text',
@@ -172,7 +146,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     })] : []),
     ...(!isAgencyLocator ? [createFormField({
       attributes: {
-        'aria-label': 'Address',
+        'aria-label': defaultValues.address,
         id: 'input-address',
         name: 'address',
         type: 'text',
@@ -184,7 +158,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     })] : []),
     createFormField({
       attributes: {
-        'aria-label': 'City',
+        'aria-label': defaultValues.city,
         id: 'input-city',
         name: 'city',
         type: 'text',
@@ -194,7 +168,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     }),
     createFormField({
       attributes: {
-        'aria-label': 'State',
+        'aria-label': defaultValues.state,
         id: 'input-state',
         name: 'state',
         type: 'select',
@@ -207,7 +181,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     }),
     ...(isAgencyLocator ? [createFormField({
       attributes: {
-        'aria-label': 'Zip Code',
+        'aria-label': defaultValues.zipcode,
         id: 'input-zipcode',
         name: 'zip',
         type: 'number',
@@ -219,7 +193,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     })] : []),
     ...(isAgencyLocator ? [createFormField({
       attributes: {
-        'aria-label': 'Service State',
+        'aria-label': defaultValues.serviceState,
         id: 'input-service-state',
         name: 'serviceState',
         type: 'select',
@@ -230,7 +204,7 @@ const getLocatorFormFields = async (isAgencyLocator) => {
     })] : []),
     ...(!isAgencyLocator ? [createFormField({
       attributes: {
-        'aria-label': 'Distance',
+        'aria-label': defaultValues.distance,
         id: 'input-distance',
         name: 'distance',
         type: 'select',
@@ -428,6 +402,38 @@ const addEventListeners = (isAgencyLocator, isOnResultsPage, block, locatorForm)
  * Decorates the block.
  */
 export default async function decorate(block) {
+  const placeholders = getLocalePlaceholders();
+  const {
+    agencyName,
+    findYourAgency,
+    findUs,
+    findAnAgency,
+    findAnOffice,
+    locateOfficeResultsPage,
+    locateAgencyResultsPage,
+    cityOrAgencyNameError,
+    city,
+    address,
+    state,
+    zipCode,
+    serviceState,
+    distance,
+  } = placeholders;
+
+  defaultValues = {
+    agencyName: agencyName || 'Agency Name',
+    address: address || 'Address',
+    city: city || 'City',
+    state: state || 'State',
+    zipcode: zipCode || 'Zip Code',
+    serviceState: serviceState || 'Service State',
+    distance: distance || 'Distance',
+    formTitle: (isAgencyLocator) => `Find an ${isAgencyLocator ? 'Agency' : 'Office'}`,
+    submitButtonText: (isAgencyLocator) => `Find an ${isAgencyLocator ? 'Agency' : 'Office'}`,
+    formAction: (isAgencyLocator) => (isAgencyLocator ? '/en/agent-verification' : '/en/locate-an-office'),
+    agencyValidationError: cityOrAgencyNameError || 'Please enter a city or agency name.',
+  };
+
   const isAgencyLocator = block.classList.contains('agency');
   const locatorType = isAgencyLocator ? 'agency' : 'office';
   const isOnResultsPage = !!document.querySelector(`.${classes.locatorResults}.${locatorType}`);

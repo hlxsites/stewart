@@ -1,10 +1,10 @@
-import { fetchPlaceholders, getMetadata } from '../../scripts/lib-franklin.js';
-import { buildLinkAutoBlocks } from '../../scripts/scripts.js';
+import { getMetadata } from '../../scripts/lib-franklin.js';
+import { buildLinkAutoBlocks, getLocalePlaceholders } from '../../scripts/scripts.js';
 
 async function addBlogPostInfo(main) {
   const h1 = main.querySelector('h1');
   if (h1) {
-    const placeholders = await fetchPlaceholders();
+    const placeholders = getLocalePlaceholders();
     const pubDate = getMetadata('publication-date');
     const author = getMetadata('author');
     if (author) {
