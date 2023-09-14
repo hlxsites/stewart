@@ -831,6 +831,8 @@ const processFragments = (document, docPath) => {
       });
 
       const sectionMeta = section.nextElementSibling;
+      const variants = colsBlock.getAttribute('data-block-variants');
+      const sectionStylesToAdd = `Columns${variants ? `, ${variants}` : ''}`;
       if (sectionMeta && sectionMeta.getAttribute('data-block') === 'Section Metadata') {
         // modify style in-line
         const styleRow = [...sectionMeta.querySelectorAll(':scope > tr')].find((row) => {
@@ -839,11 +841,11 @@ const processFragments = (document, docPath) => {
         });
         if (styleRow) {
           const styleValues = styleRow.querySelector(':scope > td:nth-child(2)');
-          styleValues.textContent = `${styleValues.textContent}, Columns, ${colsBlock.getAttribute('data-block-variants')}`;
+          styleValues.textContent = `${styleValues.textContent}, ${sectionStylesToAdd}`;
         } else {
           sectionMeta.insertAdjacentHTML(`<tr>
             <td>Style</td>
-            <td>Columns, ${colsBlock.getAttribute('data-block-variants')}</td>
+            <td>${sectionStylesToAdd}</td>
           </tr>`);
         }
       } else {
@@ -851,7 +853,7 @@ const processFragments = (document, docPath) => {
           ['Section Metadata'],
         ];
         const sectionStyle = [];
-        sectionStyle.push('Columns', colsBlock.getAttribute('data-block-variants').split(', '));
+        sectionStyle.push(sectionStylesToAdd.split(', '));
         metdataCells.push(['Style', sectionStyle.join(', ')]);
         const sectionMetadataBlock = WebImporter.DOMUtils.createTable(metdataCells, document);
         section.insertAdjacentElement('afterend', sectionMetadataBlock);
