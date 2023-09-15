@@ -88,6 +88,34 @@ export async function decorateIcons(element) {
 }
 
 /**
+ * build columns blocks from sections containing the columns style
+ * @param {Element} main the main element
+ */
+export function buildAutoColumns(main) {
+  main.querySelectorAll('.section.columns').forEach((colSect) => {
+    const blockTable = [];
+    const row = [];
+    [...colSect.children].forEach((wrapper) => {
+      row.push({ elems: [...wrapper.children] });
+      wrapper.remove();
+    });
+    blockTable.push(row);
+    const block = buildBlock('columns', blockTable);
+
+    const variants = [...colSect.classList].filter((cls) => cls.startsWith('split-'));
+    block.classList.add(...variants);
+
+    colSect.classList.remove('columns');
+    colSect.classList.remove(...variants);
+
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    colSect.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
@@ -540,6 +568,7 @@ export async function decorateMain(main, isFragment = false) {
   decorateBlocks(main);
   decorateCardSections(main);
   buildAccordions(main);
+  buildAutoColumns(main);
 }
 
 /**
@@ -591,12 +620,16 @@ export const debounce = (func, timeout = 300) => {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
+  // init page lang
+  const validLangs = ['en', 'es', 'zh', 'vi', 'ko'];
   let lang = 'en';
   const pathSegments = window.location.pathname.split('/');
   if (pathSegments.length > 1 && !window.isErrorPage) {
     [, lang] = pathSegments;
   }
+  if (!validLangs.includes(lang)) lang = 'en';
   document.documentElement.lang = lang;
+
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
@@ -639,6 +672,26 @@ export function getLocalePlaceholders() {
   return window.placeholders[document.documentElement.lang];
 }
 
+function updateTitleSuffix() {
+  const placeholders = getLocalePlaceholders();
+  if (placeholders.titleSuffix) {
+    const title = document.querySelector('head > title');
+
+    const originalTitle = createElement('meta', '', {
+      name: 'originalTitle',
+      content: title.textContent,
+    });
+    document.querySelector('head').append(originalTitle);
+  }
+  const title = getMetadata('og:title');
+  const ogTitle = document.querySelector('head > meta[property="og:title"]');
+  const twitterTitle = document.querySelector('head > meta[name="twitter:title"]');
+  const withSuffix = `${title.textContent} ${placeholders.titleSuffix}`;
+  document.querySelector('head > title').textContent = withSuffix;
+  ogTitle.content = withSuffix;
+  twitterTitle.content = withSuffix;
+}
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -646,6 +699,8 @@ export function getLocalePlaceholders() {
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
+  updateTitleSuffix();
+
   await loadBlocks(main);
 
   const { hash } = window.location;
