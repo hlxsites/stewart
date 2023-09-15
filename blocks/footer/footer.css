@@ -5,11 +5,11 @@
   background-color: var(--clr-black);
   font-size: var(--body-font-size-s);
   border-top: 1px solid #43464a;
+  color: var(--footer-text-color);
 }
 
 .footer p {
   margin: 0;
-  color: var(--footer-text-color);
   text-align: center;
 }
 

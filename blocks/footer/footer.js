@@ -1,4 +1,4 @@
-import { readBlockConfig } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, loadScript } from '../../scripts/lib-franklin.js';
 import {
   createElement,
   decorateIcons,
@@ -28,6 +28,27 @@ function createLinksList(ele) {
   });
 
   return list;
+}
+
+/**
+ * Load Bright edge links.
+ * can't be deferred til delayed because whole purpose of this is SEO, so we do it here
+ * since footer is lazy loaded, I'm optimistic this won't kill page speed.
+ */
+function loadBrightEdge() {
+  loadScript('https://cdn.bc0a.com/be_ixf_js_sdk.js', {
+    type: 'text/javascript',
+  }).then(() => {
+    if (window.BEJSSDK) {
+      const beSdkOpts = {
+        'api.endpoint': 'https://ixfd1-api.bc0a.com',
+        'sdk.account': 'f00000000186049',
+        'whitelist.parameter.list': 'ixf',
+      };
+      window.BEJSSDK.construct(beSdkOpts);
+      window.BEJSSDK.processCapsule();
+    }
+  });
 }
 
 /**
@@ -79,5 +100,7 @@ export default async function decorate(block) {
     footer.replaceChildren(firstColumn, secondColumn);
     decorateLinks(footer);
     block.append(footer);
+    block.prepend(createElement('div', { class: 'be-ix-link-block' }));
+    loadBrightEdge();
   }
 }
