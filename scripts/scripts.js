@@ -615,6 +615,15 @@ export const debounce = (func, timeout = 300) => {
   };
 };
 
+function updateTitleSuffix() {
+  const origTitle = document.title;
+  const suffix = getMetadata('title-suffix');
+  if (!document.title.includes('|') && suffix) {
+    const withsuffix = `${origTitle} | ${suffix}`;
+    document.title = withsuffix;
+  }
+}
+
 /**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
@@ -631,6 +640,9 @@ async function loadEager(doc) {
   document.documentElement.lang = lang;
 
   decorateTemplateAndTheme();
+
+  updateTitleSuffix();
+
   const main = doc.querySelector('main');
   if (main) {
     await decorateMain(main);
@@ -672,26 +684,6 @@ export function getLocalePlaceholders() {
   return window.placeholders[document.documentElement.lang];
 }
 
-function updateTitleSuffix() {
-  const placeholders = getLocalePlaceholders();
-  if (placeholders.titleSuffix) {
-    const title = document.querySelector('head > title');
-
-    const originalTitle = createElement('meta', '', {
-      name: 'originalTitle',
-      content: title.textContent,
-    });
-    document.querySelector('head').append(originalTitle);
-  }
-  const title = getMetadata('og:title');
-  const ogTitle = document.querySelector('head > meta[property="og:title"]');
-  const twitterTitle = document.querySelector('head > meta[name="twitter:title"]');
-  const withSuffix = `${title.textContent} ${placeholders.titleSuffix}`;
-  document.querySelector('head > title').textContent = withSuffix;
-  ogTitle.content = withSuffix;
-  twitterTitle.content = withSuffix;
-}
-
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -699,7 +691,6 @@ function updateTitleSuffix() {
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
-  updateTitleSuffix();
 
   await loadBlocks(main);
 
