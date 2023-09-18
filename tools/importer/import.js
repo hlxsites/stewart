@@ -843,7 +843,7 @@ const processFragments = (document, docPath) => {
           const styleValues = styleRow.querySelector(':scope > td:nth-child(2)');
           styleValues.textContent = `${styleValues.textContent}, ${sectionStylesToAdd}`;
         } else {
-          sectionMeta.insertAdjacentHTML(`<tr>
+          sectionMeta.insertAdjacentHTML('beforeend', `<tr>
             <td>Style</td>
             <td>${sectionStylesToAdd}</td>
           </tr>`);
