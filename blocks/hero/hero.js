@@ -1,24 +1,33 @@
+import { decorateBlock } from '../../scripts/lib-franklin.js';
+import { createElement } from '../../scripts/scripts.js';
+
+/**
+ * decorate the hero
+ * @param {Element} block the block
+ */
 export default function decorate(block) {
   const elementContainer = block.querySelector(':scope > div > div');
 
-  const heroWrapper = document.createElement('div');
-  if (elementContainer.querySelector('picture')) {
-    heroWrapper.append(elementContainer.querySelector('picture'));
-  }
-  if (elementContainer.querySelector('h1')) {
-    heroWrapper.append(elementContainer.querySelector('h1'));
-  }
-  if (elementContainer.querySelector('h2')) {
-    heroWrapper.append(elementContainer.querySelector('h2'));
-  }
-  if (elementContainer.querySelector('a')) {
-    const anchorWrapper = document.createElement('div');
-    anchorWrapper.classList.add('align-end');
-    anchorWrapper.append(elementContainer.querySelector('a'));
-    heroWrapper.append(anchorWrapper);
+  const heroWrapper = createElement('div', { class: 'hero-inner' });
+  const pic = elementContainer.querySelector('picture');
+  if (pic) {
+    const picParent = pic.parentElement;
+    pic.classList.add('hero-bg');
+    heroWrapper.append(pic);
+
+    // prevent left behind empty p tag
+    if (picParent.tagName === 'P') {
+      picParent.remove();
+    }
   }
 
-  block.append(heroWrapper);
+  [...elementContainer.children].forEach((child) => {
+    heroWrapper.append(child);
+    if (child.tagName === 'DIV' && child.className !== '') {
+      decorateBlock(child);
+    }
+  });
 
   elementContainer.parentElement.remove();
+  block.append(heroWrapper);
 }

@@ -69,10 +69,32 @@ function fetchTaxonomy() {
   return taxonomyPromise;
 }
 
+const getDeepNestedObject = (obj, filter) => Object.entries(obj)
+  .reduce((acc, [key, value]) => {
+    let result = [];
+    if (key === filter) {
+      result = acc.concat(value);
+    } else if (typeof value === 'object') {
+      result = acc.concat(getDeepNestedObject(value, filter));
+    } else {
+      result = acc;
+    }
+    return result;
+  }, []);
+
 /**
  * Get the taxonomy a a hierarchical json object
  * @returns {Promise} the taxonomy
  */
-export default function getTaxonomy() {
+export function getTaxonomy() {
   return fetchTaxonomy();
 }
+
+/**
+ * Returns a taxonomy category as an array of objects
+ * @param {*} category
+ */
+export const getTaxonomyCategory = async (category) => {
+  const taxonomy = await getTaxonomy();
+  return getDeepNestedObject(taxonomy, category)[0];
+};

@@ -1,13 +1,15 @@
-import { readBlockConfig, fetchPlaceholders, loadScript } from '../../scripts/lib-franklin.js';
+import { readBlockConfig, loadScript } from '../../scripts/lib-franklin.js';
+import { getGlobalPlaceholders } from '../../scripts/scripts.js';
 
 /**
  * decorate the block
  * @param {Element} block the block
  */
 export default async function decorate(block) {
+  block.classList.add('form-wrapper');
   const cfg = readBlockConfig(block);
 
-  const placeholders = await fetchPlaceholders();
+  const placeholders = getGlobalPlaceholders();
   const formId = cfg['form-id'];
   const { munchkinId } = placeholders;
   const redirectUrl = cfg.redirect || placeholders.formRedirect;
@@ -25,6 +27,18 @@ export default async function decorate(block) {
           formId,
           (form) => {
             if (form) {
+              const formElem = form.getFormElem()[0];
+              formElem.classList.remove('mktoForm');
+              const mktoFormRows = block.querySelectorAll('.mktoFormRow');
+              [...mktoFormRows].forEach((row) => {
+                row.classList.add('field-container', 'col-6');
+                const fields = row.querySelectorAll('.mktoFormCol');
+                const fieldCount = [...fields].length;
+                [...fields].forEach((field) => {
+                  field.classList.add('form-field', `col-${6 / fieldCount}`);
+                });
+              });
+
               form.onSuccess(() => {
                 window.dataLayer = window.dataLayer || [];
                 window.dataLayer.push({

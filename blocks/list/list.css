@@ -1,3 +1,4 @@
+/* stylelint-disable selector-class-pattern */
 .list-container ul {
   list-style: none;
   margin: 0;
@@ -12,7 +13,6 @@
 }
 
 .list-container ul .list-item a {
-  color: var(--clr-teal);
   text-decoration: none;
   background-color: transparent;
 }
@@ -23,11 +23,14 @@
   align-items: center;
 }
 
+.list-container .list.three-column ul .list-item .list-inner-wrapper {
+  flex-direction: column;
+  text-align: center;
+}
+
 .list-container ul .list-item .fa-icon {
   display: inline-block;
   border-radius: 100%;
-  background-color: var(--clr-teal);
-  color: var(--clr-white);
   font-size: 1.25rem;
   width: 2.5rem;
   height: 2.5rem;
@@ -38,12 +41,23 @@
   margin-inline-end: 1rem;
 }
 
+.list-container:not(.teal) ul .list-item .fa-icon {
+  background-color: var(--clr-teal);
+  color: var(--clr-white);
+}
+
+.list-container.teal ul .list-item .fa-icon {
+  background-color: unset;
+  color: var(--clr-white);
+}
+
+
 .list-container ul .list-item .link-text {
   font-weight: 600;
 }
 
 .list-container ul .list-item .text-wrapper strong {
-  font-size: 1rem;
+  font-size: var(--body-font-size-m);
   line-height: 1.25rem;
   letter-spacing: 0.01rem;
   margin-bottom: 0.5rem;
@@ -60,19 +74,11 @@
 
 .list-container .default-content-wrapper h2 {
   text-align: center;
-  margin-bottom: 2rem;
 }
 
 .list-container.card-wrapper .default-content-wrapper h2 {
   text-align: left;
   margin-bottom: 0.5rem;
-}
-
-.list-container .default-content-wrapper h3 {
-  margin-bottom: 2rem;
-  font-size: var(--body-font-size-l);
-  line-height: 1.375rem;
-  letter-spacing: 0.0113rem;
 }
 
 .list-container .default-content-wrapper p {
@@ -98,18 +104,31 @@
   color: var(--clr-primary);
 }
 
+.section:not(.teal) ul .list-item a {
+  color: var(--clr-teal);
+}
+
 /* Style the default content which is ouside of List block - END */
 
 .list-container ul .list-item .text-wrapper h4,
 .list-container ul .list-item .text-wrapper p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--body-font-size-xs);
   line-height: 1.125rem;
   letter-spacing: 0.0138rem;
 }
 
+.list-container .one-column ul .list-item:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
 @media (min-width: 600px) {
-  .list-container ul {
+  .list-container .list.three-column ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .list-container .list:not(.one-column,.three-column) ul {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -118,12 +137,14 @@
     padding-bottom: 1rem;
   }
 
-  .list-container ul .list-item:nth-child(odd) {
+  .list-container .list:not(.one-column,.three-column) .list-item:nth-child(2n+1),
+  .list-container .list.three-column .list-item:not(:nth-child(3n)) {
     padding-inline-end: 2.5rem;
     border-inline-end: .0625rem solid var(--clr-gray-dark);
   }
 
-  .list-container ul .list-item:nth-child(2n) {
+  .list-container .list:not(.one-column,.three-column) .list-item:nth-child(2n),
+  .list-container .list.three-column .list-item:not(:nth-child(3n+1)) {
     padding-inline-start: 2.5rem;
   }
 }
@@ -144,12 +165,12 @@
     flex: 0 0 6rem;
   }
 
-  .list-container ul .list-item .link-text {
+  .list-container .list:not(.three-column) .list-item .link-text {
     padding-inline-start: 2.5rem;
   }
 
   .list-container ul .list-item .text-wrapper strong {
-    font-size: 1.625rem;
+    font-size: var(--body-font-size-xxl);
     line-height: 2.375rem;
     letter-spacing: 0.0163rem;
     margin-bottom: 0;
@@ -163,14 +184,6 @@
   }
 
   /* Style the default content whihc is ouside of List block - START */
-
-  .list-container .default-content-wrapper h2 {
-    margin-bottom: 4rem;
-  }
-  
-  .list-container .default-content-wrapper h3 {
-    margin-bottom: 4rem;
-  }
 
   .list-container .default-content-wrapper p {
     margin-bottom: 3.5rem;
@@ -189,7 +202,12 @@
 
   .list-container ul .list-item .text-wrapper h4,
   .list-container ul .list-item .text-wrapper p {
-    font-size: 1.375rem;
+    font-size: var(--body-font-size-xl);
     line-height: 2rem;
+  }
+
+  .list-container .list.three-column .list-item .text-wrapper p,
+  .list-container .list.three-column .list-item .text-wrapper strong {
+    font-size: var(--body-font-size-l);
   }
 }

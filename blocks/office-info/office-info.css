@@ -1,0 +1,227 @@
+main .office-info-container {
+    padding-inline: 0;
+    margin-bottom: 0;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(0deg,var(--clr-black) .17%,var(--clr-gray-medium) 80.24%,var(--clr-gray-dark) 116.63%);
+    color: var(--clr-white);
+}
+
+main .office-info-container .office-info-wrapper {
+    max-width:none;
+}
+
+main .office-info {
+    color: var(--clr-white);
+}
+
+main .office-info h2::before {
+    display: block;
+    font-family: var(--icon-font-family);
+    font-weight: 300;
+    content: "\f1ad";
+    color: var(--clr-teal-light);
+    margin-bottom: .5rem;
+}
+
+main .office-info h2 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+main .office-info address {
+    font-style: normal;
+}
+
+main .office-info .postal-address .street-address, h4 {
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.4375rem;
+    letter-spacing: .0106rem;
+    margin: 0;
+}
+
+main .office-info .postal-address {
+    margin-bottom: 1.5rem;
+}
+
+main .office-info .telephone-numbers {
+    text-align: right;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    letter-spacing: .01rem;
+}
+
+main .office-info .telephone-numbers>div {
+    margin-bottom: 1rem;
+}
+
+main .office-info .hours-of-operation {
+    margin-bottom: 3rem;
+}
+
+main .office-info .hours-of-operation h4 {
+    margin: 0;
+}
+
+main .office-info .additional-info {
+    border-top: 1px solid var(--clr-gray);
+    padding-top: 3rem;
+}
+
+main .office-info .additional-info .row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+main .office-info .align-items-center {
+    align-items: center!important;
+}
+
+main .office-info .align-items-center div{
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+main .office-info .hours-of-operation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+main .office-info .additional-info .btn-secondary {
+    margin-top: 3rem;
+    width: 100%;
+    background-color: transparent;
+    color: var(--clr-white);
+    border: 3px solid;
+    display: block;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+main .office-info .additional-info .btn-secondary:hover {
+    text-decoration: none;
+}
+
+main .office-info .map-link::before {
+    font-family: var(--icon-font-family);
+    font-weight: 300;
+    content: "\f3c5";
+    color: var(--clr-teal-light);
+    margin-right: .5rem;
+}
+
+main .office-info .map-link a {
+    text-decoration: underline;
+    color: var(--clr-white);
+}
+
+main .office-info .address-info .map-link {
+    grid-column: 3;
+    grid-row: 2;
+    text-align: right;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    letter-spacing: .01rem;
+}
+
+@media (min-width: 900px) {
+    main .office-info h2::before {
+        margin-bottom: 0;
+        margin-right: 1rem;
+        position: absolute;
+        transform: translateX(-5pc);
+    }
+
+    main .office-info .address-info .map-link {
+        font-size: 1.625rem;
+        line-height: 2.375rem;
+        letter-spacing: .0162rem;
+    }
+
+    main .office-info .additional-info .btn-secondary {
+        margin-top: 0;
+        font-size: 1.5rem;
+        line-height: 1.13;
+        letter-spacing: .0143rem;
+        min-width: 280px;
+        padding: 1rem;
+    }
+
+    main .office-info .additional-info .row {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    main .office-info .additional-info {
+        padding-top: 3.5rem;
+    }
+
+    main .office-info .hours-of-operation, main .office-info .address-info .map-link, main .office-info .postal-address {
+        margin-bottom: 3.5rem;
+    }
+
+    main .office-info .postal-address .street-address, h4 {
+        font-size: 2rem;
+        line-height: 2.625rem;
+        letter-spacing: .02rem;
+        margin-bottom: 2rem;
+    }
+
+    main .office-info .address-information {
+        max-width: 78rem;
+        margin: 0 auto;
+    }
+
+    main .office-info {
+        padding: 4.5rem 7.5rem;
+    }
+
+    main .office-info h2 {
+        margin-bottom: 3.5rem;
+        text-align: left;
+    }
+
+    main .office-info .telephone-numbers {
+        font-size: 1.625rem;
+        line-height: 2.375rem;
+        letter-spacing: .0162rem;
+    }
+
+    main .office-info h4 {
+        margin: 0;
+    }
+}
+
+@media (min-width: 600px) {
+    main .office-info .address-info .hours-of-operation {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    main .office-info .address-info .telephone-numbers {
+        grid-column: 3;
+        grid-row: 1;
+        text-align: right;
+    }
+
+    main .office-info .address-info {
+        display: grid;
+        grid-template-columns: 1fr 56px 1fr;
+    }
+
+    main .office-info .address-info .postal-address {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    main .office-info .additional-info .left {
+        flex: 0 0 66.6666%;
+        max-width: 66.6666%;
+    }
+
+    main .office-info .additional-info .right {
+        flex: 0 0 33.3333%;
+        max-width: 33.3333%;
+    }
+}

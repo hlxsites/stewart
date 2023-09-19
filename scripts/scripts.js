@@ -13,6 +13,7 @@ import {
   loadCSS,
   toClassName,
   getMetadata,
+  fetchPlaceholders,
 } from './lib-franklin.js';
 
 // valid template for which we have css/js files
@@ -20,9 +21,10 @@ const VALID_TEMPLATES = [
   'section-landing-page',
   'section-page',
   'blog-article-page',
+  'landing-page',
 ];
 const PRODUCTION_DOMAINS = ['www.stewart.com'];
-const LCP_BLOCKS = ['hero']; // add your LCP blocks to the list
+const LCP_BLOCKS = ['hero', 'alert']; // add your LCP blocks to the list
 
 /**
  * create an element.
@@ -86,6 +88,34 @@ export async function decorateIcons(element) {
 }
 
 /**
+ * build columns blocks from sections containing the columns style
+ * @param {Element} main the main element
+ */
+export function buildAutoColumns(main) {
+  main.querySelectorAll('.section.columns').forEach((colSect) => {
+    const blockTable = [];
+    const row = [];
+    [...colSect.children].forEach((wrapper) => {
+      row.push({ elems: [...wrapper.children] });
+      wrapper.remove();
+    });
+    blockTable.push(row);
+    const block = buildBlock('columns', blockTable);
+
+    const variants = [...colSect.classList].filter((cls) => cls.startsWith('split-'));
+    block.classList.add(...variants);
+
+    colSect.classList.remove('columns');
+    colSect.classList.remove(...variants);
+
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    colSect.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
@@ -96,43 +126,59 @@ export function buildHeroBlock(main) {
   }
 
   const section = h1.closest('div');
+
   const picture = section.querySelector('picture');
   if (!picture) {
     return;
   }
 
   const elems = [...section.children];
-  const filtered = elems.filter((el) => !el.classList.contains('section-metadata'));
+  const filtered = elems.filter((el) => !el.classList.contains('section-metadata') && !el.classList.contains('alert'));
   const block = buildBlock('hero', { elems: filtered });
   section.append(block);
-  main.prepend(section);
 }
 
-export function buildEmbedBlocks(main) {
-  // For every youtube link, convert to an embed block
-  main.querySelectorAll('a[href*="youtube.com/embed"]').forEach((a) => {
-    // Get picture if it exists and move it to the block
-    const picture = a.closest('div').querySelector('picture');
-    const block = buildBlock('embed', { elems: picture ? [picture, a.cloneNode()] : [a.cloneNode()] });
-    a.replaceWith(block);
-    decorateBlock(block);
-  });
+export function buildEmbed(link) {
+  const elems = [link.cloneNode(true)];
+  const block = buildBlock('embed', { elems });
+  link.replaceWith(block);
+  decorateBlock(block);
 }
 
-export function buildFragmentBlocks(main) {
+export function buildFragment(link) {
+  const block = buildBlock('fragment', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildForm(link) {
+  const block = buildBlock('form', link.cloneNode(true));
+  link.replaceWith(block);
+  decorateBlock(block);
+}
+
+export function buildLinkAutoBlocks(main) {
   const hosts = ['localhost', 'hlx.page', 'hlx.live', ...PRODUCTION_DOMAINS];
-  // links to /fragments/* become fragment blocks
-  main.querySelectorAll('a[href*="/fragments/"]').forEach((a) => {
-    if (a.href) {
-      const url = new URL(a.href);
+  main.querySelectorAll('a[href]').forEach((a) => {
+    const url = new URL(a.href);
+    const hostMatch = hosts.some((host) => url.hostname.includes(host));
+    let autoBlocked = false;
+    if (hostMatch && url.pathname.includes('/fragments/') && a.textContent.includes(url.pathname)) {
+      buildFragment(a);
+      autoBlocked = true;
+    } else if (hostMatch
+      && url.pathname.includes('/forms/') && url.pathname.endsWith('.json')
+      && a.textContent.includes(url.pathname)) {
+      buildForm(a);
+      autoBlocked = true;
+    } else if (url.hostname.includes('youtube.com') && url.pathname.startsWith('/embed')) {
+      buildEmbed(a);
+      autoBlocked = true;
+    }
 
-      // for safety, we do a host match, and make sure the text content matches the path
-      const hostMatch = hosts.some((host) => url.hostname.includes(host));
-      if (hostMatch && a.textContent.includes(url.pathname)) {
-        const block = buildBlock('fragment', a.cloneNode(true));
-        a.replaceWith(block);
-        decorateBlock(block);
-      }
+    if (autoBlocked) {
+      const buttonContainer = a.closest('.button-container');
+      if (buttonContainer) buttonContainer.classList.remove('button-container');
     }
   });
 }
@@ -143,8 +189,7 @@ export function buildFragmentBlocks(main) {
  */
 export function buildAutoBlocks(main) {
   buildHeroBlock(main);
-  buildEmbedBlocks(main);
-  buildFragmentBlocks(main);
+  buildLinkAutoBlocks(main);
 }
 
 export function decorateLinks(element) {
@@ -153,14 +198,16 @@ export function decorateLinks(element) {
     try {
       if (a.href) {
         const url = new URL(a.href);
+        // protect against maito: links or other weirdness
+        if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
 
-        // local links are relative
-        // non local and non email links open in a new tab
         const hostMatch = hosts.some((host) => url.hostname.includes(host));
-
         if (hostMatch) {
+          // local links are rewritten to be relative
           a.href = `${url.pathname.replace('.html', '')}${url.search}${url.hash}`;
-        } else {
+        } else if (!url.hostname.includes('.stewart.com')) {
+          // non local open in a new tab
+          // but if a different stewart.com sub-domain, leave absolute, don't open in a new tab
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
         }
@@ -178,6 +225,7 @@ export function decorateLinks(element) {
  * @param {Element} container The container element
  */
 export function wrapImgsInLinks(container) {
+  const ignorePatterns = ['/fragments/', '/forms/'];
   const pictures = container.querySelectorAll('picture');
   pictures.forEach((pic) => {
     // need to deal with 2 use cases here
@@ -187,6 +235,9 @@ export function wrapImgsInLinks(container) {
       && pic.nextElementSibling.nextElementSibling && pic.nextElementSibling.nextElementSibling.tagName === 'A') {
       const link = pic.nextElementSibling.nextElementSibling;
       if (link.textContent.includes(link.getAttribute('href'))) {
+        if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+          return;
+        }
         pic.nextElementSibling.remove();
         link.innerHTML = pic.outerHTML;
         pic.replaceWith(link);
@@ -195,29 +246,27 @@ export function wrapImgsInLinks(container) {
     }
 
     const parent = pic.parentNode;
-    if (parent.tagName !== 'P' || !parent.nextElementSibling || parent.nextElementSibling.tagName !== 'P') {
+    if (!parent.nextElementSibling) {
       // eslint-disable-next-line no-console
       console.warn('no next element');
       return;
     }
-    const link = parent.nextElementSibling.querySelector('a');
+    const nextSibling = parent.nextElementSibling;
+    if (parent.tagName !== 'P' || nextSibling.tagName !== 'P' || nextSibling.children.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('next element not viable link container');
+      return;
+    }
+    const link = nextSibling.querySelector('a');
     if (link && link.textContent.includes(link.getAttribute('href'))) {
+      if (ignorePatterns.some((pattern) => link.getAttribute('href').includes(pattern))) {
+        return;
+      }
       link.parentElement.remove();
       link.innerHTML = pic.outerHTML;
       pic.replaceWith(link);
     }
   });
-}
-
-/**
- * fetches the navigation markup
- */
-export async function fetchNavigationHTML() {
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta).pathname : '/nav';
-
-  const response = await fetch(`${navPath}.plain.html`);
-  return response.text();
 }
 
 /**
@@ -277,6 +326,54 @@ function decorateSectionBackgroundImages(main) {
 }
 
 /**
+ * Builds accordion blocks from default content
+ * @param {Element} main The container element
+ */
+function buildAccordions(main) {
+  const accordionSectionContainers = main.querySelectorAll('.section.accordion');
+  accordionSectionContainers.forEach((accordion) => {
+    const contentWrappers = accordion.querySelectorAll(':scope > div');
+    const blockTable = [];
+    let row;
+    contentWrappers.forEach((wrapper) => {
+      let removeWrapper = true;
+      [...wrapper.children].forEach((child) => {
+        if (child.nodeName === 'H2') {
+          if (row) {
+            blockTable.push(row);
+          }
+
+          row = [{ elems: [] }, { elems: [] }];
+          row[0].elems.push(child);
+        }
+
+        if (!row) {
+          // if there is content in the section before the first h2
+          // then that content is preserved
+          // otherwise, we remove the wrapper
+          removeWrapper = false;
+        }
+        if (row && child.nodeName !== 'H2') {
+          row[1].elems.push(child);
+        }
+      });
+      if (removeWrapper) wrapper.remove();
+    });
+
+    // add last row
+    if (row) {
+      blockTable.push(row);
+    }
+
+    const block = buildBlock('accordion', blockTable);
+    const wrapper = createElement('div');
+    wrapper.append(block);
+    accordion.append(wrapper);
+    decorateBlock(block);
+  });
+}
+
+/**
  * perform additional section class decoration
  * @param {Element} main the container element
  */
@@ -300,16 +397,46 @@ function decorateSectionsExt(main) {
     // and the next one does not, then the section gets no bottom margin
     let nextSection;
     if (i <= (allSections.length - 1)) nextSection = allSections[i + 1];
+    const thisHasBg = section.querySelector('.hero') || [...section.classList].some((cls) => bgClasses.includes(cls));
     if (nextSection) {
       const nextHasBg = [...nextSection.classList].some((cls) => bgClasses.includes(cls));
-      const thisHasBg = [...section.classList].some((cls) => bgClasses.includes(cls));
       if (thisHasBg && nextHasBg) {
         section.classList.add('no-margin');
       }
-    } else {
+    } else if (thisHasBg) {
       section.classList.add('no-margin');
     }
   }
+}
+
+function isLinkOutsideParagraph(link) {
+  const parent = link.parentElement;
+
+  if (parent.tagName === 'LI') {
+    return false;
+  }
+
+  // Check for siblings which would indicate this link is in other text.
+  const siblings = [...parent.childNodes].filter((node) => {
+    if (link === node) return false; // The link itself is not a sibling
+    if (node.nodeType === Node.TEXT_NODE) {
+      // If a sibling is a text that is more than whitespace, then this link is inside other text.
+      return node.textContent.trim().length > 0;
+    }
+    if (node.nodeType === Node.ELEMENT_NODE && getComputedStyle(node).display !== 'block') {
+      // If a sibling is an inline element, then this link is inside other text.
+      return false;
+    }
+    return true;
+  });
+  // Recurse up one level if the link should be a secondary or tertiary button.
+  if (parent.tagName === 'STRONG' || parent.tagName === 'EM') {
+    return siblings.length === 0 && (
+      parent.parentElement.childNodes.size === 0
+      || isLinkOutsideParagraph(parent));
+  }
+
+  return siblings.length === 0;
 }
 
 /**
@@ -319,25 +446,18 @@ function decorateSectionsExt(main) {
 export function decorateButtons(element) {
   element.querySelectorAll('a').forEach((a) => {
     a.title = a.title || a.textContent;
-    if (a.href !== a.textContent) {
-      if (!a.querySelector('img')) {
-        const up = a.parentElement;
-        if (up.childNodes.length === 1 && (up.tagName === 'P' || up.tagName === 'DIV')) {
-          a.className = 'button primary'; // default
-          up.classList.add('button-container');
-        }
-
-        const twoup = a.parentElement.parentElement;
-        if (up.childNodes.length === 1 && up.tagName === 'STRONG'
-          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
-          a.className = 'button tertiary';
-          twoup.classList.add('button-container');
-        }
-        if (up.childNodes.length === 1 && up.tagName === 'EM'
-          && twoup.childNodes.length === 1 && (twoup.tagName === 'P' || twoup.tagName === 'DIV')) {
-          a.className = 'button secondary';
-          twoup.classList.add('button-container');
-        }
+    if (a.href !== a.textContent && !a.querySelector('img') && isLinkOutsideParagraph(a)) {
+      const up = a.parentElement;
+      const twoup = up.parentElement;
+      if (up.tagName === 'STRONG') {
+        a.className = 'button tertiary';
+        twoup.classList.add('button-container');
+      } else if (up.tagName === 'EM') {
+        a.className = 'button secondary';
+        twoup.classList.add('button-container');
+      } else if (up) {
+        a.className = 'button primary'; // default
+        up.classList.add('button-container');
       }
     }
   });
@@ -386,6 +506,34 @@ async function loadTemplate(templateName) {
   return null;
 }
 
+const decorateCardSections = (main) => {
+  const template = getMetadata('template');
+  const isLanding = toClassName(template) === 'landing-page';
+  main.querySelectorAll('.section.card').forEach((cardSect) => {
+    const newWrapper = createElement('div');
+    const contentWrappers = cardSect.querySelectorAll(':scope > div');
+    contentWrappers.forEach((wrapper) => {
+      if (!(isLanding && wrapper.classList.contains('footer-wrapper'))) {
+        newWrapper.append(wrapper);
+      }
+    });
+    const block = buildBlock('card', [[newWrapper]]);
+    cardSect.prepend(block);
+    decorateBlock(block);
+    cardSect.classList.remove('card');
+
+    if (isLanding) {
+      // find logo image and lift it out of card
+      const cardLogo = block.querySelector('.default-content-wrapper .bg-image + p > picture');
+      if (cardLogo) {
+        const logoWrapper = createElement('div', { class: 'default-content-wrapper' });
+        logoWrapper.append(cardLogo.parentElement);
+        block.insertAdjacentElement('beforebegin', logoWrapper);
+      }
+    }
+  });
+};
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -418,6 +566,62 @@ export async function decorateMain(main, isFragment = false) {
   decorateSections(main);
   decorateSectionsExt(main);
   decorateBlocks(main);
+  decorateCardSections(main);
+  buildAccordions(main);
+  buildAutoColumns(main);
+}
+
+/**
+ * load fonts.css and set a session storage flag
+ */
+async function loadFonts() {
+  await loadCSS(`${window.hlx.codeBasePath}/fonts/fonts.css`);
+  try {
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+  } catch (e) {
+    // do nothing
+  }
+}
+
+/**
+ * Adds a parameter to the URL.
+ * @param {String} key
+ * @param {String} value
+ */
+export function addQueryParamToURL(key, value) {
+  const url = new URL(window.location.href);
+  url.searchParams.set(key, value);
+  window.history.pushState({}, '', url.toString());
+}
+
+/**
+ * Gets a query param from the URL.
+ * @param {String} key
+ * @returns {String} the value of the query parameter
+ */
+export function getQueryParamFromURL(key) {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(key) || '';
+}
+
+/**
+ * Generic debounce function
+ */
+export const debounce = (func, timeout = 300) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+};
+
+function updateTitleSuffix() {
+  const origTitle = document.title;
+  const suffix = getMetadata('title-suffix');
+  if (!document.title.includes('|') && suffix) {
+    const withsuffix = `${origTitle} | ${suffix}`;
+    document.title = withsuffix;
+  }
 }
 
 /**
@@ -425,14 +629,59 @@ export async function decorateMain(main, isFragment = false) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // init page lang
+  const validLangs = ['en', 'es', 'zh', 'vi', 'ko'];
+  let lang = 'en';
+  const pathSegments = window.location.pathname.split('/');
+  if (pathSegments.length > 1 && !window.isErrorPage) {
+    [, lang] = pathSegments;
+  }
+  if (!validLangs.includes(lang)) lang = 'en';
+  document.documentElement.lang = lang;
+
   decorateTemplateAndTheme();
+
+  updateTitleSuffix();
+
   const main = doc.querySelector('main');
   if (main) {
     await decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
+
+  try {
+    /* if fonts already loaded, load fonts.css */
+    if (sessionStorage.getItem('fonts-loaded')) {
+      await loadFonts();
+    }
+  } catch (e) {
+    // do nothing
+  }
+}
+
+/**
+ * @returns the global placeholders from the window object.
+ */
+export function getGlobalPlaceholders() {
+  if (!window.placeholders || !window.placeholders.default) {
+    console.error('global placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
+  }
+
+  return window.placeholders.default;
+}
+
+/**
+ * @returns the locale specific placeholders from the window object.
+ */
+export function getLocalePlaceholders() {
+  if (!window.placeholders || !window.placeholders[document.documentElement.lang]) {
+    console.error('locale placeholders not initialized yet.'); // eslint-disable-line no-console
+    return {};
+  }
+
+  return window.placeholders[document.documentElement.lang];
 }
 
 /**
@@ -441,16 +690,28 @@ async function loadEager(doc) {
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  await Promise.all([fetchPlaceholders(), fetchPlaceholders(document.documentElement.lang)]);
+
   await loadBlocks(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadHeader(doc.querySelector('header'));
-  loadFooter(doc.querySelector('footer'));
+  const template = getMetadata('template');
+  if (toClassName(template) === 'landing-page') {
+    // landing pages get no header or footer
+    // this isn't autoblocking in main, so need to do this here
+    doc.querySelector('header').remove();
+    doc.querySelector('footer').remove();
+  } else {
+    loadHeader(doc.querySelector('header'));
+    loadFooter(doc.querySelector('footer'));
+  }
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  await loadFonts();
+
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));

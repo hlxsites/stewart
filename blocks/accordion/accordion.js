@@ -19,11 +19,14 @@ export default function decorate(block) {
   [...block.children].forEach((accordionItem, accordionItemIndex) => {
     accordionItem.classList.add(classNames.accordionItem);
     const { children } = accordionItem;
+    // if (accordionStandardBlock) {
+    // Removing header wrapper only for regular accordion block
     const headerDiv = children[0];
-    headerDiv.outerHTML = headerDiv.innerHTML;
+    const header = headerDiv.querySelector('h3, h2');
+    headerDiv.replaceWith(...headerDiv.children);
 
-    const header = accordionItem.querySelector('h3');
     const headerText = header.textContent;
+    header.classList.add('accordion-item-heading');
     header.innerHTML = '';
 
     const button = createElement('button', {
@@ -39,8 +42,8 @@ export default function decorate(block) {
     panel.classList.add(classNames.accordionPanel);
     panel.setAttribute('id', `accordion-panel-${block.dataset.accordionIndex}-${accordionItemIndex}`);
     panel.setAttribute('role', 'region');
+    panel.setAttribute('aria-hidden', 'true');
     panel.setAttribute('aria-labelledby', `accordion-${block.dataset.accordionIndex}-${accordionItemIndex}`);
-    panel.setAttribute('hidden', '');
   });
 
   const accordionTriggers = block.querySelectorAll(`.${classNames.accordionItemTrigger}`);
@@ -51,7 +54,8 @@ export default function decorate(block) {
       const panel = trigger.parentElement.nextElementSibling;
       const isExpanded = trigger.getAttribute('aria-expanded') === 'true' || false;
       trigger.setAttribute('aria-expanded', !isExpanded);
-      panel.hidden = isExpanded;
+      panel.classList.toggle(classNames.accordionItemActive);
+      panel.setAttribute('aria-hidden', isExpanded);
     });
   });
 }

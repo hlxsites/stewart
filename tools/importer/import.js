@@ -1,5 +1,5 @@
 /* global WebImporter */
-/* eslint-disable no-unused-expressions, max-len, no-unused-vars, newline-per-chained-call, no-restricted-syntax, no-console, class-methods-use-this */
+/* eslint-disable newline-per-chained-call, no-restricted-syntax, no-console */
 /*
  * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -11,98 +11,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-
-class BlockBuilder {
-  constructor(document, pageMetadata = {}) {
-    this.doc = document;
-    this.root = document.createElement('div');
-    this.pageMetadata = pageMetadata;
-  }
-
-  jumpTo(e) {
-    this.current = e;
-    return this;
-  }
-
-  up() { return this.jumpTo(this.current?.parentElement); }
-
-  upToTag(tag) {
-    const cur = this.current;
-    while (this.current && this.current?.tagName !== tag.toUpperCase()) this.up();
-    return this.jumpTo(this.current || cur);
-  }
-
-  append(e) { return (this.current ? this.current.append(e) : this.root.append(e), this); }
-
-  replace(e, f) {
-    if (!e) { return; }
-    const old = this.current;
-    const oldRoot = this.root;
-    this.root = this.doc.createElement('div');
-    this.jumpTo(this.root);
-    f();
-    e.parentElement.replaceChild(this.root, e);
-    this.root = oldRoot;
-    this.jumpTo(old);
-  }
-
-  replaceChildren(parent) { return (this.#writeSectionMeta().metaBlock('Metadata', this.pageMetadata), parent.replaceChildren(...this.root.children)); }
-
-  element(tag, attrs = {}) {
-    const e = this.doc.createElement(tag);
-    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-    return this.append(e).jumpTo(e);
-  }
-
-  text(text) { return this.append(this.doc.createTextNode(text)); }
-
-  withText(text) { return this.text(text).up(); }
-
-  section(meta = {}) { return (this.root.children.length ? this.#writeSectionMeta().jumpTo(undefined).element('hr').up() : this).withSectionMetadata(meta); }
-
-  withSectionMetadata(meta) {
-    this.sectionMeta = meta;
-    return this;
-  }
-
-  addSectionMetadata(key, value) {
-    (this.sectionMeta = this.sectionMeta || {})[key] = value;
-    return this;
-  }
-
-  block(name, colspan = 2, createRow = true) {
-    const tableAttrs = {
-    };
-    const variantIndex = name.indexOf('(');
-    if (variantIndex > -1) {
-      // block name has variants, so
-      // eslint-disable-next-line prefer-destructuring
-      tableAttrs['data-block'] = name.slice(0, variantIndex - 1);
-      // eslint-disable-next-line prefer-destructuring
-      tableAttrs['data-block-variants'] = name.slice(variantIndex + 1, -1);
-    } else {
-      tableAttrs['data-block'] = name;
-    }
-    return (this.endBlock().element('table', tableAttrs).element('tr').element('th', { colspan }).text(name), createRow ? this.row() : this);
-  }
-
-  row(attrs = {}) { return this.upToTag('table').element('tr').element('td', attrs); }
-
-  column(attrs = {}) { return this.upToTag('tr').element('td', attrs); }
-
-  endBlock() { return this.jumpTo(undefined); }
-
-  metaBlock(name, meta) {
-    if (meta && Object.entries(meta).length > 0) {
-      this.block(name, 2, false);
-      for (const [k, v] of Object.entries(meta)) (v && v.children) ? this.row().text(k).column().append(v) : this.row().text(k).column().text(v);
-      this.endBlock();
-    }
-    return this;
-  }
-
-  #writeSectionMeta() { return this.metaBlock('Section Metadata', this.sectionMeta).withSectionMetadata(undefined); }
-}
+import BlockBuilder from './BlockBuilder.js';
 
 const capitalizeWord = (word) => `${word[0].toUpperCase()}${word.slice(1)}`;
 
@@ -151,6 +60,8 @@ const translateTemplateName = (templateName) => {
     case 'market-landing-page': return 'Market Landing Page';
     case 'primary-site-section-landing-page': return 'Section Landing Page';
     case 'landing-page-template': return 'Landing Page';
+    case 'state-template': return 'State Landing Page';
+    case 'office-details-page': return 'Office Details Page';
     case 'primary-site-subsection-landing-page':
     case 'detail-content-page':
       return 'Section Page';
@@ -178,6 +89,13 @@ const extractMetadata = (document, url) => {
         const templateName = translateTemplateName(val);
         if (templateName) {
           metadata.Template = templateName;
+        }
+      } else if (prop === 'og:title') {
+        if (val.includes('|')) {
+          const titles = val.split('|');
+          metadata.Title = titles[0].trim();
+        } else {
+          metadata.Title = val;
         }
       } else {
         let propName = prop.replaceAll('og:', '');
@@ -223,6 +141,10 @@ const buildPersonDetailCards = (builder, section) => {
   section.querySelectorAll('.cmp-container#person-detail-card').forEach((card) => {
     const content = card.querySelector('.contentcontainer');
     const image = card.querySelector('.cmp-imageattributeprojection img');
+    const jobTitle = content.querySelector('[property="jobTitle"]');
+    if (jobTitle) {
+      jobTitle.parentElement.innerHTML = `<h4 class='title'>${jobTitle.innerHTML.replace(/<br(.*?)[/]?>/gi, "</h4><h4 class='title'>")}</h4>`;
+    }
     builder.replace(card, () => {
       builder.block('Person Detail Card', 2, true).append(image).column().append(content);
     });
@@ -232,6 +154,11 @@ const buildPersonDetailCards = (builder, section) => {
 const buildEmbed = (builder, section) => {
   // Find any embeds and convert as needed, for now youtube links
   section.querySelectorAll('.embed').forEach((embed) => {
+    // Remove empty embeds
+    if (embed.childNodes.length === 0 || (embed.childNodes.length === 1 && embed.childNodes[0].nodeName === '#text')) {
+      embed.remove();
+      return;
+    }
     builder.replace(embed, () => {
       const src = embed.querySelector('iframe')?.getAttribute('src');
       if (src) {
@@ -275,19 +202,47 @@ const buildSearchResults = (builder, section) => {
       builder.block('Search Results', 1, false);
     });
   });
+
+  // office search results
+  section.querySelectorAll('.search-results [data-component="search-results"]').forEach((sr) => {
+    builder.replace(sr, () => {
+      builder.block('Locator Results (Office)', 2, true).append('Source').column().append('Market');
+    });
+  });
 };
 
 const buildOfficeInfos = (builder, section) => {
   section.querySelectorAll('.cmp-officeinformation').forEach((office) => {
     builder.replace(office, () => {
       // todo how do we get office id?
-      const address = office.querySelector('address');
-      builder.block('Office Info', 1, true).append(address);
+      const cityInfo = office.querySelector('.citystatezip').textContent.split(',');
+      const city = cityInfo[0];
+      const stateZip = cityInfo[1].trim().split(' ');
+      const state = stateZip[0];
+      const zip = stateZip[1];
+
+      builder.block('Office Info', 2, false)
+        .row().append('Name').column().append(office.querySelector('h2').textContent)
+        .row().append('Street Address').column().append(office.querySelector('.streetAddress'))
+        .row().append('Street Address 2').column().append(office.querySelector('.streetAddress2'))
+        .row().append('City').column().append(city)
+        .row().append('State').column().append(state)
+        .row().append('Zip').column().append(zip)
+        .row().append('Telephone').column().append(office.querySelector('[property="telephone"]')?.textContent?.replace('ph.', '') || '')
+        .row().append('Fax').column().append(office.querySelector('[property="faxNumber"]')?.textContent?.replace('fx.', '') || '')
+        .row().append('Hours').column().append(office.querySelector('.hoursOfOperation ul'))
+        .row().append('Website Link').column().append(office.querySelector('.additionalInfo a'));
     });
   });
 };
 
 const buildForms = (builder, section) => {
+  section.querySelectorAll('.title-order-form').forEach((toForm) => {
+    builder.replace(toForm, () => {
+      builder.block('Title Order Form', 1, false);
+    });
+  });
+
   section.querySelectorAll('.formcontainer').forEach((form) => {
     builder.replace(form, () => {
       builder.block('Form', 1, false);
@@ -322,12 +277,12 @@ const buildColumnsBlock = (builder, section) => {
     let inTable = false;
     // for each child of parent element, append if it is not a column
     for (const child of [...parentElement.children]) {
-      if (child.classList.contains('columnrow')) {
+      if (child.classList.contains('columnrow') || child.querySelector('.columnrow')) { // Few columns present inside container component
         // First make sure we don't try to render nested columns
         child.querySelectorAll('.cmp-columnrow__item .cmp-columnrow__item').forEach((nested) => nested.classList.remove('cmp-columnrow__item'));
         const cols = child.querySelectorAll('.cmp-columnrow__item');
         let newRow = true;
-        for (const col of [...cols]) {
+        for (const [index, col] of [...cols].entries()) {
           if (isHeading(col) || ((col.classList.contains('col-12') || col.querySelector('.col-12')) && newRow) || (cols.length === 1 && !inTable)) {
             if (inTable) {
               builder.jumpTo(undefined);
@@ -343,13 +298,13 @@ const buildColumnsBlock = (builder, section) => {
               }
 
               if (cols.length === 2) {
-                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8')) {
+                if (cols[0].classList.contains('col-md-8') || cols[0].classList.contains('col-lg-8') || cols[0].classList.contains('col-xl-8')) {
                   variants.add('Split 66-33');
-                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4')) {
+                } else if (cols[0].classList.contains('col-md-4') || cols[0].classList.contains('col-lg-4') || cols[0].classList.contains('col-xl-4')) {
                   variants.add('Split 33-66');
-                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9')) {
+                } else if (cols[0].classList.contains('col-md-9') || cols[0].classList.contains('col-lg-9') || cols[0].classList.contains('col-xl-9')) {
                   variants.add('Split 75-25');
-                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3')) {
+                } else if (cols[0].classList.contains('col-md-3') || cols[0].classList.contains('col-lg-3') || cols[0].classList.contains('col-xl-3')) {
                   variants.add('Split 25-75');
                 }
               }
@@ -363,6 +318,8 @@ const buildColumnsBlock = (builder, section) => {
               if (col.querySelector('.ss-containerpresentationtype-card')) {
                 if (col.querySelectorAll('[class*="ss-container-black-opacity"]').length > 0) {
                   variants.add('Card', 'Dark');
+                } else if (col.querySelector('.ss-cardtype-peoplecard')) {
+                  variants.add('People Card');
                 } else {
                   variants.add('Card');
                 }
@@ -376,6 +333,13 @@ const buildColumnsBlock = (builder, section) => {
               builder.block(name, numColumns, false);
               newRow = true;
               inTable = true;
+            }
+
+            if (cols.length > 2 && (index % 2) === 0
+              && (col.classList.contains('col-md-6') || col.classList.contains('col-lg-6') || col.classList.contains('col-xl-6'))) {
+              // Move the additional columns into a new row
+              // if more than 2 columns(50%) exist in a row
+              newRow = true;
             }
 
             if (newRow) {
@@ -475,14 +439,39 @@ const buildAccordions = (builder, section) => {
 const buildGenericLists = (builder, section) => {
   // Loop over all genericlist divs
   section.querySelectorAll('.genericlist').forEach((list) => {
-    builder.replace(list, () => {
-      let name = 'List';
-      if (!list.classList.contains('ss-layout-twocolumn')) {
-        name += ' (1 Col)';
-      }
-      builder.block(name, 1, false);
-      list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
-    });
+    if (list.classList.contains('ss-layout-fluid')) {
+      // Put spaces between each list item, the unicode character is
+      // the only way to retain spaces when converted to markdown. ¯\_(ツ)_/¯
+      list.querySelectorAll('li').forEach((listItem) => {
+        const space = builder.doc.createTextNode('\u00A0');
+        listItem.append(space);
+      });
+      // Get rid of intermediate block-formatted elements,
+      // so they don't cause carriage returns in the markdown output
+      list.querySelectorAll('ul, li, div, p').forEach((tag) => {
+        [...tag.childNodes].forEach((child) => {
+          tag.parentElement.insertBefore(child, tag);
+        });
+        tag.remove();
+      });
+      // Wrap each link in a strong tag so they show in tertiary format
+      [...list.querySelectorAll('a')].forEach((link) => {
+        const strong = builder.doc.createElement('strong');
+        link.replaceWith(strong);
+        strong.append(link);
+      });
+    } else {
+      builder.replace(list, () => {
+        let name = 'List';
+        if (list.classList.contains('ss-layout-threecolumn')) {
+          name += ' (Three Column)';
+        } else if (!list.classList.contains('ss-layout-twocolumn')) {
+          name += ' (One Column)';
+        }
+        builder.block(name, 1, false);
+        list.querySelectorAll('li').forEach((listItem) => builder.row().append(...listItem.children));
+      });
+    }
   });
 };
 
@@ -622,6 +611,7 @@ const buildGenericSection = (builder, section) => {
   sessionStorage.setItem('allSectionClasses', JSON.stringify(allSectionClasses));
   builder.section();
   if (classes.length > 0) { builder.addSectionMetadata('style', classCombo); }
+
   buildSectionContent(builder, section);
 };
 
@@ -637,8 +627,6 @@ const buildBackgroundableSection = (builder, section) => {
 
 const isNarrowHero = (hero) => hero.querySelector('.col-md-7.col-lg-11.col-xl-7, .col-md-7.col-lg-9, .col-md-6.col-lg-8');
 const buildHeroSection = (builder, hero) => {
-  const meta = {};
-
   let classes = hero.classList.value.split(' ');
   // remove classes named pagesection or start with aem
   classes = classes.map(translateClassNames).filter((e) => !(!e));
@@ -698,31 +686,6 @@ const buildSection = (builder, section) => {
   }
 };
 
-const ICON_PARENT_SELECTOR = '.icon .cmp-icon';
-const ICON_SELECTOR = `${ICON_PARENT_SELECTOR} i`;
-const restoreIcons = (document, originalDocument) => {
-  // For every li with an icon in the original document, find the corresponding li in the imported document and add the icon
-  // Use the index of the li in the query selector to locate in both lists
-  originalDocument.querySelectorAll(ICON_SELECTOR).forEach((icon, index) => {
-    const li = document.querySelectorAll(ICON_PARENT_SELECTOR)[index];
-    if (!li) {
-      console.log('Could not find li for icon: ', icon.innerHTML, ' index ', index);
-      return;
-    }
-    // Change icon to text indicating name of icon instead
-    const iconName = [...icon.classList].filter((c) => c.startsWith('fa')).join(' ').replaceAll(' fa-', '-');
-    if (iconName) {
-      const newIcon = document.createTextNode(`:${iconName}: `);
-      if (li.querySelector('a')) {
-        li.querySelector('a').prepend(newIcon);
-      } else {
-        li.prepend(newIcon);
-      }
-      console.log('Added icon: ', newIcon.textContent, ' to ', li.innerHTML);
-    }
-  });
-};
-
 const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/\.html$/, '').replace(/\/$/, '').toLowerCase());
 
 /**
@@ -735,7 +698,7 @@ const sanitizePath = (path) => WebImporter.FileUtils.sanitizePath(path.replace(/
    * @return {string} The path
    */
 const generateDocumentPath = ({
-  document, url, html, params,
+  _document, url, _html, _params,
 }) => sanitizePath(new URL(url).pathname);
 
 const updateLinks = (document) => {
@@ -763,7 +726,7 @@ const updateLinks = (document) => {
   });
 };
 
-const preocessHeadingIcons = (document) => {
+const processHeadingIcons = (document) => {
   document.querySelectorAll('.ss-heading-icon-location').forEach((iconHeadingWrapper) => {
     const heading = iconHeadingWrapper.querySelector('h1, h2, h3, h4, h5, h6');
     if (heading) {
@@ -798,6 +761,26 @@ const gatherAssetLinks = (document) => {
   return [...assetLinks].join(', ');
 };
 
+const sectionContainsOnlyCols = (section, colsBlock) => {
+  let containsOnlyCols = true;
+
+  const allTables = section.querySelectorAll('table');
+  allTables.forEach((table) => {
+    if (table === colsBlock) return;
+    if (colsBlock.contains(table)) return;
+
+    containsOnlyCols = false;
+  });
+
+  section.querySelectorAll('p, img').forEach((thing) => {
+    if (colsBlock.contains(thing)) return;
+
+    containsOnlyCols = false;
+  });
+
+  return containsOnlyCols;
+};
+
 const processFragments = (document, docPath) => {
   const fragments = [];
   const pathSegments = docPath.split('/');
@@ -818,14 +801,14 @@ const processFragments = (document, docPath) => {
           assetLinks: 'n/a',
           fragmentPaths: 'isFragment',
           hasNestedSections: 'false',
-          previewUrl: `https://main--stewart--hlxsites.hlx.page${cardPath}`,
-          liveUrl: `https://main--stewart--hlxsites.hlx.live${cardPath}`,
+          previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`,
+          liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${cardPath}`,
           prodUrl: `https://www.stewart.com${cardPath}`,
         },
       });
       const link = document.createElement('a');
-      link.href = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
-      link.textContent = `https://main--stewart--hlxsites.hlx.page${cardPath}`;
+      link.href = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
+      link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${cardPath}`;
       card.replaceWith(link);
     } else {
       card.remove();
@@ -835,6 +818,51 @@ const processFragments = (document, docPath) => {
   // find blocks inside of columns
   let fragmentCount = 1;
   document.querySelectorAll('[data-block="Columns"] [data-block]').forEach((internalBlock) => {
+    // if the section contains no content other than the cols block, then we can auto-block it
+    // rather than a extracting a fragment
+    const colsBlock = internalBlock.closest('[data-block="Columns"]');
+    const section = colsBlock.closest('.pagesection');
+    if (sectionContainsOnlyCols(section, colsBlock)) {
+      [...colsBlock.children].forEach((tr) => {
+        [...tr.children].forEach((td) => {
+          if (td.tagName !== 'TD') return;
+          colsBlock.insertAdjacentElement('beforebegin', td.querySelector('div'));
+        });
+      });
+
+      const sectionMeta = section.nextElementSibling;
+      const variants = colsBlock.getAttribute('data-block-variants');
+      const sectionStylesToAdd = `Columns${variants ? `, ${variants}` : ''}`;
+      if (sectionMeta && sectionMeta.getAttribute('data-block') === 'Section Metadata') {
+        // modify style in-line
+        const styleRow = [...sectionMeta.querySelectorAll(':scope > tr')].find((row) => {
+          const key = row.querySelector(':scope > td')?.textContent;
+          return key?.toLowerCase() === 'style';
+        });
+        if (styleRow) {
+          const styleValues = styleRow.querySelector(':scope > td:nth-child(2)');
+          styleValues.textContent = `${styleValues.textContent}, ${sectionStylesToAdd}`;
+        } else {
+          sectionMeta.insertAdjacentHTML('beforeend', `<tr>
+            <td>Style</td>
+            <td>${sectionStylesToAdd}</td>
+          </tr>`);
+        }
+      } else {
+        const metdataCells = [
+          ['Section Metadata'],
+        ];
+        const sectionStyle = [];
+        sectionStyle.push(sectionStylesToAdd.split(', '));
+        metdataCells.push(['Style', sectionStyle.join(', ')]);
+        const sectionMetadataBlock = WebImporter.DOMUtils.createTable(metdataCells, document);
+        section.insertAdjacentElement('afterend', sectionMetadataBlock);
+      }
+
+      colsBlock.remove();
+      return;
+    }
+
     const blockName = internalBlock.getAttribute('data-block');
     const div = document.createElement('div');
     // name fragments based on site section and page name
@@ -856,14 +884,14 @@ const processFragments = (document, docPath) => {
         assetLinks: 'n/a',
         fragmentPaths: 'isFragment',
         hasNestedSections: 'false',
-        previewUrl: `https://main--stewart--hlxsites.hlx.page${path}`,
-        liveUrl: `https://main--stewart--hlxsites.hlx.live${path}`,
+        previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${path}`,
+        liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${path}`,
         prodUrl: `https://www.stewart.com${path}`,
       },
     });
     const link = document.createElement('a');
-    link.href = `https://main--stewart--hlxsites.hlx.page${path}`;
-    link.textContent = `https://main--stewart--hlxsites.hlx.page${path}`;
+    link.href = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
+    link.textContent = `https://main--stewart-title--stewartmarketing.hlx.page${path}`;
     internalBlock.replaceWith(link);
   });
 
@@ -871,6 +899,20 @@ const processFragments = (document, docPath) => {
 };
 
 export default {
+  preprocess: ({
+    document, _url, _html, _params,
+  }) => {
+    const faIconPrefixes = ['fa', 'far', 'fab', 'fas', 'fal'];
+    const iconSel = faIconPrefixes.map((prefix) => `i.${prefix}`).join(', ');
+    document.querySelectorAll(iconSel).forEach((icon) => {
+      const iconName = Array.from(icon.classList).find((c) => c.startsWith('fa-')).substring(3);
+      const iconType = Array.from(icon.classList).find((c) => faIconPrefixes.includes(c));
+      const iconSpan = document.createElement('span');
+      iconSpan.innerHTML = `:${iconType}-${iconName}:`;
+      icon.replaceWith(iconSpan);
+    });
+  },
+
   /**
    * Apply DOM operations to the provided document and return
    * the root element to be then transformed to Markdown.
@@ -887,14 +929,14 @@ export default {
     // define the main element: the one that will be transformed to Markdown
     const builder = new BlockBuilder(document, extractMetadata(document, url));
 
-    const parser = new DOMParser();
-    const originalDoc = parser.parseFromString(html, 'text/html');
-
-    // Restore markup that was stripped out by the importer
-    restoreIcons(document, originalDoc);
-
     // Strip out header and footers that are not needed
     document.querySelector('page-header, page-footer')?.remove();
+
+    // some landing page specific stuff before we do anything else
+    if (getMetadata(document, 'template') === 'landing-page-template') {
+      const footer = document.querySelector('.embed .footer');
+      footer?.closest('.embed')?.remove();
+    }
 
     // deal with breadcrumbs
     const bc = document.querySelector('.breadcrumbnavigation');
@@ -926,7 +968,7 @@ export default {
     updateLinks(document);
 
     // add icon markup to headings with icons
-    preocessHeadingIcons(document);
+    processHeadingIcons(document);
 
     const docPath = generateDocumentPath({
       document,
@@ -935,6 +977,8 @@ export default {
       params,
     });
 
+    const blocks = gatherBlockNames(document) || 'n/a';
+    const assetLinks = gatherAssetLinks(document) || 'n/a';
     const fragments = processFragments(document, docPath);
 
     // Note the classes used for each section
@@ -942,12 +986,12 @@ export default {
     console.log('Section style combinations:', sessionStorage.getItem('allSectionClasses'));
 
     const report = {
-      blocks: gatherBlockNames(document) || 'n/a',
-      assetLinks: gatherAssetLinks(document) || 'n/a',
+      blocks,
+      assetLinks,
       fragmentPaths: fragments.map((f) => f.path).join(', ') || 'n/a',
       hasNestedSections,
-      previewUrl: `https://main--stewart--hlxsites.hlx.page${docPath}`,
-      liveUrl: `https://main--stewart--hlxsites.hlx.live${docPath}`,
+      previewUrl: `https://main--stewart-title--stewartmarketing.hlx.page${docPath}`,
+      liveUrl: `https://main--stewart-title--stewartmarketing.hlx.live${docPath}`,
       prodUrl: `https://www.stewart.com${docPath}`,
     };
 

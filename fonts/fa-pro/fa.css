@@ -35,7 +35,7 @@
 }
 
 .fa, .far, .fas {
-  font-family:Font Awesome\ 5 Pro
+  font-family: var(--icon-font-family);
 }
 
 .far {
@@ -52,7 +52,7 @@
 }
 
 .fal {
-  font-family: Font Awesome\ 5 Pro;
+  font-family: var(--icon-font-family);
   font-weight:300
 }
 
@@ -9290,4 +9290,20 @@
 
 .fa-zhihu:before {
   content: "\f63f"
+}
+
+.fa-spin {
+  animation: fa-spin 2s linear infinite;
+}
+
+@keyframes fa-spin {
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg)
+  }
+
+  to {
+      -webkit-transform: rotate(1turn);
+      transform: rotate(1turn)
+  }
 }

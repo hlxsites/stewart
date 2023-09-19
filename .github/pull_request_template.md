@@ -2,8 +2,8 @@ Please always provide the [GitHub issue(s)](../issues) your PR is for, as well a
 
 Fix #<gh-issue-id>
 
-If your PR introduces a new block/black varaint, please update the block library https://main--stewart--hlxsites.hlx.page/tools/sidekick/library/library.html
+If your PR introduces a new block/black varaint, please update the block library https://main--stewart-title--stewartmarketing.hlx.page/tools/sidekick/library/library.html
 
 Test URLs:
-- Before: https://main--stewart--hlxsites.hlx.live/
-- After: https://<branch>--stewart--hlxsites.hlx.live/
+- Before: https://main--stewart-title--stewartmarketing.hlx.live/en
+- After: https://<branch>--stewart-title--stewartmarketing.hlx.live/en
